@@ -1,0 +1,238 @@
+name: "{{ params.name }}"
+ctx: "{{ params.ctx }}"
+init:
+  remote:
+    repo: "cloud"
+    hosts_content: |
+      [main]
+      localhost ansible_connection=local
+
+      [host:children]
+      remote
+      
+      [remote]
+  local:
+    repo: "cloud"
+    hosts_content: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+  external:
+    repo: "cloud"
+    hosts_file: "files/main/external.hosts"
+main: 
+  remote: 
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    dns: []
+    nodes:
+    - "remote"
+  external:
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    nodes:
+    - "external"
+  local:
+    clouds:
+    - "local"
+    nodes:
+    - "local"
+    local:
+      pods:
+      - "local"
+clouds:
+  digital_ocean:
+    type: "digital_ocean"
+    credentials: "digital_ocean"
+    params:
+      tags:
+      - "main"
+      firewalls:
+      - "main"
+    other_params:
+      firewalls_dict: "do_firewalls_dict"
+  local:
+    type: "local"
+cloud_params:   
+  do_firewalls_dict:
+    main:
+      name: "main"
+      tags: ["main"]
+      inbound_rules:
+      - ports: "22"
+        sources:
+          addresses: ["0.0.0.0/0", "::/0"]
+      outbound_rules:
+      - protocol: "tcp"
+        ports: "1-65535"
+        destinations:
+          addresses: ["0.0.0.0/0", "::/0"]
+      - protocol: "udp"
+        ports: "1-65535"
+        destinations:
+          addresses: ["0.0.0.0/0", "::/0"]
+      - protocol: "icmp"
+        ports: "1-65535"
+        destinations:
+          addresses: ["0.0.0.0/0", "::/0"]
+orchestrations: 
+  none: 
+    type: "none"
+  compose: 
+    type: "compose"
+    version: "1.24.0"
+    container: "false"
+nodes:
+  remote:
+    amount: 1
+    cloud: "{{ params.env_params.cloud_name }}"
+    base_dir: "/var/cloud"
+    credentials: "node"
+    main_pod: "remote"
+    shared_params: "main"
+  external:
+    external: true
+    cloud: "{{ params.env_params.cloud_name }}"
+    base_dir: "/var/cloud"
+    credentials: "node"
+    main_pod: "remote"
+    shared_params: "main"
+  local:
+    cloud: "local"
+    base_dir: "/var/cloud"
+    credentials: "node"
+    main_pod: "local"
+    params: 
+      size: "{{ params.env_params.node_size | default('micro') }}"
+      cron: ["main"]
+    other_params: 
+      cloud_instance_dict: "main_cloud_instance_dict"
+      cloud_region_dict: "main_cloud_region_dict"
+      cloud_size_dict: "main_cloud_size_dict"
+      host_test_dict: "main_host_test_dict"
+      cron_dict: "main_cron_dict"
+node_shared_params:
+  main:
+    instance: "ubuntu"
+    region: "default"
+    size: "micro"
+    host_test: "default"
+    cron: ["main"]
+    digital_ocean_tags: ["main"]
+    cloud_instance_dict: "main_cloud_instance_dict"
+    cloud_region_dict: "main_cloud_region_dict"
+    cloud_size_dict: "main_cloud_size_dict"
+    host_test_dict: "main_host_test_dict"
+    cron_dict: "main_cron_dict"
+node_params:
+  main_cloud_instance_dict:
+    digital_ocean:
+      ubuntu:
+        image: "ubuntu-18-04-x64"
+        user_data_file: "templates/ubuntu-18.04.j2.sh"
+        ipv6: "yes"
+  main_cloud_region_dict:
+    digital_ocean:
+      default:
+        name: "nyc3"
+        region: "nyc"
+        zone: "3"
+  main_cloud_size_dict:
+    local:
+      micro:
+        memory: "1gb"
+        cpu: 1
+      small:
+        memory: "2gb"
+        cpu: 2
+      medium:
+        memory: "4gb"
+        cpu: 4
+      large:
+        memory: "8gb"
+        cpu: 8
+      xlarge:
+        memory: "16gb"
+        cpu: 16
+      x2large:
+        memory: "32gb"
+        cpu: 32
+      x4large:
+        memory: "64gb"
+        cpu: 64
+    digital_ocean:
+      micro:
+        name: "1gb"
+        memory: "1gb"
+        cpu: 1
+      small:
+        name: "2gb"
+        memory: "2gb"
+        cpu: 2
+      medium:
+        name: "4gb"
+        memory: "4gb"
+        cpu: 2
+  main_host_test_dict:
+    default:
+      log_file: "/var/log/setup.log"
+      setup_last_line: "Setup Finished"
+      initial_connection_timeout: 90
+      setup_finished_timeout: 300
+  main_cron_dict: 
+    main:
+      user: "root"
+      src_file: "files/main/cron"
+      dest_dir: "/var/spool/cron/crontabs"
+pods:
+  remote:
+    repo: "main"
+    orchestration: "compose"
+    root: "yes"
+    ctx: "ctx.yml"
+    fast_prepare: "true"
+    env_dir: "env-remote"
+    env_repos:
+    - repo: "main_env"
+      dir: "env-main"
+    credentials:
+      vault: "vault"
+    params: {}
+  local:
+    repo: "main"
+    orchestration: "{{ params.env_params.orchestration }}"
+    root: "yes"
+    ctx: "ctx.yml"
+    fast_prepare: "true"
+    env_dir: "env-local"
+    env_repos:
+    - repo: "main_env"
+      dir: "env-main"
+    credentials:
+      vault: "vault"
+    params: {}
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    version: "master"
+  main:
+    src: "https://github.com/lucasbasquerotto/ansible-manager"
+    version: "master"
+  main_env:
+    src: "ssh://git@bitbucket.org/lucasbasquerotto/ansible-main-env-demo.git"
+    version: "master"
+    private: true
+    key_file_encrypted: "files/main/env_main.encrypted.key"
+destroy:
+  remote: 
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    dns: []
+    nodes:
+    - "remote"
+    node_dns: true
+  local: {}
+credentials:
+  node: "{{ params.credentials.node | default({}) }}"
+  vault: "{{ params.credentials.vault | default({}) }}"
+  digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
