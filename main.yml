@@ -75,13 +75,6 @@ cloud_params:
         ports: "1-65535"
         destinations:
           addresses: ["0.0.0.0/0", "::/0"]
-orchestrations: 
-  none: 
-    type: "none"
-  compose: 
-    type: "compose"
-    version: "1.24.0"
-    container: "false"
 nodes:
   remote:
     amount: 1
@@ -187,7 +180,6 @@ node_params:
 pods:
   remote:
     repo: "main"
-    orchestration: "compose"
     root: "yes"
     ctx: "ctx.yml"
     fast_prepare: "true"
@@ -200,7 +192,6 @@ pods:
     params: {}
   local:
     repo: "main"
-    orchestration: "{{ params.env_params.orchestration }}"
     root: "yes"
     ctx: "ctx.yml"
     fast_prepare: "true"
