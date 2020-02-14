@@ -1,5 +1,5 @@
 name: "{{ params.name }}"
-ctx: "{{ params.ctx }}"
+ctxs: "{{ params.ctxs }}"
 init:
   remote:
     repo: "cloud"
