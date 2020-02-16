@@ -183,7 +183,6 @@ pods:
     root: "yes"
     ctx: "ctx.yml"
     fast_prepare: "true"
-    env_dir: "env-remote"
     env_repos:
     - repo: "main_env"
       dir: "env-main"
@@ -195,7 +194,6 @@ pods:
     root: "yes"
     ctx: "ctx.yml"
     fast_prepare: "true"
-    env_dir: "env-local"
     env_repos:
     - repo: "main_env"
       dir: "env-main"
