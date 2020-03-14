@@ -2,6 +2,8 @@ name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 init:
   remote:
+    entrypoint: "main.yml"
+    entrypoint_template_src: "main.tpl.yml"
     repo: "cloud"
     hosts_content: |
       [main]
@@ -12,6 +14,8 @@ init:
       
       [remote]
   local:
+    entrypoint: "main.yml"
+    entrypoint_template_src: "main.tpl.yml"
     repo: "cloud"
     hosts_content: |
       [main]
@@ -82,6 +86,14 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "node"
     main_pod: "remote"
+    tasks_group: "node_prepare"
+    params:
+      instance: "ubuntu"
+      region: "default"
+      size: "micro"
+      host_test_type: "default"
+      cron: ["main"]
+      digital_ocean_tags: ["main"]
     shared_params: "main"
   external:
     external: true
@@ -89,29 +101,27 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "node"
     main_pod: "remote"
+    tasks_group: "node_prepare"
+    params:
+      instance: "ubuntu"
+      region: "default"
+      size: "micro"
+      host_test_type: "default"
+      cron: ["main"]
+      digital_ocean_tags: ["main"]
     shared_params: "main"
   local:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "node"
     main_pod: "local"
+    tasks_group: "node_prepare"
     params: 
       size: "{{ params.env_params.node_size | default('micro') }}"
       cron: ["main"]
-    other_params: 
-      cloud_instance_dict: "main_cloud_instance_dict"
-      cloud_region_dict: "main_cloud_region_dict"
-      cloud_size_dict: "main_cloud_size_dict"
-      host_test_dict: "main_host_test_dict"
-      cron_dict: "main_cron_dict"
+    shared_params: "main"
 node_shared_params:
   main:
-    instance: "ubuntu"
-    region: "default"
-    size: "micro"
-    host_test: "default"
-    cron: ["main"]
-    digital_ocean_tags: ["main"]
     cloud_instance_dict: "main_cloud_instance_dict"
     cloud_region_dict: "main_cloud_region_dict"
     cloud_size_dict: "main_cloud_size_dict"
@@ -183,6 +193,7 @@ pods:
     root: "yes"
     ctx: "ctx.yml"
     fast_prepare: "true"
+    tasks_group: "pod_main"
     env_repos:
     - repo: "main_env"
       dir: "env-main"
@@ -212,6 +223,36 @@ repos:
     version: "master"
     private: true
     key_file_encrypted: "files/main/env_main.encrypted.key"
+run_stages:
+  default: ["default_prepare_nodes", "default_build_pods"]
+run_stage_tasks:
+  default_prepare_nodes:
+    task_tag: "prepare"
+    nodes_tasks: true
+    all_nodes: true
+  default_build_pods:
+    task_tag: "build"
+    pods_tasks: true
+    all_nodes: true
+tasks_groups:
+  node_prepare:
+    prepare: "docker_compose_install"
+  pod_main:
+    build: "main_build"
+tasks:
+  skip:
+    type: "skip"
+  docker_compose_install:
+    type: "task"
+    root: "true"
+    file: "docker.yml"
+    compose_params:
+      version: "1.25.3"
+      remote: true
+  main_build: 
+    type: "task"
+    root: "true"
+    file: "docker-compose.build.yml"
 destroy:
   remote: 
     clouds:
