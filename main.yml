@@ -87,6 +87,11 @@ nodes:
     credentials: "node"
     main_pod: "remote"
     tasks_group: "node_prepare"
+    dependencies:
+    - host: "main-domain-test"
+      node: "remote"
+    - host: "main-domain-test-new"
+      node: "remote"
     params:
       instance: "ubuntu"
       region: "default"
@@ -199,7 +204,8 @@ pods:
       dir: "env-main"
     credentials:
       vault: "vault"
-    params: {}
+    params: 
+      test: true
   local:
     repo: "main"
     root: "yes"
