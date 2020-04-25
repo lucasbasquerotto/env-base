@@ -31,6 +31,8 @@ main:
     dns: []
     nodes:
     - "remote"
+    run_stages: 
+    - "default"
   external:
     clouds:
     - "{{ params.env_params.cloud_name }}"
@@ -170,15 +172,15 @@ node_params:
         cpu: 64
     digital_ocean:
       micro:
-        name: "1gb"
+        name: "s-1vcpu-1gb"
         memory: "1gb"
         cpu: 1
       small:
-        name: "2gb"
+        name: "s-2vcpu-2gb"
         memory: "2gb"
         cpu: 2
       medium:
-        name: "4gb"
+        name: "s-2vcpu-4gb"
         memory: "4gb"
         cpu: 2
   main_host_test_dict:
@@ -230,7 +232,7 @@ repos:
     private: true
     key_file_encrypted: "files/main/env_main.encrypted.key"
 run_stages:
-  default: ["default_prepare_nodes", "default_build_pods"]
+  default: ["default_prepare_nodes", "default_build_pods", "default_wait"]
 run_stage_tasks:
   default_prepare_nodes:
     task_tag: "prepare"
@@ -240,9 +242,14 @@ run_stage_tasks:
     task_tag: "build"
     pods_tasks: true
     all_nodes: true
+  default_wait:
+    task_tag: "wait"
+    nodes_tasks: true
+    all_nodes: true
 tasks_groups:
   node_prepare:
     prepare: "docker_compose_install"
+    wait: "main_wait"
   pod_main:
     build: "main_build"
 tasks:
@@ -259,6 +266,10 @@ tasks:
     type: "task"
     root: "true"
     file: "docker-compose.build.yml"
+  main_wait:
+    type: "shell"
+    root: "true"
+    cmd: "sleep {{ params.env_params.wait | default('60') }}"
 destroy:
   remote: 
     clouds:
