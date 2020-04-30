@@ -139,7 +139,7 @@ node_params:
     digital_ocean:
       ubuntu:
         image: "ubuntu-18-04-x64"
-        user_data_file: "templates/ubuntu-18.04.j2.sh"
+        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
         ipv6: "yes"
   main_cloud_region_dict:
     digital_ocean:
@@ -192,7 +192,7 @@ node_params:
   main_cron_dict: 
     main:
       user: "root"
-      src_file: "files/main/cron"
+      src_file: "{{ params.env.repo_dir }}/cron/main.cron"
       dest_dir: "/var/spool/cron/crontabs"
 pods:
   remote:
@@ -230,7 +230,7 @@ repos:
     src: "ssh://git@bitbucket.org/lucasbasquerotto/ansible-main-env-demo.git"
     version: "master"
     private: true
-    key_file_encrypted: "files/main/env_main.encrypted.key"
+    key_file_encrypted: "ssh/env_main.encrypted.key"
 run_stages:
   default: ["default_prepare_nodes", "default_build_pods", "default_wait"]
 run_stage_tasks:

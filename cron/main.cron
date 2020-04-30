@@ -1,0 +1,1 @@
+*/2 * * * * . $HOME/.profile; mkdir -p "$DATA_DIR/tmp/" && echo "`date '+\%F \%X'` - MAIN_DIR=$MAIN_DIR" >> "$DATA_DIR/tmp/cron.log" 2>&1

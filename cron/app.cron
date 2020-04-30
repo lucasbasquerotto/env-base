@@ -1,0 +1,1 @@
+*/5 * * * * . $HOME/.profile; mkdir -p "$DATA_DIR/log/cron/" && "$MAIN_DIR"/run backup >> "$DATA_DIR/log/cron/`date '+\%F'`.log" 2>&1
