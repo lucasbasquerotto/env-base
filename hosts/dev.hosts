@@ -14,6 +14,8 @@ discourse_app
 discourse_web
 discourse_redis
 discourse_db
+bind
+bind_slave
 
 [wp_local]
 [efk_local]
@@ -27,3 +29,5 @@ discourse_db
 [discourse_web]
 [discourse_redis]
 [discourse_db]
+[bind]
+[bind_slave]
