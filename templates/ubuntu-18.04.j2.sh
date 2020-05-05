@@ -1,4 +1,5 @@
 #!/bin/bash
+#shellcheck disable=SC1083,SC2129
 set -euo pipefail
 
 ########################
@@ -62,7 +63,7 @@ if [ "${encrypted_root_pw}" != "*" ]; then
 fi
 
 # Create SSH directory for sudo user
-home_directory="$(eval echo ~${USERNAME})"
+home_directory="$(eval echo ~"${USERNAME}")"
 mkdir --parents "${home_directory}/.ssh"
 
 # Add additional provided public keys
@@ -145,7 +146,7 @@ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bi
 apt update
 
 # Finally, install Docker
-apt install -y docker-ce=$DOCKER_CE_VERSION docker-compose
+apt install -y docker-ce="$DOCKER_CE_VERSION" docker-compose haveged
 
 echo "Docker Installed" >> "/var/log/setup.log"
 
