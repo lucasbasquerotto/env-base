@@ -232,7 +232,7 @@ repos:
     private: true
     key_file_encrypted: "ssh/env_main.encrypted.key"
 run_stages:
-  default: ["default_prepare_nodes", "default_build_pods", "default_wait"]
+  default: ["default_prepare_nodes", "default_build_pods"]
 run_stage_tasks:
   default_prepare_nodes:
     task_tag: "prepare"
