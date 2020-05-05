@@ -99,7 +99,7 @@ nodes:
       region: "default"
       size: "micro"
       host_test_type: "default"
-      cron: ["main"]
+      cron: []
       digital_ocean_tags: ["main"]
     shared_params: "main"
   external:
