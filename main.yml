@@ -55,7 +55,7 @@ clouds:
       - "main"
       firewalls:
       - "main"
-    other_params:
+    group_params:
       firewalls_dict: "do_firewalls_dict"
   local:
     type: "local"
@@ -101,7 +101,7 @@ nodes:
       host_test_type: "default"
       cron: []
       digital_ocean_tags: ["main"]
-    shared_params: "main"
+    shared_group_params: "main"
   external:
     external: true
     cloud: "{{ params.env_params.cloud_name }}"
@@ -116,7 +116,7 @@ nodes:
       host_test_type: "default"
       cron: ["main"]
       digital_ocean_tags: ["main"]
-    shared_params: "main"
+    shared_group_params: "main"
   local:
     cloud: "local"
     base_dir: "/var/cloud"
@@ -126,8 +126,8 @@ nodes:
     params: 
       size: "{{ params.env_params.node_size | default('micro') }}"
       cron: ["main"]
-    shared_params: "main"
-node_shared_params:
+    shared_group_params: "main"
+node_shared_group_params:
   main:
     cloud_instance_dict: "main_cloud_instance_dict"
     cloud_region_dict: "main_cloud_region_dict"
