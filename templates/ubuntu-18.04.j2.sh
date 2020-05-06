@@ -106,12 +106,12 @@ echo "Main logic finished" >> "/var/log/setup.log"
 ###   FREE PORT 53   ###
 ########################
 
-echo "Disabling systemd-resolved..." >> "/var/log/setup.log"
+# echo "Disabling systemd-resolved..." >> "/var/log/setup.log"
 
-systemctl disable systemd-resolved
-systemctl stop systemd-resolved
+# systemctl disable systemd-resolved
+# systemctl stop systemd-resolved
 
-echo "systemd-resolved disabled" >> "/var/log/setup.log"
+# echo "systemd-resolved disabled" >> "/var/log/setup.log"
 
 ########################
 ###   ANSIBLE HOST   ###
