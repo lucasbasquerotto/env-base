@@ -28,7 +28,6 @@ main:
   remote: 
     clouds:
     - "{{ params.env_params.cloud_name }}"
-    dns: []
     nodes:
     - "remote"
     run_stages: 
@@ -38,6 +37,8 @@ main:
     - "{{ params.env_params.cloud_name }}"
     nodes:
     - "external"
+    run_stages: 
+    - "default"
   local:
     clouds:
     - "local"
