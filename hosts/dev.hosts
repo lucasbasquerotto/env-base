@@ -11,6 +11,7 @@ wp_efk_app
 wp_db
 wp_web
 discourse_app
+discourse_app_backup
 discourse_web
 discourse_redis
 discourse_db
@@ -26,6 +27,7 @@ bind_slave
 [wp_db]
 [wp_web]
 [discourse_app]
+[discourse_app_backup]
 [discourse_web]
 [discourse_redis]
 [discourse_db]
