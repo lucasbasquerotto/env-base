@@ -15,6 +15,7 @@ discourse_app_backup
 discourse_web
 discourse_redis
 discourse_db
+discourse_multicontainer
 bind
 bind_slave
 
@@ -31,5 +32,6 @@ bind_slave
 [discourse_web]
 [discourse_redis]
 [discourse_db]
+[discourse_multicontainer]
 [bind]
 [bind_slave]
