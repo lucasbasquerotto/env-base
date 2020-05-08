@@ -29,21 +29,24 @@ main:
     clouds:
     - "{{ params.env_params.cloud_name }}"
     nodes:
-    - "remote"
+    - name: "ctl"
+      key: "remote"
     run_stages: 
     - "default"
   external:
     clouds:
     - "{{ params.env_params.cloud_name }}"
     nodes:
-    - "external"
+    - name: "ctl"
+      key: "external"
     run_stages: 
     - "default"
   local:
     clouds:
     - "local"
     nodes:
-    - "local"
+    - name: "ctl"
+      key: "local"
     local:
       pods:
       - "local"
@@ -88,7 +91,7 @@ nodes:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "node"
-    main_pod: "remote"
+    pods: ["remote"]
     tasks_group: "node_prepare"
     dependencies:
     - host: "main-domain-test"
@@ -108,7 +111,7 @@ nodes:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "node"
-    main_pod: "remote"
+    pods: ["remote"]
     tasks_group: "node_prepare"
     params:
       instance: "ubuntu"
@@ -122,7 +125,7 @@ nodes:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "node"
-    main_pod: "local"
+    pods: ["local"]
     tasks_group: "node_prepare"
     params: 
       size: "{{ params.env_params.node_size | default('micro') }}"

@@ -2,6 +2,10 @@
 localhost ansible_connection=local
 
 [host:children]
+ctl
+app
+redis
+db
 wp_local
 efk_local
 efk
@@ -19,6 +23,10 @@ discourse_multicontainer
 bind
 bind_slave
 
+[ctl]
+[app]
+[redis]
+[db]
 [wp_local]
 [efk_local]
 [efk]
