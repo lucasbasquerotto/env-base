@@ -280,7 +280,14 @@ destroy:
     - "{{ params.env_params.cloud_name }}"
     dns: []
     nodes:
-    - "remote"
+    - "ctl"
+    node_dns: true
+  external: 
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    dns: []
+    nodes:
+    - "ctl"
     node_dns: true
   local: {}
 credentials:
