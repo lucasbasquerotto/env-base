@@ -4,6 +4,7 @@ localhost ansible_connection=local
 [host:children]
 ctl
 app
+web
 redis
 db
 wp_local
@@ -24,6 +25,7 @@ bind
 bind_slave
 
 [ctl]
+[web]
 [app]
 [redis]
 [db]
