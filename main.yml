@@ -10,9 +10,9 @@ init:
       localhost ansible_connection=local
 
       [host:children]
-      remote
+      ctl
       
-      [remote]
+      [ctl]
   local:
     entrypoint: "main.yml"
     entrypoint_template_src: "main.tpl.yml"
