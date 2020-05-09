@@ -95,9 +95,9 @@ nodes:
     tasks_group: "node_prepare"
     dependencies:
     - host: "main-domain-test"
-      node: "remote"
+      node: "ctl"
     - host: "main-domain-test-new"
-      node: "remote"
+      node: "ctl"
     params:
       instance: "ubuntu"
       region: "default"
