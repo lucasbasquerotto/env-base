@@ -87,7 +87,6 @@ cloud_params:
           addresses: ["0.0.0.0/0", "::/0"]
 nodes:
   remote:
-    amount: 1
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "node"
