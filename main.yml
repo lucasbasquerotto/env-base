@@ -31,16 +31,37 @@ main:
     nodes:
     - name: "ctl"
       key: "remote"
-    run_stages: 
-    - "default"
+    run_stages:
+    - tasks:
+      - name: "docker_compose_install"
+        all_nodes: true
+        nodes_tasks: true
+      - name: "main_build"
+        all_nodes: true
+        pods_tasks: true
   external:
     clouds:
     - "{{ params.env_params.cloud_name }}"
     nodes:
     - name: "ctl"
-      key: "external"
-    run_stages: 
-    - "default"
+      key: "remote"
+      external: true
+      pod_params:
+        main:
+          test: true
+    dependencies:
+    - host: "main-domain-test"
+      node: "ctl"
+    - host: "main-domain-test-new"
+      node: "ctl"
+    run_stages:
+    - tasks:
+      - name: "docker_compose_install"
+        all_nodes: true
+        nodes_tasks: true
+      - name: "main_build"
+        all_nodes: true
+        pods_tasks: true
   local:
     clouds:
     - "local"
@@ -90,13 +111,7 @@ nodes:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "node"
-    pods: ["remote"]
-    tasks_group: "node_prepare"
-    dependencies:
-    - host: "main-domain-test"
-      node: "ctl"
-    - host: "main-domain-test-new"
-      node: "ctl"
+    pods: ["main"]
     params:
       instance: "ubuntu"
       region: "default"
@@ -105,27 +120,11 @@ nodes:
       cron: []
       digital_ocean_tags: ["main"]
     shared_group_params: "main"
-  external:
-    external: true
-    cloud: "{{ params.env_params.cloud_name }}"
-    base_dir: "/var/cloud"
-    credentials: "node"
-    pods: ["remote"]
-    tasks_group: "node_prepare"
-    params:
-      instance: "ubuntu"
-      region: "default"
-      size: "micro"
-      host_test_type: "default"
-      cron: ["main"]
-      digital_ocean_tags: ["main"]
-    shared_group_params: "main"
   local:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "node"
-    pods: ["local"]
-    tasks_group: "node_prepare"
+    pods: ["main"]
     params: 
       size: "{{ params.env_params.node_size | default('micro') }}"
       cron: ["main"]
@@ -198,20 +197,7 @@ node_params:
       src_file: "{{ params.env.repo_dir }}/cron/main.cron"
       dest_dir: "/var/spool/cron/crontabs"
 pods:
-  remote:
-    repo: "main"
-    root: "yes"
-    ctx: "ctx.yml"
-    fast_prepare: "true"
-    tasks_group: "pod_main"
-    env_repos:
-    - repo: "main_env"
-      dir: "env-main"
-    credentials:
-      vault: "vault"
-    params: 
-      test: true
-  local:
+  main:
     repo: "main"
     root: "yes"
     ctx: "ctx.yml"
@@ -221,7 +207,6 @@ pods:
       dir: "env-main"
     credentials:
       vault: "vault"
-    params: {}
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/ansible-docker.git"
@@ -234,45 +219,6 @@ repos:
     version: "master"
     private: true
     key_file_encrypted: "ssh/env_main.encrypted.key"
-run_stages:
-  default: ["default_prepare_nodes", "default_build_pods"]
-run_stage_tasks:
-  default_prepare_nodes:
-    task_tag: "prepare"
-    nodes_tasks: true
-    all_nodes: true
-  default_build_pods:
-    task_tag: "build"
-    pods_tasks: true
-    all_nodes: true
-  default_wait:
-    task_tag: "wait"
-    nodes_tasks: true
-    all_nodes: true
-tasks_groups:
-  node_prepare:
-    prepare: "docker_compose_install"
-    wait: "main_wait"
-  pod_main:
-    build: "main_build"
-tasks:
-  skip:
-    type: "skip"
-  docker_compose_install:
-    type: "task"
-    root: "true"
-    file: "docker.yml"
-    compose_params:
-      version: "1.25.3"
-      remote: true
-  main_build: 
-    type: "task"
-    root: "true"
-    file: "docker-compose.build.yml"
-  main_wait:
-    type: "shell"
-    root: "true"
-    cmd: "sleep {{ params.env_params.wait | default('60') }}"
 destroy:
   remote: 
     clouds:
