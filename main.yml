@@ -116,24 +116,22 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "node"
     pods: ["main"]
-    params:
-      instance: "ubuntu"
-      region: "default"
-      size: "micro"
-      host_test_type: "default"
-      cron: []
-      digital_ocean_tags: ["main"]
-    shared_group_params: "main"
+    shared_params: ["do_ubuntu_remote"]
   local:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "node"
     pods: ["main"]
-    params: 
-      size: "{{ params.env_params.node_size | default('micro') }}"
-      cron: ["main"]
-    shared_group_params: "main"
+    shared_params: ["local"]
 node_shared_params:
+  local:
+    size:
+      memory: "1gb"
+      cpu: 1
+    cron: 
+      user: "root"
+      src_file: "{{ params.env.repo_dir }}/cron/main.cron"
+      dest_dir: "/var/spool/cron/crontabs"
   do_ubuntu_remote:
     instance:
       image: "ubuntu-18-04-x64"
@@ -152,82 +150,7 @@ node_shared_params:
       setup_last_line: "Setup Finished"
       initial_connection_timeout: 90
       setup_finished_timeout: 300
-  do_ubuntu_local:
-    size:
-      name: "s-1vcpu-1gb"
-      memory: "1gb"
-      cpu: 1
-    cron: 
-      user: "root"
-      src_file: "{{ params.env.repo_dir }}/cron/main.cron"
-      dest_dir: "/var/spool/cron/crontabs"
-node_shared_group_params:
-  main:
-    cloud_instance_dict: "main_cloud_instance_dict"
-    cloud_region_dict: "main_cloud_region_dict"
-    cloud_size_dict: "main_cloud_size_dict"
-    host_test_dict: "main_host_test_dict"
-    cron_dict: "main_cron_dict"
-node_params:
-  main_cloud_instance_dict:
-    digital_ocean:
-      ubuntu:
-        image: "ubuntu-18-04-x64"
-        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
-        ipv6: "yes"
-  main_cloud_region_dict:
-    digital_ocean:
-      default:
-        name: "nyc3"
-        region: "nyc"
-        zone: "3"
-  main_cloud_size_dict:
-    local:
-      micro:
-        memory: "1gb"
-        cpu: 1
-      small:
-        memory: "2gb"
-        cpu: 2
-      medium:
-        memory: "4gb"
-        cpu: 4
-      large:
-        memory: "8gb"
-        cpu: 8
-      xlarge:
-        memory: "16gb"
-        cpu: 16
-      x2large:
-        memory: "32gb"
-        cpu: 32
-      x4large:
-        memory: "64gb"
-        cpu: 64
-    digital_ocean:
-      micro:
-        name: "s-1vcpu-1gb"
-        memory: "1gb"
-        cpu: 1
-      small:
-        name: "s-2vcpu-2gb"
-        memory: "2gb"
-        cpu: 2
-      medium:
-        name: "s-2vcpu-4gb"
-        memory: "4gb"
-        cpu: 2
-  main_host_test_dict:
-    default:
-      log_file: "/var/log/setup.log"
-      setup_last_line: "Setup Finished"
-      initial_connection_timeout: 90
-      setup_finished_timeout: 300
-  main_cron_dict: 
-    main:
-      user: "root"
-      src_file: "{{ params.env.repo_dir }}/cron/main.cron"
-      dest_dir: "/var/spool/cron/crontabs"
+    digital_ocean_tags: ["main"]
 pods:
   main:
     repo: "main"
