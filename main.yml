@@ -74,7 +74,7 @@ main:
       key: "local"
     local:
       pods:
-      - "local"
+      - "main"
 clouds:
   digital_ocean:
     type: "digital_ocean"
