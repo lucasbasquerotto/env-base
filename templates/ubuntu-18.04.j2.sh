@@ -159,8 +159,8 @@ echo "Installing Other Depedencies..." >> "/var/log/setup.log"
 # First, update your existing list of packages
 apt update
 
-# Next, install jq
-apt install -y jq
+# Next, install the packages
+apt install -y jq gnupg2 pass
 
 echo "Other Depedencies Installed" >> "/var/log/setup.log"
 
