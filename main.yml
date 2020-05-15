@@ -79,36 +79,30 @@ clouds:
     type: "digital_ocean"
     credentials: "digital_ocean"
     params:
-      tags:
+      x_digital_ocean_tags:
       - "main"
-      firewalls:
-      - "main"
-    group_params:
-      firewalls_dict: "do_firewalls_dict"
+      x_digital_ocean_firewalls:
+      - name: "main"
+        tags: ["main"]
+        inbound_rules:
+        - ports: "22"
+          sources:
+            addresses: ["0.0.0.0/0", "::/0"]
+        outbound_rules:
+        - protocol: "tcp"
+          ports: "1-65535"
+          destinations:
+            addresses: ["0.0.0.0/0", "::/0"]
+        - protocol: "udp"
+          ports: "1-65535"
+          destinations:
+            addresses: ["0.0.0.0/0", "::/0"]
+        - protocol: "icmp"
+          ports: "1-65535"
+          destinations:
+            addresses: ["0.0.0.0/0", "::/0"]
   local:
     type: "local"
-cloud_params:   
-  do_firewalls_dict:
-    main:
-      name: "main"
-      tags: ["main"]
-      inbound_rules:
-      - ports: "22"
-        sources:
-          addresses: ["0.0.0.0/0", "::/0"]
-      outbound_rules:
-      - protocol: "tcp"
-        ports: "1-65535"
-        destinations:
-          addresses: ["0.0.0.0/0", "::/0"]
-      - protocol: "udp"
-        ports: "1-65535"
-        destinations:
-          addresses: ["0.0.0.0/0", "::/0"]
-      - protocol: "icmp"
-        ports: "1-65535"
-        destinations:
-          addresses: ["0.0.0.0/0", "::/0"]
 nodes:
   remote:
     cloud: "{{ params.env_params.cloud_name }}"
@@ -149,7 +143,7 @@ node_shared_params:
       setup_last_line: "Setup Finished"
       initial_connection_timeout: 90
       setup_finished_timeout: 300
-    digital_ocean_tags: ["main"]
+    x_digital_ocean_tags: ["main"]
 pods:
   main:
     repo: "main"
