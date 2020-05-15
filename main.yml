@@ -1,29 +1,5 @@
 name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
-init:
-  remote:
-    entrypoint: "main.yml"
-    entrypoint_template_src: "main.tpl.yml"
-    repo: "cloud"
-    hosts_content: |
-      [main]
-      localhost ansible_connection=local
-
-      [host:children]
-      ctl
-      
-      [ctl]
-  local:
-    entrypoint: "main.yml"
-    entrypoint_template_src: "main.tpl.yml"
-    repo: "cloud"
-    hosts_content: |
-      [main]
-      localhost ansible_connection=local
-      [host]
-  external:
-    repo: "cloud"
-    hosts_file: "files/main/external.hosts"
 main: 
   remote: 
     destroy: 
@@ -41,6 +17,16 @@ main:
       - name: "main_build"
         all_nodes: true
         pods_tasks: true
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      repo: "cloud"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host:children]
+        ctl        
+        [ctl]
   external:
     destroy: 
       nodes: true
@@ -66,6 +52,11 @@ main:
       - name: "main_build"
         all_nodes: true
         pods_tasks: true
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      repo: "cloud"
+      hosts_file: "files/main/external.hosts"
   local:
     clouds:
     - "local"
@@ -75,6 +66,14 @@ main:
     local:
       pods:
       - "main"
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      repo: "cloud"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
 clouds:
   digital_ocean:
     type: "digital_ocean"
@@ -129,7 +128,7 @@ node_shared_params:
       memory: "1gb"
       cpu: 1
     cron: 
-      user: "root"
+    - user: "root"
       src_file: "{{ params.env.repo_dir }}/cron/main.cron"
       dest_dir: "/var/spool/cron/crontabs"
   do_ubuntu_remote:
