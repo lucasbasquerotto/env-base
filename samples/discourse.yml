@@ -27,8 +27,8 @@ main:
         [main]
         localhost ansible_connection=local
         [host:children]
-        app        
-        [app]
+        discourse        
+        [discourse]
 clouds:
   digital_ocean:
     type: "digital_ocean"
