@@ -1,0 +1,145 @@
+name: "{{ params.name }}"
+ctxs: ["app"]
+ctx: "app"
+main: 
+  app: 
+    destroy: 
+      nodes: true
+      buckets: true
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    buckets:
+    - "discourse_backup"
+    nodes:
+    - "discourse"
+    run_stages:
+    - tasks:
+      - name: "discourse_setup"
+        all_nodes: true
+        pods_tasks: true
+      - name: "discourse_rebuild"
+        all_nodes: true
+        pods_tasks: true
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      repo: "cloud"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host:children]
+        app        
+        [app]
+clouds:
+  digital_ocean:
+    type: "digital_ocean"
+    credentials: "digital_ocean"
+    params:
+      x_digital_ocean_tags:
+      - "auto"
+      - "dmz"
+      x_digital_ocean_firewalls:
+      - name: "auto"
+        tags: ["auto"]
+        inbound_rules:
+        - ports: "22"
+          sources:
+            tags: ["main"]
+        outbound_rules:
+        - protocol: "tcp"
+          ports: "1-65535"
+          destinations:
+            addresses: ["0.0.0.0/0", "::/0"]
+        - protocol: "udp"
+          ports: "1-65535"
+          destinations:
+            addresses: ["0.0.0.0/0", "::/0"]
+        - protocol: "icmp"
+          ports: "1-65535"
+          destinations:
+            addresses: ["0.0.0.0/0", "::/0"]
+      - name: "dmz"
+        tags: ["dmz"]
+        inbound_rules:
+        - ports: "80"
+          sources:
+            addresses: ["0.0.0.0/0", "::/0"]
+        - ports: "443"
+          sources:
+            addresses: ["0.0.0.0/0", "::/0"]
+dns:
+  cloudflare: 
+    type: "cloudflare"
+    zone: "{{ params.env_params.domain }}"
+    credentials: "cloudflare"
+  godaddy: 
+    type: "godaddy"
+    zone: "{{ params.env_params.domain }}"
+    credentials: "godaddy"
+buckets: 
+  discourse_backup:
+    name: "{{ params.env_params.discourse_backup_bucket_name }}"
+    endpoint: "{{ params.env_params.discourse_backup_bucket_endpoint }}"
+    credentials: "discourse_backup_bucket"
+nodes:
+  discourse:
+    cloud: "{{ params.env_params.cloud_name }}"
+    base_dir: "/var"
+    credentials: "host"
+    pods: ["discourse"]
+    params:
+      dns:
+      - record: "forum"
+        name: "{{ params.env_params.dns_name }}"        
+      instance:
+        image: "ubuntu-18-04-x64"
+        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        ipv6: "yes"
+      region:
+        name: "nyc3"
+        region: "nyc"
+        zone: "3"
+      size:
+        name: "s-1vcpu-1gb"
+        memory: "1gb"
+        cpu: 1
+      host_test:
+        log_file: "/var/log/setup.log"
+        setup_last_line: "Setup Finished"
+        initial_connection_timeout: 90
+        setup_finished_timeout: 300
+      x_digital_ocean_tags:
+      - "auto"
+      - "dmz"
+pods:
+  discourse:
+    repo: "discourse_docker"
+    root: "yes"
+    fast_prepare: "true"
+    flat: true
+    base_dir: "discourse"
+    env_files:
+    - src: "{{ params.env.repo_dir }}/samples/discourse/setup.sh"
+      dest: "shared/setup.sh"
+      mode: 0755
+    - src: "discourse/app.yml"
+      dest: "containers/app.yml"
+    credentials:
+      discourse_backup_bucket: "discourse_backup_bucket"
+tasks:
+  discourse_setup:
+    type: "shell"
+    root: "true"
+    cmd: "./shared/setup.sh"
+  discourse_rebuild:
+    type: "shell"
+    root: "true"
+    cmd: "./launcher rebuild app"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    version: "master"
+  discourse_docker:
+    src: "https://github.com/discourse/discourse_docker.git"
+    version: "master"
+credentials: "{{ params.credentials | default({}) }}"
