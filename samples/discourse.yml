@@ -1,6 +1,5 @@
 name: "{{ params.name }}"
 ctxs: ["app"]
-ctx: "app"
 main: 
   app: 
     destroy: 
