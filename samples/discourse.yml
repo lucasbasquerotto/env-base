@@ -121,7 +121,7 @@ pods:
     - src: "{{ params.env.repo_dir }}/samples/discourse/setup.sh"
       dest: "shared/setup.sh"
       mode: "0755"
-    - src: "discourse/app.yml"
+    - src: "samples/discourse/app.yml"
       dest: "containers/app.yml"
     credentials:
       discourse_backup_bucket: "discourse_backup_bucket"
