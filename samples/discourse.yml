@@ -120,7 +120,7 @@ pods:
     env_files:
     - src: "{{ params.env.repo_dir }}/samples/discourse/setup.sh"
       dest: "shared/setup.sh"
-      mode: 0755
+      mode: "0755"
     - src: "discourse/app.yml"
       dest: "containers/app.yml"
     credentials:
