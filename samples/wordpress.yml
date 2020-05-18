@@ -250,7 +250,7 @@ pod_params:
     s3_wp_uploads: "s3_wp_uploads"
     setup_task_wp_db: >-
       {{ 
-      params.env_params.new_db | 
+      params.env_params.new_db | default(false) | bool |
       ternary('setup_task_wp_db_new_db', 'setup_task_wp_db_restore') 
       }}
     setup_verify_wp_db: "setup_verify_wp_db"
