@@ -120,9 +120,11 @@ pods:
     env_files:
     - src: "{{ params.env.repo_dir }}/samples/discourse/setup.sh"
       dest: "shared/setup.sh"
+      root: true
       mode: "0755"
     - src: "samples/discourse/app.yml"
       dest: "containers/app.yml"
+      root: true
     credentials:
       discourse_backup_bucket: "discourse_backup_bucket"
 tasks:
