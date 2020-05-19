@@ -130,11 +130,11 @@ pods:
 tasks:
   discourse_setup:
     type: "shell"
-    root: "true"
+    root: true
     cmd: "./shared/setup.sh"
   discourse_rebuild:
     type: "shell"
-    root: "true"
+    root: true
     cmd: "./launcher rebuild app"
 repos:
   cloud:
