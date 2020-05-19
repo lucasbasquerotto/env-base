@@ -20,7 +20,7 @@ main:
       meta:
         template_no_empty_lines: true
       repo: "cloud"
-  app: 
+  remote: 
     destroy: 
       nodes: true
       buckets: true
@@ -53,6 +53,8 @@ main:
         wp        
         [wp]
 clouds:
+  local:
+    type: "local"
   digital_ocean:
     type: "digital_ocean"
     credentials: "digital_ocean"
@@ -112,7 +114,14 @@ nodes:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "user"
-    pods: ["wp"]
+    pods: 
+    - name: "wp"
+      params:
+        local: true
+      group_params:
+        custom_args: "wp_custom_args_local"
+        custom_domain: "wp_custom_domain_local"
+        run: "wp_custom_run_app_local"
     tasks_group: "node_prepare"
     params:
       size:
@@ -122,7 +131,13 @@ nodes:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "host"
-    pods: ["wp"]
+    - name: "wp"
+      params:
+        local: false
+      group_params:
+        custom_args: "wp_custom_args"
+        custom_domain: "wp_custom_domain"
+        run: "wp_custom_run_app"
     params:
       dns:
       - record: "blog"
@@ -168,16 +183,13 @@ pods:
       wp_uploads_bucket: "wp_uploads_bucket"
     params:
       type: "app"
-      local: "{{ params.env_params.local }}"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
     group_params:
-      custom_args: "wp_custom_args"
-      custom_domain: "wp_custom_domain"
       custom_images: "wp_custom_images"
       custom_memory: "wp_custom_memory_app"
-      run: "wp_custom_run"
-    shared_group_params: "wp_custom_app"
+      meta: "wp_meta"
+      run_dict: wp_run_dict
 pod_params:
   wp_custom_args:
     mysql:
@@ -185,24 +197,30 @@ pod_params:
       port: "3306"
     wordpress:
       app_name: "wp_local"
-      env: >-
-        {{ 
-        params.env_params.local | bool | 
-        ternary('development', 'staging') 
-        }}
+      env: "staging"
+      lang: "en_US"
+    fluentd: 
+      port: "24224"
+  wp_custom_args_local:
+    mysql:
+      host: "mysql"
+      port: "3306"
+    wordpress:
+      app_name: "wp_local"
+      env: "development"
       lang: "en_US"
     fluentd: 
       port: "24224"
   wp_custom_domain:
     main_domain: "{{ params.env_params.wp_full_domain }}"
-    main_port: >-
-      {{ 
-      params.env_params.local | bool | 
-      ternary(
-      params.env_params.ssl | bool | ternary(8443, 8080),
-      params.env_params.ssl | bool | ternary(443, 80)
-      ) 
-      }}
+    main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
+    main_ssl: "{{ params.env_params.ssl }}"
+    pma_domain: "{{ params.env_params.wp_full_domain }}"
+    pma_port: "{{ params.env_params.ssl bool | ternary(9443, 9080) }}"
+    pma_ssl: "{{ params.env_params.ssl }}"
+  wp_custom_domain_local:
+    main_domain: "{{ params.env_params.wp_full_domain }}"
+    main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.wp_full_domain }}"
     pma_port: "{{ params.env_params.ssl bool | ternary(9443, 9080) }}"
@@ -235,11 +253,7 @@ pod_params:
     s3_uploads: 512mb
     s3_backup: 512mb
   wp_custom_run_app:
-    tasks: >-
-      {{ 
-      params.env_params.local | 
-      ternary('tasks_app_custom_local', 'tasks_app_custom') 
-      }}
+    tasks: "tasks_app_custom"
     general: "general"
     migrate: "migrate"
     setup_task_wp_uploads: "setup_task_wp_uploads"
@@ -267,6 +281,29 @@ pod_params:
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs_sync_dir"
     s3_logs: "s3_logs"
+  wp_custom_run_app_local:
+    tasks: "tasks_app_custom_local"
+    general: "general_local"
+    migrate: "migrate"
+    setup_task_wp_uploads: "setup_task_wp_uploads"
+    setup_verify_wp_uploads: "setup_verify_wp_uploads"
+    setup_remote_wp_uploads: "setup_remote_wp_uploads_file"
+    backup_task_wp_uploads: "backup_task_wp_uploads"
+    backup_remote_wp_uploads: "backup_remote_wp_uploads_sync_dir"
+    s3_wp_uploads: "s3_wp_uploads"
+    setup_task_wp_db: >-
+      {{ 
+      params.env_params.new_db | default(false) | bool |
+      ternary('setup_task_wp_db_new_db', 'setup_task_wp_db_restore') 
+      }}
+    setup_verify_wp_db: "setup_verify_wp_db"
+    setup_remote_wp_db: "setup_remote_wp_db_file"
+    setup_local_wp_db: "setup_local_wp_db"
+    backup_task_wp_db: "backup_task_wp_db"
+    backup_remote_wp_db: "backup_remote_wp_db_sync_dir"
+    backup_local_wp_db: "backup_local_wp_db"
+    db_wp_db: "db_wp_db"
+    s3_wp_db: "s3_wp_db"
   wp_meta:
     use_run_dict: true
   wp_run_dict:
@@ -281,8 +318,14 @@ pod_params:
       backup_local_base_dir: "/tmp/main/backup"
       orchestration: "compose"
       script_dir: "custom-pod/wordpress/scripts"
-      script_env_file: >-
-        {{ params.env_params.local | bool | ternary('local.sh', 'remote.sh') }}
+      script_env_file: "remote.sh"
+      toolbox_service: "toolbox"
+    general_local:
+      backup_delete_old_days: 3
+      backup_local_base_dir: "/tmp/main/backup"
+      orchestration: "compose"
+      script_dir: "custom-pod/wordpress/scripts"
+      script_env_file: "local.sh"
       toolbox_service: "toolbox"
     migrate:
       url: >-

@@ -146,7 +146,7 @@ add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bi
 apt update
 
 # Finally, install Docker
-apt install -y docker-ce="$DOCKER_CE_VERSION" docker-compose haveged
+apt install -y docker-ce docker-compose haveged
 
 echo "Docker Installed" >> "/var/log/setup.log"
 
