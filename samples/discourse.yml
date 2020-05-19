@@ -122,6 +122,7 @@ pods:
       dest: "shared/setup.sh"
       root: true
       mode: "0755"
+    env_templates:
     - src: "samples/discourse/app.yml"
       dest: "containers/app.yml"
       root: true

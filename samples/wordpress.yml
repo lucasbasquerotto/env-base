@@ -216,14 +216,14 @@ pod_params:
     main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.wp_full_domain }}"
-    pma_port: "{{ params.env_params.ssl bool | ternary(9443, 9080) }}"
+    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_domain_local:
     main_domain: "{{ params.env_params.wp_full_domain }}"
     main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.wp_full_domain }}"
-    pma_port: "{{ params.env_params.ssl bool | ternary(9443, 9080) }}"
+    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_images:
     nginx_image: "nginx"
@@ -331,10 +331,10 @@ pod_params:
       url: >-
         {{ params.env_params.ssl | bool | ternary('https', 'http') 
         }}://{{ params.env_params.wp_full_domain }}
-      title: "{{ params.env_params.wp_title | default('No Title :/') }}"
-      admin_user: "{{ params.credentials.wordpress.setup.admin_user | default('') }}"
-      admin_password: "{{ params.credentials.wordpress.setup.admin_password | default('') }}"
-      admin_email: "{{ params.credentials.wordpress.setup.admin_email | default('') }}"
+      title: "{{ params.env_params.wp_title }}"
+      admin_user: "{{ params.credentials.wordpress.setup.admin_user }}"
+      admin_password: "{{ params.credentials.wordpress.setup.admin_password }}"
+      admin_email: "{{ params.credentials.wordpress.setup.admin_email }}"
       restore_seed: true
       remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
       old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
