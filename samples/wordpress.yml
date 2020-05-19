@@ -131,6 +131,7 @@ nodes:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "host"
+    pods:
     - name: "wp"
       params:
         local: false

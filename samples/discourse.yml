@@ -126,6 +126,7 @@ pods:
     - src: "samples/discourse/app.yml"
       dest: "containers/app.yml"
       root: true
+      params: "{{ params.env_params.app_params }}"
     credentials:
       discourse_backup_bucket: "discourse_backup_bucket"
 tasks:
