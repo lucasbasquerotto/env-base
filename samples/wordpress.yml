@@ -254,7 +254,11 @@ pod_params:
     s3_uploads: 512mb
     s3_backup: 512mb
   wp_custom_run_app:
-    tasks: "tasks_app_custom"
+    tasks: >-
+      {{ 
+      params.env_params.new_db | default(false) | bool |
+      ternary('tasks_app_custom_new_db', 'tasks_app_custom') 
+      }}
     general: "general"
     migrate: "migrate"
     setup_task_wp_uploads: "setup_task_wp_uploads"
@@ -283,7 +287,11 @@ pod_params:
     backup_remote_logs: "backup_remote_logs_sync_dir"
     s3_logs: "s3_logs"
   wp_custom_run_app_local:
-    tasks: "tasks_app_custom_local"
+    tasks: >-
+      {{ 
+      params.env_params.new_db | default(false) | bool |
+      ternary('tasks_app_custom_new_db_local', 'tasks_app_custom_local') 
+      }}
     general: "general_local"
     migrate: "migrate"
     setup_task_wp_uploads: "setup_task_wp_uploads"
@@ -311,9 +319,15 @@ pod_params:
     tasks_app_custom:
       backup: "backup:task:wp_db,backup:task:wp_uploads,backup:task:logs" 
       setup: "setup:task:logs,setup:task:wp_uploads,setup:task:wp_db" 
+    tasks_app_custom_new_db:
+      backup: "backup:task:wp_db,backup:task:wp_uploads,backup:task:logs" 
+      setup: "setup:task:wp_db" 
     tasks_app_custom_local:
       backup: "backup:task:wp_db,backup:task:wp_uploads" 
       setup: "setup:task:wp_uploads,setup:task:wp_db" 
+    tasks_app_custom_new_db_local:
+      backup: "backup:task:wp_db,backup:task:wp_uploads" 
+      setup: "setup:task:wp_db" 
     general:
       backup_delete_old_days: 3
       backup_local_base_dir: "/tmp/main/backup"
