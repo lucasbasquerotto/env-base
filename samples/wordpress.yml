@@ -392,6 +392,7 @@ pod_params:
       cli: "awscli"
       cli_cmd: "run"
     setup_task_wp_db_new_db:
+      task_name_verify: "setup:verify:db:wp_db"
       setup_run_new_task: "true"
       task_name_new: "setup:new:wp_db"
     setup_task_wp_db_restore:
