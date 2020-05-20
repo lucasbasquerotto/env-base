@@ -294,7 +294,6 @@ pod_params:
       }}
     general: "general_local"
     migrate: "migrate"
-    setup_new_wp_db: "migrate"
     setup_task_wp_uploads: "setup_task_wp_uploads"
     setup_verify_wp_uploads: "setup_verify_wp_uploads"
     setup_remote_wp_uploads: "setup_remote_wp_uploads_file"
@@ -309,6 +308,7 @@ pod_params:
     setup_verify_wp_db: "setup_verify_wp_db"
     setup_remote_wp_db: "setup_remote_wp_db_file"
     setup_local_wp_db: "setup_local_wp_db"
+    setup_new_wp_db: "setup_new_wp_db"
     backup_task_wp_db: "backup_task_wp_db"
     backup_remote_wp_db: "backup_remote_wp_db_sync_dir"
     backup_local_wp_db: "backup_local_wp_db"
