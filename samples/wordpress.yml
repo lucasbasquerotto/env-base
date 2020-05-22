@@ -140,7 +140,7 @@ nodes:
         run: "wp_custom_run_app"
     params:
       dns:
-      - record: "blog"
+      - record: "{{ params.env_params.dns_record }}"
         name: "{{ params.env_params.dns_name }}"   
       cron:
       - user: "root"

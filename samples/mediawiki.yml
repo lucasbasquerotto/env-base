@@ -112,6 +112,7 @@ nodes:
       params:
         local: true
       group_params:
+        custom_args: "mediawiki_custom_args_local"
         custom_domain: "mediawiki_custom_domain_local"
         run: "mediawiki_custom_run_app_local"
     params:
@@ -127,11 +128,12 @@ nodes:
       params:
         local: false
       group_params:
+        custom_args: "mediawiki_custom_args"
         custom_domain: "mediawiki_custom_domain"
         run: "mediawiki_custom_run_app"
     params:
       dns:
-      - record: "chat"
+      - record: "{{ params.env_params.dns_record }}"
         name: "{{ params.env_params.dns_name }}"   
       cron:
       - user: "root"
@@ -167,13 +169,13 @@ pods:
     - repo: "custom_pod"
       dir: "custom-pod"
     credentials:
+      mediawiki: "mediawiki"
       mediawiki_backup_bucket: "mediawiki_backup_bucket"
     params:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
     group_params:
-      custom_args: "mediawiki_custom_args"
       custom_images: "mediawiki_custom_images"
       custom_memory: "mediawiki_custom_memory_app"
       meta: "mediawiki_meta"
@@ -181,12 +183,20 @@ pods:
 pod_params:
   mediawiki_custom_args:
     nginx:
-      port: "8080"
-    mariadb:
-      host: "mariadb"
+      http_port: "80"
+      https_port: "443"
+    mysql:
+      host: "mysql"
       port: "3306"
     fluentd: 
       port: "24224"
+  mediawiki_custom_args_local:
+    nginx:
+      http_port: "8080"
+      https_port: "8443"
+    mysql:
+      host: "mysql"
+      port: "3306"
   mediawiki_custom_domain:
     ssl: "{{ params.env_params.ssl }}"
     main_domain: "{{ params.env_params.mediawiki_full_domain }}"
@@ -200,12 +210,10 @@ pod_params:
     nginx_version: "1.14.2-alpine"
     mediawiki_image: "mediawiki"
     mediawiki_version: "1.34.1"
-    mariadb_image: "mariadb"
-    mariadb_version: "10.5.3-bionic"
+    mysql_image: "mariadb"
+    mysql_version: "10.5.3-bionic"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200513"
-    hubot_image: "mediawiki/hubot-mediawiki"
-    hubot_version: "v1.0.11"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
     fluentd_image: "lucasbasquerotto/wordpress"
@@ -213,9 +221,8 @@ pod_params:
   mediawiki_custom_memory_app:
     nginx: 512mb
     mediawiki: 1gb
-    mariadb: 1gb
+    mysql: 1gb
     toolbox: 512mb
-    hubot: 512mb
     s3_backup: 512mb
     fluentd: 256mb
   mediawiki_custom_run_app:

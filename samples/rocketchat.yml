@@ -133,7 +133,7 @@ nodes:
         run: "rocketchat_custom_run_app"
     params:
       dns:
-      - record: "chat"
+      - record: "{{ params.env_params.dns_record }}"
         name: "{{ params.env_params.dns_name }}"   
       cron:
       - user: "root"
@@ -169,6 +169,7 @@ pods:
     - repo: "custom_pod"
       dir: "custom-pod"
     credentials:
+      hubot: "hubot"
       rocketchat_backup_bucket: "rocketchat_backup_bucket"
     params:
       type: "app"
