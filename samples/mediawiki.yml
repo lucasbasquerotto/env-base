@@ -175,6 +175,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      mediawiki: "{{ params.env_params.mediawiki }}"
     group_params:
       custom_images: "mediawiki_custom_images"
       custom_memory: "mediawiki_custom_memory_app"
