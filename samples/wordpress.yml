@@ -195,7 +195,7 @@ pod_params:
       host: "mysql"
       port: "3306"
     wordpress:
-      app_name: "wp_local"
+      app_name: "wp_remote"
       env: "staging"
       lang: "en_US"
     fluentd: 
@@ -208,8 +208,6 @@ pod_params:
       app_name: "wp_local"
       env: "development"
       lang: "en_US"
-    fluentd: 
-      port: "24224"
   wp_custom_domain:
     main_domain: "{{ params.env_params.wp_full_domain }}"
     main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
@@ -218,10 +216,10 @@ pod_params:
     pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_domain_local:
-    main_domain: "{{ params.env_params.wp_full_domain }}"
+    main_domain: "localhost"
     main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
     main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "{{ params.env_params.wp_full_domain }}"
+    pma_domain: "localhost"
     pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_images:

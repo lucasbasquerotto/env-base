@@ -185,14 +185,16 @@ pod_params:
     mongo:
       host: "mongo"
       port: "27017"
+    fluentd: 
+      port: "24224"
   rocketchat_custom_domain:
+    ssl: "{{ params.env_params.ssl }}"
     main_domain: "{{ params.env_params.rocketchat_full_domain }}"
     main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
-    main_ssl: "{{ params.env_params.ssl }}"
   rocketchat_custom_domain_local:
-    main_domain: "{{ params.env_params.rocketchat_full_domain }}"
+    ssl: "{{ params.env_params.ssl }}"
+    main_domain: "localhost"
     main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
-    main_ssl: "{{ params.env_params.ssl }}"
   rocketchat_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -206,6 +208,8 @@ pod_params:
     hubot_version: "v1.0.11"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
+    fluentd_image: "lucasbasquerotto/wordpress"
+    fluentd_version: "fluentd-1.7.4-01"
   rocketchat_custom_memory_app:
     nginx: 512mb
     rocketchat: 1gb
@@ -214,6 +218,7 @@ pod_params:
     hubot: 512mb
     mongo_init: 512mb
     s3_backup: 512mb
+    fluentd: 256mb
   rocketchat_custom_run_app:
     tasks: "tasks_app"
     general: "general"
@@ -234,10 +239,10 @@ pod_params:
   rocketchat_run_dict:
     tasks_app:
       backup: "backup:task:logs" 
-      setup: "setup:task:logs" 
+      setup: "setup:main:network,setup:task:logs" 
     tasks_local:
       backup: "backup:task:logs" 
-      setup: "" 
+      setup: "setup:main:network" 
     general:
       backup_delete_old_days: 3
       backup_local_base_dir: "/tmp/main/backup"
