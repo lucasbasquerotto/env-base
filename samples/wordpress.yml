@@ -122,7 +122,6 @@ nodes:
         custom_args: "wp_custom_args_local"
         custom_domain: "wp_custom_domain_local"
         run: "wp_custom_run_app_local"
-    tasks_group: "node_prepare"
     params:
       size:
         memory: "2gb"
@@ -173,7 +172,6 @@ pods:
     root: "yes"
     ctx: "custom-pod/wordpress/ctx.yml"
     fast_prepare: "true"
-    tasks_group: "pod_wp"
     env_repos: 
     - repo: "custom_pod"
       dir: "custom-pod"
