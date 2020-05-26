@@ -175,6 +175,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      use_bot: "{{ params.env_params.use_bot }}"
     group_params:
       custom_images: "rocketchat_custom_images"
       custom_memory: "rocketchat_custom_memory_app"
