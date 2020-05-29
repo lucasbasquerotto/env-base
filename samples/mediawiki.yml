@@ -255,6 +255,12 @@ pod_params:
     tasks: "tasks_local"
     general: "general"
     migrate: "migrate"
+    s3_uploads: "s3_uploads"
+    setup_task_uploads: "setup_task_uploads"
+    setup_verify_uploads: "setup_verify_uploads"
+    setup_remote_uploads: "setup_remote_uploads_file"
+    backup_task_uploads: "backup_task_uploads"
+    backup_remote_uploads: "backup_remote_uploads_no_sync"
     s3_logs: "s3_logs"
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs"
@@ -262,10 +268,10 @@ pod_params:
     use_run_dict: true
   mediawiki_run_dict:
     tasks_app:
-      backup: "backup:task:logs"
-      setup: "setup:main:network,setup:task:logs"
+      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
+      setup: "setup:main:network,setup:task:uploads,setup:task:db,setup:task:logs"
     tasks_local:
-      backup: "backup:task:logs"
+      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
       setup: "setup:main:network"
     general:
       backup_delete_old_days: 3
@@ -311,6 +317,62 @@ pod_params:
       backup_src_dir: "uploads"
       backup_bucket_sync: "true"
       backup_bucket_sync_dir: "uploads"
+    backup_remote_uploads_no_sync:
+      task_kind: "dir"
+      task_name_s3: "s3:task:uploads"
+      backup_src_dir: "uploads"
+      backup_bucket_static_dir: "files"
+      backup_zip_file: "mediawiki-uploads.zip"
+    s3_db:
+      endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+      bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+      service: "s3_backup"
+      cli: "awscli"
+      cli_cmd: "run"
+    setup_task_db_restore:
+      task_name_verify: "setup:verify:db:db"
+      task_name_remote: "setup:remote:default:db"
+      task_name_local: "setup:local:db:db"
+      setup_dest_base_dir: "/tmp/main/mysql/restore"
+    setup_verify_db:
+      db_task_name: "db:restore:verify:mysql"
+    setup_remote_db_file:
+      task_kind: "file"
+      restore_dest_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+      restore_tmp_dir: "/tmp/main/restore/mysql"
+      restore_remote_file: "https://github.com/lucasbasquerotto/my-projects/blob/master/wp/backup-db-20190917_195406-1568760846.zip?raw=true"
+      restore_is_zip_file: "true"
+      restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
+      restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+    setup_local_db:
+      db_task_name: "db:restore:file:mysql"
+      db_sql_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+    backup_task_db:
+      task_name_local: "backup:local:db:db"
+      task_name_remote: "backup:remote:default:db"
+      backup_src_base_dir: "/tmp/main/mysql/backup"
+      backup_local_static_dir:  "/tmp/main/backup/static"
+    backup_remote_db_no_sync:
+      task_kind: "file"
+      task_name_s3: "s3:task:db"
+      backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+      backup_bucket_static_dir: "files"
+      backup_zip_file: "mediawiki-db.zip"
+    backup_remote_db_sync_dir:
+      task_kind: "file"
+      task_name_s3: "s3:task:db"
+      backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+      backup_bucket_sync: "true"
+      backup_bucket_sync_dir: "db"
+    backup_local_db:
+      db_task_name: "db:backup:file:mysql"
+      db_sql_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+    db_db:
+      db_service: "mysql"
+      db_name: "{{ params.credentials.mediawiki.db.name }}"
+      db_user: "{{ params.credentials.mediawiki.db.user }}"
+      db_pass: "{{ params.credentials.mediawiki.db.password }}"
+      db_connect_wait_secs: 90
     s3_logs:
       endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
       bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
