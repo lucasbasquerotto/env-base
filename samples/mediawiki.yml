@@ -1,12 +1,12 @@
 name: "{{ params.name }}"
-main: 
+main:
   local:
     clouds:
     - "local"
     nodes:
     - "mediawiki_local"
     local:
-      pods: 
+      pods:
       - "mediawiki"
     params:
       entrypoint: "main.yml"
@@ -18,8 +18,8 @@ main:
       meta:
         template_no_empty_lines: true
       repo: "cloud"
-  remote: 
-    destroy: 
+  remote:
+    destroy:
       nodes: true
       buckets: true
     clouds:
@@ -47,7 +47,7 @@ main:
         [main]
         localhost ansible_connection=local
         [host:children]
-        mediawiki        
+        mediawiki
         [mediawiki]
 clouds:
   local:
@@ -89,15 +89,15 @@ clouds:
           sources:
             addresses: ["0.0.0.0/0", "::/0"]
 dns:
-  cloudflare: 
+  cloudflare:
     type: "cloudflare"
     zone: "{{ params.env_params.domain }}"
     credentials: "cloudflare"
-  godaddy: 
+  godaddy:
     type: "godaddy"
     zone: "{{ params.env_params.domain }}"
     credentials: "godaddy"
-buckets: 
+buckets:
   mediawiki_backup:
     name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
     endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
@@ -107,7 +107,7 @@ nodes:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "user"
-    pods: 
+    pods:
     - name: "mediawiki"
       params:
         local: true
@@ -134,11 +134,11 @@ nodes:
     params:
       dns:
       - record: "{{ params.env_params.dns_record }}"
-        name: "{{ params.env_params.dns_name }}"   
+        name: "{{ params.env_params.dns_name }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-        dest_dir: "/var/spool/cron/crontabs"     
+        dest_dir: "/var/spool/cron/crontabs"
       instance:
         image: "ubuntu-18-04-x64"
         user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
@@ -165,7 +165,7 @@ pods:
     root: "yes"
     ctx: "custom-pod/mediawiki/ctx.yml"
     fast_prepare: "true"
-    env_repos: 
+    env_repos:
     - repo: "custom_pod"
       dir: "custom-pod"
     credentials:
@@ -189,7 +189,7 @@ pod_params:
     mysql:
       host: "mysql"
       port: "3306"
-    fluentd: 
+    fluentd:
       port: "24224"
   mediawiki_custom_args_local:
     nginx:
@@ -254,11 +254,11 @@ pod_params:
     use_run_dict: true
   mediawiki_run_dict:
     tasks_app:
-      backup: "backup:task:logs" 
-      setup: "setup:main:network,setup:task:logs" 
+      backup: "backup:task:logs"
+      setup: "setup:main:network,setup:task:logs"
     tasks_local:
-      backup: "backup:task:logs" 
-      setup: "setup:main:network" 
+      backup: "backup:task:logs"
+      setup: "setup:main:network"
     general:
       backup_delete_old_days: 3
       backup_local_base_dir: "/tmp/main/backup"
@@ -266,6 +266,12 @@ pod_params:
       script_dir: "custom-pod/mediawiki"
       script_env_file: "main.sh"
       toolbox_service: "toolbox"
+    migrate:
+      db_service: "mysql"
+      db_name: "{{ params.credentials.mediawiki.db.name }}"
+      db_user: "{{ params.credentials.mediawiki.db.user }}"
+      db_pass: "{{ params.credentials.mediawiki.db.password }}"
+      db_connect_wait_secs: 90
     s3_logs:
       endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
       bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
@@ -303,7 +309,7 @@ tasks:
     compose_params:
       version: "1.25.3"
       remote: true
-  main_build: 
+  main_build:
     type: "shell"
     root: true
     cmd: "./run build"
