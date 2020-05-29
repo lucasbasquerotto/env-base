@@ -238,6 +238,7 @@ pod_params:
   mediawiki_custom_run_app:
     tasks: "tasks_app"
     general: "general"
+    migrate: "migrate"
     s3_logs: "s3_logs"
     setup_task_logs: "setup_task_logs"
     setup_verify_logs: "setup_verify_logs"
@@ -247,6 +248,7 @@ pod_params:
   mediawiki_custom_run_app_local:
     tasks: "tasks_local"
     general: "general"
+    migrate: "migrate"
     s3_logs: "s3_logs"
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs"
