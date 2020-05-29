@@ -195,6 +195,8 @@ pod_params:
     nginx:
       http_port: "8080"
       https_port: "8443"
+      private_http_port: "9080"
+      private_https_port: "9443"
     mysql:
       host: "mysql"
       port: "3306"
@@ -202,15 +204,21 @@ pod_params:
     ssl: "{{ params.env_params.ssl }}"
     main_domain: "{{ params.env_params.mediawiki_full_domain }}"
     main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
+    pma_domain: "{{ params.env_params.mediawiki_full_domain }}"
+    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
   mediawiki_custom_domain_local:
     ssl: "{{ params.env_params.ssl }}"
     main_domain: "localhost"
     main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
+    pma_domain: "localhost"
+    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
   mediawiki_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
     mediawiki_image: "mediawiki"
     mediawiki_version: "1.34.1"
+    pma_image: "phpmyadmin/phpmyadmin"
+    pma_version: "4.8.5"
     mysql_image: "mariadb"
     mysql_version: "10.5.3-bionic"
     toolbox_image: "lucasbasquerotto/image"
@@ -222,6 +230,7 @@ pod_params:
   mediawiki_custom_memory_app:
     nginx: 512mb
     mediawiki: 1gb
+    pma: 512mb
     mysql: 1gb
     toolbox: 512mb
     s3_backup: 512mb
