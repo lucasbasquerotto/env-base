@@ -236,7 +236,11 @@ pod_params:
     s3_backup: 512mb
     fluentd: 256mb
   mediawiki_custom_run_app:
-    tasks: "tasks_app"
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks_app_restore_db', 'tasks_app_new_db')
+      }}
     general: "general"
     migrate: "migrate"
     s3_uploads: "s3_uploads"
@@ -245,6 +249,15 @@ pod_params:
     setup_remote_uploads: "setup_remote_uploads_file"
     backup_task_uploads: "backup_task_uploads"
     backup_remote_uploads: "backup_remote_uploads_sync_dir"
+    s3_db: "s3_db"
+    db_db: "db_db"
+    setup_task_db: "setup_task_db"
+    setup_verify_db: "setup_verify_db"
+    setup_remote_db: "setup_remote_db_file"
+    setup_local_db: "setup_local_db"
+    backup_task_db: "backup_task_db"
+    backup_remote_db: "backup_remote_db_sync_dir"
+    backup_local_db: "backup_local_db"
     s3_logs: "s3_logs"
     setup_task_logs: "setup_task_logs"
     setup_verify_logs: "setup_verify_logs"
@@ -252,7 +265,11 @@ pod_params:
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs"
   mediawiki_custom_run_app_local:
-    tasks: "tasks_local"
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks_restore_local', 'tasks_new_db_local')
+      }}
     general: "general"
     migrate: "migrate"
     s3_uploads: "s3_uploads"
@@ -261,18 +278,31 @@ pod_params:
     setup_remote_uploads: "setup_remote_uploads_file"
     backup_task_uploads: "backup_task_uploads"
     backup_remote_uploads: "backup_remote_uploads_no_sync"
+    setup_task_db: "setup_task_db"
+    setup_verify_db: "setup_verify_db"
+    setup_remote_db: "setup_remote_db_file"
+    setup_local_db: "setup_local_db"
+    backup_task_db: "backup_task_db"
+    backup_remote_db: "backup_remote_db_sync_dir"
+    backup_local_db: "backup_local_db"
     s3_logs: "s3_logs"
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs"
   mediawiki_meta:
     use_run_dict: true
   mediawiki_run_dict:
-    tasks_app:
-      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
-      setup: "setup:main:network,setup:task:uploads,setup:task:db,setup:task:logs"
-    tasks_local:
+    tasks_app_new_db:
       backup: "backup:task:uploads,backup:task:db,backup:task:logs"
       setup: "setup:main:network"
+    tasks_app_restore_db:
+      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
+      setup: "setup:main:network,setup:task:uploads,setup:task:db,setup:task:logs"
+    tasks_new_db_local:
+      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
+      setup: "setup:main:network"
+    tasks_restore_local:
+      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
+      setup: "setup:main:network,setup:task:uploads,setup:task:db"
     general:
       backup_delete_old_days: 3
       backup_local_base_dir: "/tmp/main/backup"
@@ -329,7 +359,7 @@ pod_params:
       service: "s3_backup"
       cli: "awscli"
       cli_cmd: "run"
-    setup_task_db_restore:
+    setup_task_db:
       task_name_verify: "setup:verify:db:db"
       task_name_remote: "setup:remote:default:db"
       task_name_local: "setup:local:db:db"
