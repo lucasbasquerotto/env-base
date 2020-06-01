@@ -169,6 +169,7 @@ pods:
     - repo: "custom_pod"
       dir: "custom-pod"
     credentials:
+      rocketchat: "rocketchat"
       hubot: "hubot"
       rocketchat_backup_bucket: "rocketchat_backup_bucket"
     params:
@@ -186,6 +187,8 @@ pod_params:
     nginx:
       http_port: "80"
       https_port: "443"
+      private_http_port: "9080"
+      private_https_port: "9443"
     mongo:
       host: "mongo"
       port: "27017"
@@ -195,6 +198,8 @@ pod_params:
     nginx:
       http_port: "8080"
       https_port: "8443"
+      private_http_port: "9080"
+      private_https_port: "9443"
     mongo:
       host: "mongo"
       port: "27017"
@@ -202,10 +207,14 @@ pod_params:
     ssl: "{{ params.env_params.ssl }}"
     main_domain: "{{ params.env_params.rocketchat_full_domain }}"
     main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
+    mongo_express_domain: "{{ params.env_params.rocketchat_full_domain }}"
+    mongo_express_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
   rocketchat_custom_domain_local:
     ssl: "{{ params.env_params.ssl }}"
     main_domain: "localhost"
     main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
+    mongo_express_domain: "localhost"
+    mongo_express_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
   rocketchat_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -213,6 +222,8 @@ pod_params:
     rocketchat_version: "3.2.2"
     mongo_image: "mongo"
     mongo_version: "4.0"
+    mongo_express_image: "mongo-express"
+    mongo_express_version: "0.54.0"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200513"
     hubot_image: "rocketchat/hubot-rocketchat"
@@ -224,6 +235,7 @@ pod_params:
   rocketchat_custom_memory_app:
     nginx: 512mb
     rocketchat: 1gb
+    mongo_express: 512mb
     mongo: 1gb
     toolbox: 512mb
     hubot: 512mb

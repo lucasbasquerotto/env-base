@@ -186,6 +186,8 @@ pod_params:
     nginx:
       http_port: "80"
       https_port: "443"
+      private_http_port: "9080"
+      private_https_port: "9443"
     mysql:
       host: "mysql"
       port: "3306"
