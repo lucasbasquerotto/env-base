@@ -382,7 +382,7 @@ pod_params:
     setup_remote_wp_uploads_file:
       task_kind: "dir"
       restore_tmp_dir: "/tmp/main/restore/wordpress/uploads"
-      restore_remote_file: "https://github.com/lucasbasquerotto/my-projects/blob/master/wp/backup-uploads-20190917_195406-1568760846.zip?raw=true"
+      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/uploads/20190917_195406.zip?raw=true"
       restore_is_zip_file: "true"
       restore_zip_pass: "{{ params.credentials.wp_uploads_zip_file_pass | default('') }}"
       restore_recursive_mode_dir: "777"
@@ -419,7 +419,7 @@ pod_params:
       task_kind: "file"
       restore_dest_file: "{{ params.credentials.wordpress.db.name }}.sql"
       restore_tmp_dir: "/tmp/main/restore/mysql"
-      restore_remote_file: "https://github.com/lucasbasquerotto/my-projects/blob/master/wp/backup-db-20190917_195406-1568760846.zip?raw=true"
+      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/db/20190917_195406.zip?raw=true"
       restore_is_zip_file: "true"
       restore_zip_pass: "{{ params.credentials.wp_db_zip_file_pass | default('') }}"
       restore_zip_inner_file: "{{ params.credentials.wordpress.db.name }}.sql"
