@@ -25,6 +25,7 @@ main:
     clouds:
     - "{{ params.env_params.cloud_name }}"
     buckets:
+    - "rocketchat_uploads"
     - "rocketchat_backup"
     nodes:
     - "rocketchat"
