@@ -389,7 +389,7 @@ pod_params:
       restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
     setup_local_db:
       db_task_name: "db:restore:file:mysql"
-      db_sql_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+      db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
     backup_task_db:
       task_name_local: "backup:local:db:db"
       task_name_remote: "backup:remote:default:db"
@@ -409,7 +409,7 @@ pod_params:
       backup_bucket_sync_dir: "db"
     backup_local_db:
       db_task_name: "db:backup:file:mysql"
-      db_sql_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+      db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
     db_db:
       db_service: "mysql"
       db_name: "{{ params.credentials.mediawiki.db.name }}"
