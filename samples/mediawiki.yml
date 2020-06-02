@@ -98,6 +98,10 @@ dns:
     zone: "{{ params.env_params.domain }}"
     credentials: "godaddy"
 buckets:
+  mediawiki_uploads:
+    name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
+    endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
+    credentials: "mediawiki_uploads_bucket"
   mediawiki_backup:
     name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
     endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
@@ -282,6 +286,8 @@ pod_params:
     setup_remote_uploads: "setup_remote_uploads_file"
     backup_task_uploads: "backup_task_uploads"
     backup_remote_uploads: "backup_remote_uploads_no_sync"
+    s3_db: "s3_db"
+    db_db: "db_db"
     setup_task_db: "setup_task_db"
     setup_verify_db: "setup_verify_db"
     setup_remote_db: "setup_remote_db_file"
@@ -290,6 +296,9 @@ pod_params:
     backup_remote_db: "backup_remote_db_sync_dir"
     backup_local_db: "backup_local_db"
     s3_logs: "s3_logs"
+    setup_task_logs: "setup_task_logs"
+    setup_verify_logs: "setup_verify_logs"
+    setup_remote_logs: "setup_remote_logs"
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs"
   mediawiki_meta:
@@ -321,8 +330,8 @@ pod_params:
       db_pass: "{{ params.credentials.mediawiki.db.password }}"
       db_connect_wait_secs: 90
     s3_uploads:
-      endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+      endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
+      bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
       service: "s3_uploads"
       cli: "awscli"
       cli_cmd: "run"
