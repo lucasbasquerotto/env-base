@@ -171,6 +171,7 @@ pods:
     credentials:
       mediawiki: "mediawiki"
       mediawiki_backup_bucket: "mediawiki_backup_bucket"
+      mediawiki_uploads_bucket: "mediawiki_uploads_bucket"
     params:
       type: "app"
       orchestration: "docker_compose"
@@ -236,6 +237,7 @@ pod_params:
     mysql: 1gb
     toolbox: 512mb
     s3_backup: 512mb
+    s3_uploads: 512mb
     fluentd: 256mb
   mediawiki_custom_run_app:
     tasks: >-
@@ -338,7 +340,7 @@ pod_params:
       restore_zip_pass: "{{ params.credentials.mediawiki_uploads_zip_file_pass | default('') }}"
       restore_recursive_mode_dir: "777"
       restore_recursive_mode_file: "666"
-      restore_zip_inner_dir: "uploads"
+      restore_zip_inner_dir: "images"
     backup_task_uploads:
       task_name_remote: "backup:remote:default:uploads"
       backup_src_base_dir: "/var/main/data/mediawiki"
@@ -346,15 +348,15 @@ pod_params:
     backup_remote_uploads_sync_dir:
       task_kind: "dir"
       task_name_s3: "s3:task:uploads"
-      backup_src_dir: "uploads"
+      backup_src_dir: "images"
       backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "uploads"
+      backup_bucket_sync_dir: "images"
     backup_remote_uploads_no_sync:
       task_kind: "dir"
       task_name_s3: "s3:task:uploads"
-      backup_src_dir: "uploads"
+      backup_src_dir: "images"
       backup_bucket_static_dir: "files"
-      backup_zip_file: "mediawiki-uploads.zip"
+      backup_zip_file: "mediawiki-images.zip"
     s3_db:
       endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
       bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
