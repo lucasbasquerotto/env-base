@@ -172,6 +172,7 @@ pods:
     credentials:
       rocketchat: "rocketchat"
       hubot: "hubot"
+      rocketchat_uploads_bucket: "rocketchat_uploads_bucket"
       rocketchat_backup_bucket: "rocketchat_backup_bucket"
     params:
       type: "app"
@@ -221,14 +222,14 @@ pod_params:
     nginx_version: "1.14.2-alpine"
     rocketchat_image: "rocket.chat"
     rocketchat_version: "3.2.2"
-    mongo_image: "mongo"
-    mongo_version: "4.0"
-    mongo_express_image: "mongo-express"
-    mongo_express_version: "0.54.0"
-    toolbox_image: "lucasbasquerotto/image"
-    toolbox_version: "toolbox-20200513"
     hubot_image: "rocketchat/hubot-rocketchat"
     hubot_version: "v1.0.11"
+    mongo_express_image: "mongo-express"
+    mongo_express_version: "0.54.0"
+    mongo_image: "mongo"
+    mongo_version: "4.0"
+    toolbox_image: "lucasbasquerotto/image"
+    toolbox_version: "toolbox-20200513"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
     fluentd_image: "lucasbasquerotto/wordpress"
@@ -241,6 +242,7 @@ pod_params:
     toolbox: 512mb
     hubot: 512mb
     mongo_init: 512mb
+    s3_uploads: 512mb
     s3_backup: 512mb
     fluentd: 256mb
   rocketchat_custom_run_app:
