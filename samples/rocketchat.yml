@@ -50,6 +50,33 @@ main:
         [host:children]
         rocketchat
         [rocketchat]
+  nodes:
+    destroy:
+      nodes: true
+      buckets: true
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    buckets:
+    - "rocketchat_uploads"
+    - "rocketchat_backup"
+    nodes:
+    - name: "db"
+      key: "rocketchat"
+      params:
+        type: "db"
+      group_params:
+        custom_memory: "rocketchat_custom_memory_db"
+        run: "rocketchat_custom_run_db"
+    - name: "web"
+      key: "rocketchat"
+      dependencies:
+      - host: "mysql"
+        node: "db"
+      params:
+        type: "web"
+      group_params:
+        custom_memory: "rocketchat_custom_memory_web"
+        run: "rocketchat_custom_run_web"
 clouds:
   local:
     type: "local"
@@ -237,11 +264,26 @@ pod_params:
   rocketchat_custom_memory_app:
     nginx: 512mb
     rocketchat: 1gb
+    hubot: 512mb
     mongo_express: 512mb
     mongo: 1gb
     toolbox: 512mb
-    hubot: 512mb
     mongo_init: 512mb
+    s3_uploads: 512mb
+    s3_backup: 512mb
+    fluentd: 256mb
+  rocketchat_custom_memory_db:
+    mongo: 1gb
+    toolbox: 512mb
+    mongo_init: 512mb
+    s3_backup: 512mb
+    fluentd: 256mb
+  rocketchat_custom_memory_web:
+    nginx: 512mb
+    rocketchat: 1gb
+    hubot: 512mb
+    mongo_express: 512mb
+    toolbox: 512mb
     s3_uploads: 512mb
     s3_backup: 512mb
     fluentd: 256mb
@@ -294,6 +336,58 @@ pod_params:
     s3_logs: "s3_logs"
     backup_task_logs: "backup_task_logs"
     backup_remote_logs: "backup_remote_logs"
+  rocketchat_custom_run_db:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks_db_restore_db', 'tasks_db_new_db')
+      }}
+    general: "general"
+    s3_uploads: "s3_uploads"
+    setup_task_uploads: "setup_task_uploads"
+    setup_verify_uploads: "setup_verify_uploads"
+    setup_remote_uploads: "setup_remote_uploads_file"
+    backup_task_uploads: "backup_task_uploads"
+    backup_remote_uploads: "backup_remote_uploads_sync_dir"
+    setup_task_db: "setup_task_db"
+    setup_verify_db: "setup_verify_db"
+    setup_remote_db: "setup_remote_db_file"
+    setup_local_db: "setup_local_db"
+    backup_task_db: "backup_task_db"
+    backup_remote_db: "backup_remote_db_sync_file"
+    backup_local_db: "backup_local_db"
+    s3_logs: "s3_logs"
+    setup_task_logs: "setup_task_logs"
+    setup_verify_logs: "setup_verify_logs"
+    setup_remote_logs: "setup_remote_logs"
+    backup_task_logs: "backup_task_logs"
+    backup_remote_logs: "backup_remote_logs"
+  rocketchat_custom_run_web:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks_web_restore_db', 'tasks_web_new_db')
+      }}
+    general: "general"
+    s3_uploads: "s3_uploads"
+    setup_task_uploads: "setup_task_uploads"
+    setup_verify_uploads: "setup_verify_uploads"
+    setup_remote_uploads: "setup_remote_uploads_file"
+    backup_task_uploads: "backup_task_uploads"
+    backup_remote_uploads: "backup_remote_uploads_sync_dir"
+    setup_task_db: "setup_task_db"
+    setup_verify_db: "setup_verify_db"
+    setup_remote_db: "setup_remote_db_file"
+    setup_local_db: "setup_local_db"
+    backup_task_db: "backup_task_db"
+    backup_remote_db: "backup_remote_db_sync_file"
+    backup_local_db: "backup_local_db"
+    s3_logs: "s3_logs"
+    setup_task_logs: "setup_task_logs"
+    setup_verify_logs: "setup_verify_logs"
+    setup_remote_logs: "setup_remote_logs"
+    backup_task_logs: "backup_task_logs"
+    backup_remote_logs: "backup_remote_logs"
   rocketchat_meta:
     use_run_dict: true
   rocketchat_run_dict:
@@ -309,6 +403,18 @@ pod_params:
     tasks_restore_local:
       backup: "backup:task:uploads,backup:task:db,backup:task:logs"
       setup: "setup:main:network,setup:task:uploads,setup:task:db"
+    tasks_db_new_db:
+      backup: "backup:task:db,backup:task:logs"
+      setup: "setup:main:network"
+    tasks_db_restore_db:
+      backup: "backup:task:db,backup:task:logs"
+      setup: "setup:main:network,setup:task:db,setup:task:logs"
+    tasks_web_new_db:
+      backup: "backup:task:uploads,backup:task:logs"
+      setup: "setup:main:network"
+    tasks_web_restore_db:
+      backup: "backup:task:uploads,backup:task:logs"
+      setup: "setup:main:network,setup:task:uploads,setup:task:logs"
     general:
       backup_delete_old_days: 3
       backup_local_base_dir: "/tmp/main/backup"

@@ -52,6 +52,60 @@ main:
         [host:children]
         wp
         [wp]
+  nodes:
+    destroy:
+      nodes: true
+      buckets: true
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
+    buckets:
+    - "wp_uploads"
+    - "wp_backup"
+    nodes:
+    - name: "db"
+      key: "wp"
+      params:
+        type: "db"
+      group_params:
+        custom_memory: "wp_custom_memory_db"
+        run: "wp_custom_run_db"
+    - name: "web"
+      key: "wp"
+      dependencies:
+      - host: "mysql"
+        node: "db"
+      params:
+        type: "web"
+      group_params:
+        custom_memory: "wp_custom_memory_web"
+        run: "wp_custom_run_web"
+    run_stages:
+    - tasks:
+      - name: "docker_compose_install"
+        all_nodes: true
+        nodes_tasks: true
+      - name: "main_build"
+        all_nodes: true
+        pods_tasks: true
+      - name: "main_upgrade"
+        nodes: ["db"]
+        pods_tasks: true
+    - tasks:
+      - name: "main_upgrade"
+        nodes: ["web"]
+        pods_tasks: true
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      repo: "cloud"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host:children]
+        db
+        web
+        [db]
+        [web]
 clouds:
   local:
     type: "local"
@@ -243,9 +297,22 @@ pod_params:
     nginx: 512mb
     wordpress: 512mb
     pma: 512mb
-    mysql: 1gb
+    mysql: 758gb
     toolbox: 512mb
     composer: 512mb
+    fluentd: 256mb
+    s3_uploads: 512mb
+    s3_backup: 512mb
+  wp_custom_memory_db:
+    mysql: 1gb
+    toolbox: 512mb
+    fluentd: 256mb
+    s3_backup: 512mb
+  wp_custom_memory_web:
+    nginx: 512mb
+    wordpress: 1gb
+    pma: 512mb
+    toolbox: 512mb
     fluentd: 256mb
     s3_uploads: 512mb
     s3_backup: 512mb
@@ -311,6 +378,74 @@ pod_params:
     backup_local_db: "backup_local_db"
     db_db: "db_db"
     s3_db: "s3_db"
+  wp_custom_run_db:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks_db_custom', 'tasks_db_custom_new_db')
+      }}
+    general: "general"
+    migrate: "migrate"
+    setup_task_uploads: "setup_task_uploads"
+    setup_verify_uploads: "setup_verify_uploads"
+    setup_remote_uploads: "setup_remote_uploads_file"
+    backup_task_uploads: "backup_task_uploads"
+    backup_remote_uploads: "backup_remote_uploads_sync_dir"
+    s3_uploads: "s3_uploads"
+    setup_task_db: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('setup_task_db_restore', 'setup_task_db_new_db')
+      }}
+    setup_verify_db: "setup_verify_db"
+    setup_remote_db: "setup_remote_db_file"
+    setup_local_db: "setup_local_db"
+    setup_new_db: "setup_new_db"
+    backup_task_db: "backup_task_db"
+    backup_remote_db: "backup_remote_db_sync_file"
+    backup_local_db: "backup_local_db"
+    db_db: "db_db"
+    s3_db: "s3_db"
+    setup_task_logs: "setup_task_logs"
+    setup_verify_logs: "setup_verify_logs"
+    setup_remote_logs: "setup_remote_logs_bucket_path_dir"
+    backup_task_logs: "backup_task_logs"
+    backup_remote_logs: "backup_remote_logs_sync_dir"
+    s3_logs: "s3_logs"
+  wp_custom_run_web:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks_web_custom', 'tasks_web_custom_new_db')
+      }}
+    general: "general"
+    migrate: "migrate"
+    setup_task_uploads: "setup_task_uploads"
+    setup_verify_uploads: "setup_verify_uploads"
+    setup_remote_uploads: "setup_remote_uploads_file"
+    backup_task_uploads: "backup_task_uploads"
+    backup_remote_uploads: "backup_remote_uploads_sync_dir"
+    s3_uploads: "s3_uploads"
+    setup_task_db: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('setup_task_db_restore', 'setup_task_db_new_db')
+      }}
+    setup_verify_db: "setup_verify_db"
+    setup_remote_db: "setup_remote_db_file"
+    setup_local_db: "setup_local_db"
+    setup_new_db: "setup_new_db"
+    backup_task_db: "backup_task_db"
+    backup_remote_db: "backup_remote_db_sync_file"
+    backup_local_db: "backup_local_db"
+    db_db: "db_db"
+    s3_db: "s3_db"
+    setup_task_logs: "setup_task_logs"
+    setup_verify_logs: "setup_verify_logs"
+    setup_remote_logs: "setup_remote_logs_bucket_path_dir"
+    backup_task_logs: "backup_task_logs"
+    backup_remote_logs: "backup_remote_logs_sync_dir"
+    s3_logs: "s3_logs"
   wp_meta:
     use_run_dict: true
   wp_run_dict:
@@ -325,6 +460,18 @@ pod_params:
       setup: "setup:task:uploads,setup:task:db"
     tasks_app_custom_new_db_local:
       backup: "backup:task:db,backup:task:uploads"
+      setup: "setup:task:db"
+    tasks_db_custom:
+      backup: "backup:task:db,backup:task:logs"
+      setup: "setup:task:logs,setup:task:db"
+    tasks_db_custom_new_db:
+      backup: "backup:task:db,backup:task:logs"
+      setup: "setup:task:db"
+    tasks_db_custom:
+      backup: "backup:task:uploads,backup:task:logs"
+      setup: "setup:task:logs,setup:task:uploads"
+    tasks_db_custom_new_db:
+      backup: "backup:task:uploads,backup:task:logs"
       setup: "setup:task:db"
     general:
       backup_delete_old_days: 3
