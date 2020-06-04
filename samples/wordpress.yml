@@ -5,6 +5,13 @@ main:
     - "local"
     nodes:
     - "wp_local"
+    - name: "app"
+      key: "wp_local"
+      pods:
+        wp:
+          group_params:
+            run: "wp_run_app_local"
+            run_tasks: "wp_run_app_local_tasks"
     local:
       pods:
       - "wp"
@@ -30,7 +37,13 @@ main:
     - "wp_uploads"
     - "wp_backup"
     nodes:
-    - "wp"
+    - name: "app"
+      key: "wp"
+      pods:
+        wp:
+          group_params:
+            run: "wp_run_app"
+            run_tasks: "wp_run_app_tasks"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -50,8 +63,8 @@ main:
         [main]
         localhost ansible_connection=local
         [host:children]
-        wp
-        [wp]
+        app
+        [app]
   nodes:
     destroy:
       nodes: true
@@ -64,21 +77,27 @@ main:
     nodes:
     - name: "db"
       key: "wp"
-      params:
-        type: "db"
-      group_params:
-        custom_memory: "wp_custom_memory_db"
-        run: "wp_custom_run_db"
+      pods:
+        wp:
+          params:
+            type: "db"
+          group_params:
+            custom_memory: "wp_custom_memory_db"
+            run: "wp_run_db"
+            run_tasks: "wp_run_db_tasks"
     - name: "web"
       key: "wp"
       dependencies:
       - host: "mysql"
         node: "db"
-      params:
-        type: "web"
-      group_params:
-        custom_memory: "wp_custom_memory_web"
-        run: "wp_custom_run_web"
+      pods:
+        wp:
+          params:
+            type: "web"
+          group_params:
+            custom_memory: "wp_custom_memory_web"
+            run: "wp_run_web"
+            run_tasks: "wp_run_web_tasks"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -175,7 +194,6 @@ nodes:
       group_params:
         custom_args: "wp_custom_args_local"
         custom_domain: "wp_custom_domain_local"
-        run: "wp_custom_run_app_local"
     params:
       size:
         memory: "2gb"
@@ -191,7 +209,6 @@ nodes:
       group_params:
         custom_args: "wp_custom_args"
         custom_domain: "wp_custom_domain"
-        run: "wp_custom_run_app"
     params:
       dns:
       - record: "{{ params.env_params.dns_record }}"
@@ -243,6 +260,7 @@ pods:
       custom_memory: "wp_custom_memory_app"
       meta: "wp_meta"
       run_dict: wp_run_dict
+      run_tasks_dict: wp_run_tasks_dict
 pod_params:
   wp_custom_args:
     mysql:
@@ -316,7 +334,10 @@ pod_params:
     fluentd: 256mb
     s3_uploads: 512mb
     s3_backup: 512mb
-  wp_custom_run_app:
+  wp_meta:
+    use_run_dict: true
+    use_run_tasks_dict: true
+  wp_run_app:
     tasks: >-
       {{
       params.env_params.restore_db | default(false) | bool |
@@ -324,33 +345,31 @@ pod_params:
       }}
     general: "general"
     migrate: "migrate"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_uploads: "s3_uploads"
-    setup_task_db: >-
+  wp_run_app_tasks:
+    uploads_setup: >-
       {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('setup_task_db_restore', 'setup_task_db_new_db')
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    setup_new_db: "setup_new_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    db_db: "db_db"
-    s3_db: "s3_db"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs_bucket_path_dir"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs_sync_dir"
-    s3_logs: "s3_logs"
-  wp_custom_run_app_local:
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_file', 'db_setup_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    db_setup_new: "db_setup_new"
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  wp_run_app_local:
     tasks: >-
       {{
       params.env_params.restore_db | default(false) | bool |
@@ -358,27 +377,31 @@ pod_params:
       }}
     general: "general_local"
     migrate: "migrate_local"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_uploads: "s3_uploads"
-    setup_task_db: >-
+  wp_run_app_local_tasks:
+    uploads_setup: >-
       {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('setup_task_db_restore', 'setup_task_db_new_db')
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    setup_new_db: "setup_new_db_local"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    db_db: "db_db"
-    s3_db: "s3_db"
-  wp_custom_run_db:
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    db_setup_new: "db_setup_new_local"
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  wp_run_db:
     tasks: >-
       {{
       params.env_params.restore_db | default(false) | bool |
@@ -386,33 +409,21 @@ pod_params:
       }}
     general: "general"
     migrate: "migrate"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_uploads: "s3_uploads"
-    setup_task_db: >-
+  wp_run_db_tasks:
+    db_setup: >-
       {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('setup_task_db_restore', 'setup_task_db_new_db')
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    setup_new_db: "setup_new_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    db_db: "db_db"
-    s3_db: "s3_db"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs_bucket_path_dir"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs_sync_dir"
-    s3_logs: "s3_logs"
-  wp_custom_run_web:
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    db_setup_new: "db_setup_new"
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  wp_run_web:
     tasks: >-
       {{
       params.env_params.restore_db | default(false) | bool |
@@ -420,34 +431,301 @@ pod_params:
       }}
     general: "general"
     migrate: "migrate"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_uploads: "s3_uploads"
-    setup_task_db: >-
+  wp_run_web_tasks:
+    uploads_setup: >-
       {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('setup_task_db_restore', 'setup_task_db_new_db')
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    setup_new_db: "setup_new_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    db_db: "db_db"
-    s3_db: "s3_db"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs_bucket_path_dir"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs_sync_dir"
-    s3_logs: "s3_logs"
-  wp_meta:
-    use_run_dict: true
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup_new: "db_setup_new"
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  wp_run_tasks_dict:
+    uploads_setup_file:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:default"
+        task_name_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/main/data/wordpress/uploads"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/main/data/wordpress/uploads"
+      setup_remote:
+        task_kind: "dir"
+        restore_tmp_dir: "/tmp/main/restore/wordpress/uploads"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/uploads/20190917_195406.zip?raw=true"
+        restore_is_zip_file: "true"
+        restore_zip_pass: "{{ params.credentials.wp_uploads_zip_file_pass | default('') }}"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_zip_inner_dir: "uploads"
+    uploads_setup_s3:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:default"
+        task_name_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/log/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/main/data/wordpress/uploads"
+      setup_remote:
+        task_kind: "dir"
+        task_name_s3: "s3:task"
+        restore_tmp_dir: "/tmp/main/restore/wordpress/uploads"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "uploads"
+      s3:
+        endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
+        service: "wp_s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    uploads_backup_sync:
+      task:
+        kind: "backup"
+      backup_task:
+        task_name_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/main/data/wordpress"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        task_name_s3: "s3:task"
+        backup_src_dir: "uploads"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "uploads"
+      s3:
+        endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
+        service: "wp_s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    uploads_backup_no_sync:
+      task:
+        kind: "backup"
+      backup_task:
+        task_name_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/main/data/wordpress"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        task_name_s3: "s3:task"
+        backup_src_dir: "uploads"
+        backup_bucket_static_dir: "files"
+        backup_zip_file: "wordpress-uploads.zip"
+      db:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.wordpress.db.name }}"
+        db_user: "{{ params.credentials.wordpress.db.user }}"
+        db_pass: "{{ params.credentials.wordpress.db.password }}"
+        db_connect_wait_secs: 90
+      s3:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "wp_s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_setup_new:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:db"
+        setup_run_new_task: "true"
+        task_name_new: "setup:new"
+      setup_verify:
+        db_task_name: "db:restore:verify:mysql"
+      setup_new:
+        url: >-
+          {{ params.env_params.ssl | bool | ternary('https', 'http')
+          }}://{{ params.env_params.wp_full_domain }}
+        title: "{{ params.env_params.wp_title }}"
+        admin_user: "{{ params.credentials.wordpress.setup.admin_user }}"
+        admin_password: "{{ params.credentials.wordpress.setup.admin_password }}"
+        admin_email: "{{ params.credentials.wordpress.setup.admin_email }}"
+        restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
+        remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
+    db_setup_new_local:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:db"
+        setup_run_new_task: "true"
+        task_name_new: "setup:new"
+      setup_verify:
+        db_task_name: "db:restore:verify:mysql"
+      setup_new:
+        url: >-
+          {{ params.env_params.ssl | bool | ternary('https', 'http')
+          }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}
+        title: "{{ params.env_params.wp_title }}"
+        admin_user: "{{ params.credentials.wordpress.setup.admin_user }}"
+        admin_password: "{{ params.credentials.wordpress.setup.admin_password }}"
+        admin_email: "{{ params.credentials.wordpress.setup.admin_email }}"
+        restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
+        remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
+    db_setup_restore_file:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:db"
+        task_name_remote: "setup:remote:default"
+        task_name_local: "setup:local:db"
+        setup_dest_base_dir: "/tmp/main/mysql/restore"
+      setup_verify:
+        db_task_name: "db:restore:verify:mysql"
+      setup_remote:
+        task_kind: "file"
+        restore_dest_file: "{{ params.credentials.wordpress.db.name }}.sql"
+        restore_tmp_dir: "/tmp/main/restore/mysql"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/db/20190917_195406.zip?raw=true"
+        restore_is_zip_file: "true"
+        restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
+        restore_zip_inner_file: "{{ params.credentials.wordpress.db.name }}.sql"
+      setup_local:
+        db_task_name: "db:restore:file:mysql"
+        db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
+      db:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.wordpress.db.name }}"
+        db_user: "{{ params.credentials.wordpress.db.user }}"
+        db_pass: "{{ params.credentials.wordpress.db.password }}"
+        db_connect_wait_secs: 90
+    db_setup_restore_s3:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:db"
+        task_name_remote: "setup:remote:default"
+        task_name_local: "setup:local:db"
+        setup_dest_base_dir: "/tmp/main/mysql/restore"
+      setup_verify:
+        db_task_name: "db:restore:verify:mysql"
+      setup_remote:
+        task_kind: "file"
+        task_name_s3: "s3:task"
+        restore_tmp_dir: "/tmp/main/restore/mysql"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "db"
+      setup_local:
+        db_task_name: "db:restore:file:mysql"
+        db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
+      db:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.wordpress.db.name }}"
+        db_user: "{{ params.credentials.wordpress.db.user }}"
+        db_pass: "{{ params.credentials.wordpress.db.password }}"
+        db_connect_wait_secs: 90
+      s3:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "wp_s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_backup_sync:
+      task:
+        kind: "backup"
+      backup_task:
+        task_name_local: "backup:local:db"
+        task_name_remote: "backup:remote:default"
+        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_local:
+        db_task_name: "db:backup:file:mysql"
+        db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
+      backup_remote:
+        task_kind: "file"
+        task_name_s3: "s3:task"
+        backup_src_file: "{{ params.credentials.wordpress.db.name }}.sql"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "db"
+      db:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.wordpress.db.name }}"
+        db_user: "{{ params.credentials.wordpress.db.user }}"
+        db_pass: "{{ params.credentials.wordpress.db.password }}"
+        db_connect_wait_secs: 90
+      s3:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "wp_s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_backup_no_sync:
+      task:
+        kind: "backup"
+      backup_task:
+        task_name_local: "backup:local:db"
+        task_name_remote: "backup:remote:default"
+        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_local:
+        db_task_name: "db:backup:file:mysql"
+        db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
+      backup_remote:
+        task_kind: "file"
+        task_name_s3: "s3:task"
+        backup_src_file: "{{ params.credentials.wordpress.db.name }}.sql"
+        backup_bucket_static_dir: "files"
+        backup_zip_file: "wordpress-db.zip"
+      db:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.wordpress.db.name }}"
+        db_user: "{{ params.credentials.wordpress.db.user }}"
+        db_pass: "{{ params.credentials.wordpress.db.password }}"
+        db_connect_wait_secs: 90
+      s3:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "wp_s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    logs_setup:
+      task:
+        kind: "setup"
+      setup_task:
+        task_name_verify: "setup:verify:default"
+        task_name_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/log/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/log/main"
+      setup_remote:
+        task_kind: "dir"
+        task_name_s3: "s3:task"
+        restore_tmp_dir: "/tmp/main/restore/log"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "logs"
+      s3:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "wp_s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    logs_backup:
+      task:
+        kind: "backup"
+      backup_task:
+        task_name_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/log"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        task_name_s3: "s3:task"
+        backup_src_dir: "main"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "log"
+      s3:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "wp_s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
   wp_run_dict:
     tasks_app_custom:
       backup: "backup:task:db,backup:task:uploads,backup:task:logs"
@@ -467,10 +745,10 @@ pod_params:
     tasks_db_custom_new_db:
       backup: "backup:task:db,backup:task:logs"
       setup: "setup:task:db"
-    tasks_db_custom:
+    tasks_web_custom:
       backup: "backup:task:uploads,backup:task:logs"
       setup: "setup:task:logs,setup:task:uploads"
-    tasks_db_custom_new_db:
+    tasks_web_custom_new_db:
       backup: "backup:task:uploads,backup:task:logs"
       setup: "setup:task:db"
     general:
@@ -495,143 +773,6 @@ pod_params:
       new_domain_host: >-
         {{ params.env_params.ssl | bool | ternary('https', 'http')
         }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}/
-    setup_new_db:
-      url: >-
-        {{ params.env_params.ssl | bool | ternary('https', 'http')
-        }}://{{ params.env_params.wp_full_domain }}
-      title: "{{ params.env_params.wp_title }}"
-      admin_user: "{{ params.credentials.wordpress.setup.admin_user }}"
-      admin_password: "{{ params.credentials.wordpress.setup.admin_password }}"
-      admin_email: "{{ params.credentials.wordpress.setup.admin_email }}"
-      restore_seed: false
-    setup_new_db_local:
-      url: >-
-        {{ params.env_params.ssl | bool | ternary('https', 'http')
-        }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}
-      title: "{{ params.env_params.wp_title }}"
-      admin_user: "{{ params.credentials.wordpress.setup.admin_user }}"
-      admin_password: "{{ params.credentials.wordpress.setup.admin_password }}"
-      admin_email: "{{ params.credentials.wordpress.setup.admin_email }}"
-      restore_seed: false
-      remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
-    s3_uploads:
-      endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
-      service: "wp_s3_uploads"
-      cli: "awscli"
-      cli_cmd: "run"
-    setup_task_uploads:
-      task_name_verify: "setup:verify:default:uploads"
-      task_name_remote: "setup:remote:default:uploads"
-      setup_dest_base_dir: "/var/main/data/wordpress/uploads"
-    setup_verify_uploads:
-      setup_dest_dir_to_verify: "/var/main/data/wordpress/uploads"
-    setup_remote_uploads_file:
-      task_kind: "dir"
-      restore_tmp_dir: "/tmp/main/restore/wordpress/uploads"
-      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/uploads/20190917_195406.zip?raw=true"
-      restore_is_zip_file: "true"
-      restore_zip_pass: "{{ params.credentials.wp_uploads_zip_file_pass | default('') }}"
-      restore_recursive_mode_dir: "777"
-      restore_recursive_mode_file: "666"
-      restore_zip_inner_dir: "uploads"
-    backup_task_uploads:
-      task_name_remote: "backup:remote:default:uploads"
-      backup_src_base_dir: "/var/main/data/wordpress"
-      backup_local_static_dir:  "/tmp/main/backup/static"
-    backup_remote_uploads_sync_dir:
-      task_kind: "dir"
-      task_name_s3: "s3:task:uploads"
-      backup_src_dir: "uploads"
-      backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "uploads"
-    s3_db:
-      endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-      service: "wp_s3_backup"
-      cli: "awscli"
-      cli_cmd: "run"
-    setup_task_db_new_db:
-      task_name_verify: "setup:verify:db:db"
-      setup_run_new_task: "true"
-      task_name_new: "setup:new:db"
-    setup_task_db_restore:
-      task_name_verify: "setup:verify:db:db"
-      task_name_remote: "setup:remote:default:db"
-      task_name_local: "setup:local:db:db"
-      setup_dest_base_dir: "/tmp/main/mysql/restore"
-    setup_verify_db:
-      db_task_name: "db:restore:verify:mysql"
-    setup_remote_db_file:
-      task_kind: "file"
-      restore_dest_file: "{{ params.credentials.wordpress.db.name }}.sql"
-      restore_tmp_dir: "/tmp/main/restore/mysql"
-      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/db/20190917_195406.zip?raw=true"
-      restore_is_zip_file: "true"
-      restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
-      restore_zip_inner_file: "{{ params.credentials.wordpress.db.name }}.sql"
-    setup_local_db:
-      db_task_name: "db:restore:file:mysql"
-      db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
-    backup_task_db:
-      task_name_local: "backup:local:db:db"
-      task_name_remote: "backup:remote:default:db"
-      backup_src_base_dir: "/tmp/main/mysql/backup"
-      backup_local_static_dir:  "/tmp/main/backup/static"
-    backup_task_db_dynamic:
-      task_name_local: "backup:local:db:db"
-      task_name_remote: "backup:remote:default:db"
-      backup_src_base_dir: "/tmp/main/mysql/backup"
-    backup_remote_db_no_sync:
-      task_kind: "file"
-      task_name_s3: "s3:task:db"
-      backup_src_file: "{{ params.credentials.wordpress.db.name }}.sql"
-      backup_bucket_static_dir: "files"
-      backup_zip_file: "mediawiki-db.zip"
-    backup_remote_db_sync_file:
-      task_kind: "file"
-      task_name_s3: "s3:task:db"
-      backup_src_file: "{{ params.credentials.wordpress.db.name }}.sql"
-      backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "db"
-    backup_local_db:
-      db_task_name: "db:backup:file:mysql"
-      db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
-    db_db:
-      db_service: "mysql"
-      db_name: "{{ params.credentials.wordpress.db.name }}"
-      db_user: "{{ params.credentials.wordpress.db.user }}"
-      db_pass: "{{ params.credentials.wordpress.db.password }}"
-      db_connect_wait_secs: 90
-    s3_logs:
-      endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-      service: "wp_s3_backup"
-      cli: "awscli"
-      cli_cmd: "run"
-    setup_task_logs:
-      task_name_verify: "setup:verify:default:logs"
-      task_name_remote: "setup:remote:default:logs"
-      setup_dest_base_dir: "/var/log/main"
-    setup_verify_logs:
-      setup_dest_dir_to_verify: "/var/log/main"
-    setup_remote_logs_bucket_path_dir:
-      task_kind: "dir"
-      task_name_s3: "s3:task:logs"
-      restore_tmp_dir: "/tmp/main/restore/log"
-      restore_recursive_mode_dir: "777"
-      restore_recursive_mode_file: "666"
-      restore_remote_bucket_path_dir: "logs"
-    backup_task_logs:
-      task_name_remote: "backup:remote:default:logs"
-      backup_src_base_dir: "/var/log"
-      backup_local_static_dir:  "/tmp/main/backup/static"
-    backup_remote_logs_sync_dir:
-      task_kind: "dir"
-      task_name_s3: "s3:task:logs"
-      backup_src_dir: "main"
-      backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "log"
 tasks:
   docker_compose_install:
     type: "task"
