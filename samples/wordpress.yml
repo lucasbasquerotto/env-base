@@ -586,9 +586,9 @@ pod_params:
         db_pass: "{{ params.credentials.wordpress.db.password }}"
         db_connect_wait_secs: 90
       s3_run:
-        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-        service: "wp_s3_backup"
+        endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
+        service: "wp_s3_uploads"
         cli: "awscli"
         cli_cmd: "run"
     db_setup_new:
