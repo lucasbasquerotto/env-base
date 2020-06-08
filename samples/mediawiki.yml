@@ -287,7 +287,7 @@ pod_params:
     toolbox_version: "toolbox-20200513"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
-    fluentd_image: "lucasbasquerotto/wordpress"
+    fluentd_image: "lucasbasquerotto/mediawiki"
     fluentd_version: "fluentd-1.7.4-01"
   mediawiki_custom_memory_app:
     nginx: 512mb
@@ -430,6 +430,391 @@ pod_params:
     backup_remote_logs: "backup_remote_logs"
   mediawiki_meta:
     use_run_dict: true
+    use_run_tasks_dict: true
+  mediawiki_run:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks', 'tasks_new_db')
+      }}
+    general: "general"
+    migrate: "migrate"
+  mediawiki_run_local:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks', 'tasks_new_db')
+      }}
+    general: "general_local"
+    migrate: "migrate_local"
+  mediawiki_run_dict:
+    tasks:
+      backup: "group_backup"
+      setup: "group_setup"
+    tasks_new_db:
+      backup: "group_backup"
+    general:
+      backup_delete_old_days: 3
+      backup_local_base_dir: "/tmp/mediawiki/backup"
+      orchestration: "compose"
+      script_dir: "custom-pod/mediawiki/scripts"
+      script_env_file: "remote.sh"
+      toolbox_service: "toolbox"
+    general_local:
+      backup_delete_old_days: 3
+      backup_local_base_dir: "/tmp/main/backup"
+      orchestration: "compose"
+      script_dir: "custom-pod/mediawiki/scripts"
+      script_env_file: "local.sh"
+      toolbox_service: "toolbox"
+  mediawiki_run_tasks_app:
+    group_setup: "group_setup_app"
+    group_backup: "group_backup_app"
+    uploads_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
+      }}
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_file', 'db_setup_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    db_setup_new: "db_setup_new"
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  mediawiki_run_tasks_app_local:
+    group_setup: "group_setup_app_local"
+    group_backup: "group_backup_app_local"
+    uploads_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
+      }}
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  mediawiki_run_tasks_db:
+    group_setup: "group_setup_db"
+    group_backup: "group_backup_db"
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  mediawiki_run_tasks_web:
+    group_setup: "group_setup_web"
+    group_backup: "group_backup_web"
+    uploads_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
+      }}
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  mediawiki_run_tasks_dict:
+    group_setup_app:
+      task: { type: "group" }
+      group_task: { task_names: "logs_setup,uploads_setup,db_setup" }
+    group_backup_app:
+      task: { type: "group" }
+      group_task: { task_names: "db_backup,uploads_backup,logs_backup" }
+    group_setup_app_local:
+      task: { type: "group" }
+      group_task: { task_names: "uploads_setup,db_setup" }
+    group_backup_app_local:
+      task: { type: "group" }
+      group_task: { task_names: "db_backup,uploads_backup" }
+    group_setup_db:
+      task: { type: "group" }
+      group_task: { task_names: "logs_setup,db_setup" }
+    group_backup_db:
+      task: { type: "group" }
+      group_task: { task_names: "db_backup,logs_backup" }
+    group_setup_web:
+      task: { type: "group" }
+      group_task: { task_names: "logs_setup,uploads_setup" }
+    group_backup_web:
+      task: { type: "group" }
+      group_task: { task_names: "uploads_backup,logs_backup" }
+    uploads_setup_file:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:default"
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/main/data/mediawiki/uploads"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/main/data/mediawiki/uploads"
+      setup_remote:
+        task_kind: "dir"
+        restore_tmp_dir: "/tmp/main/restore/mediawiki/uploads"
+      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200602_194452.zip?raw=true"
+        restore_is_zip_file: "true"
+        restore_zip_pass: "{{ params.credentials.mediawiki_uploads_zip_file_pass | default('') }}"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_zip_inner_dir: "uploads"
+    uploads_setup_s3:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:default"
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/log/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/main/data/mediawiki/uploads"
+      setup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/mediawiki/uploads"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "uploads"
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    uploads_backup_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/main/data/mediawiki"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "uploads"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "uploads"
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    uploads_backup_no_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/main/data/mediawiki"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "uploads"
+        backup_bucket_static_dir: "files"
+        backup_zip_file: "mediawiki-uploads.zip"
+      db_run:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.mediawiki.db.name }}"
+        db_user: "{{ params.credentials.mediawiki.db.user }}"
+        db_pass: "{{ params.credentials.mediawiki.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_setup_restore_file:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:db"
+        subtask_cmd_remote: "setup:remote:default"
+        subtask_cmd_local: "setup:local:db"
+        setup_dest_base_dir: "/tmp/main/mysql/restore"
+      setup_verify:
+        db_subtask_cmd: "db:restore:verify:mysql"
+      setup_remote:
+        task_kind: "file"
+        restore_dest_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+        restore_tmp_dir: "/tmp/main/restore/mysql"
+      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200602_194452.zip?raw=true"
+        restore_is_zip_file: "true"
+        restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
+        restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+      setup_local:
+        db_subtask_cmd: "db:restore:file:mysql"
+        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+      db_run:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.mediawiki.db.name }}"
+        db_user: "{{ params.credentials.mediawiki.db.user }}"
+        db_pass: "{{ params.credentials.mediawiki.db.password }}"
+        db_connect_wait_secs: 90
+    db_setup_restore_s3:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:db"
+        subtask_cmd_remote: "setup:remote:default"
+        subtask_cmd_local: "setup:local:db"
+        setup_dest_base_dir: "/tmp/main/mysql/restore"
+      setup_verify:
+        db_subtask_cmd: "db:restore:verify:mysql"
+      setup_remote:
+        task_kind: "file"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/mysql"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "db"
+      setup_local:
+        db_subtask_cmd: "db:restore:file:mysql"
+        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+      db_run:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.mediawiki.db.name }}"
+        db_user: "{{ params.credentials.mediawiki.db.user }}"
+        db_pass: "{{ params.credentials.mediawiki.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_backup_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_local: "backup:local:db"
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_local:
+        db_subtask_cmd: "db:backup:file:mysql"
+        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+      backup_remote:
+        task_kind: "file"
+        subtask_cmd_s3: "s3:run"
+        backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "db"
+      db_run:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.mediawiki.db.name }}"
+        db_user: "{{ params.credentials.mediawiki.db.user }}"
+        db_pass: "{{ params.credentials.mediawiki.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_backup_no_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_local: "backup:local:db"
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_local:
+        db_subtask_cmd: "db:backup:file:mysql"
+        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
+      backup_remote:
+        task_kind: "file"
+        subtask_cmd_s3: "s3:run"
+        backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+        backup_bucket_static_dir: "files"
+        backup_zip_file: "mediawiki-db.zip"
+      db_run:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.mediawiki.db.name }}"
+        db_user: "{{ params.credentials.mediawiki.db.user }}"
+        db_pass: "{{ params.credentials.mediawiki.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    logs_setup:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:default"
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/log/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/log/main"
+      setup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/log"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "logs"
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    logs_backup:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/log"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "main"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "log"
+      s3_run:
+        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
   mediawiki_run_dict:
     tasks_app_new_db:
       backup: "backup:task:uploads,backup:task:db,backup:task:logs"

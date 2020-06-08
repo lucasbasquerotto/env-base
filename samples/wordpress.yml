@@ -4,7 +4,6 @@ main:
     clouds:
     - "local"
     nodes:
-    - "wp_local"
     - name: "app"
       key: "wp_local"
       pods:
@@ -65,6 +64,32 @@ main:
         [host:children]
         app
         [app]
+  remote_local_test:
+    clouds:
+    - "local"
+    nodes:
+    - name: "app"
+      key: "wp_local"
+      pods:
+        wp:
+          group_params:
+            run: "wp_run"
+            run_tasks: "wp_run_tasks_app"
+    local:
+      pods:
+      - "wp"
+      apps:
+      - "wp_local"
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
+      meta:
+        template_no_empty_lines: true
+      repo: "cloud"
   nodes:
     destroy:
       nodes: true
@@ -399,7 +424,7 @@ pod_params:
     db_setup: >-
       {{
       params.env_params.non_s3_setup | default(false) | bool |
-      ternary('db_setup_file', 'db_setup_s3')
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
     db_backup: >-
       {{
@@ -544,7 +569,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
-        service: "wp_s3_uploads"
+        service: "s3_uploads"
         cli: "awscli"
         cli_cmd: "run"
     uploads_backup_sync:
@@ -563,7 +588,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
-        service: "wp_s3_uploads"
+        service: "s3_uploads"
         cli: "awscli"
         cli_cmd: "run"
     uploads_backup_no_sync:
@@ -588,7 +613,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
-        service: "wp_s3_uploads"
+        service: "s3_uploads"
         cli: "awscli"
         cli_cmd: "run"
     db_setup_new:
@@ -685,7 +710,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-        service: "wp_s3_backup"
+        service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
     db_backup_sync:
@@ -714,7 +739,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-        service: "wp_s3_backup"
+        service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
     db_backup_no_sync:
@@ -743,7 +768,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-        service: "wp_s3_backup"
+        service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
     logs_setup:
@@ -765,7 +790,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-        service: "wp_s3_backup"
+        service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
     logs_backup:
@@ -784,7 +809,7 @@ pod_params:
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-        service: "wp_s3_backup"
+        service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
 tasks:
