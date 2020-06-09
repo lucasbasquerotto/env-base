@@ -280,6 +280,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      use_certbot: "{{ params.env_params.use_certbot }}"
     group_params:
       custom_images: "wp_custom_images"
       custom_memory: "wp_custom_memory_app"
@@ -306,18 +307,22 @@ pod_params:
       env: "development"
       lang: "en_US"
   wp_custom_domain:
+    public_http_port: "80"
+    public_https_port: "443"
+    private_http_port: "9080"
+    private_https_port: "9443"
     main_domain: "{{ params.env_params.wp_full_domain }}"
-    main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.wp_full_domain }}"
-    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_domain_local:
+    public_http_port: "8080"
+    public_https_port: "8443"
+    private_http_port: "9080"
+    private_https_port: "9443"
     main_domain: "localhost"
-    main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "localhost"
-    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_images:
     nginx_image: "nginx"
@@ -332,6 +337,8 @@ pod_params:
     toolbox_version: "toolbox-20200513"
     composer_image: "lucasbasquerotto/wordpress"
     composer_version: "composer-1.8.6"
+    certbot_image: "certbot/certbot"
+    certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
     fluentd_image: "lucasbasquerotto/wordpress"
@@ -344,6 +351,7 @@ pod_params:
     toolbox: 512mb
     composer: 512mb
     fluentd: 256mb
+    certbot: 256mb
     s3_uploads: 512mb
     s3_backup: 512mb
   wp_custom_memory_db:
@@ -357,6 +365,7 @@ pod_params:
     pma: 512mb
     toolbox: 512mb
     fluentd: 256mb
+    certbot: 256mb
     s3_uploads: 512mb
     s3_backup: 512mb
   wp_meta:
@@ -434,6 +443,7 @@ pod_params:
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    certbot: "certbot"
   wp_run_tasks_app_local:
     group_setup: "group_setup_app_local"
     group_setup_new_db: "group_setup_app_new_db_local"
@@ -461,6 +471,7 @@ pod_params:
     db_setup_new: "db_setup_new_local"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    certbot: "certbot_local"
   wp_run_tasks_db:
     group_setup: "group_setup_db"
     group_setup_new_db: "group_setup_db_new_db"
@@ -495,6 +506,7 @@ pod_params:
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    certbot: "certbot"
   wp_run_tasks_dict:
     group_setup_app:
       task: { type: "group" }
@@ -812,6 +824,38 @@ pod_params:
         service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
+    certbot:
+      task:
+        type: "certbot"
+      certbot_run:
+        toolbox_service: "toolbox"
+        certbot_service: "certbot"
+        webservice_type: "nginx"
+        data_base_path: "/var/main/data/vol/tasks/certbot/"
+        main_domain: "{{ params.env_params.wp_full_domain }}"
+        domains: >-
+          {{ params.env_params.wp_full_domain }}
+          www.{{ params.env_params.wp_full_domain }}
+          pma.{{ params.env_params.wp_full_domain }}
+        rsa_key_size: "4096"
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        staging: "{{ params.env_params.certbot_staging | default('false') }}"
+        force: "{{ params.env_params.certbot_force | default('false') }}"
+    certbot_local:
+      task:
+        type: "certbot"
+      certbot_run:
+        toolbox_service: "toolbox"
+        certbot_service: "certbot"
+        webservice_type: "nginx"
+        data_base_path: "/var/main/data/vol/tasks/certbot/"
+        main_domain: "localhost"
+        domains: "localhost"
+        rsa_key_size: "4096"
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        dev: "true"
+        staging: "true"
+        force: "{{ params.env_params.certbot_force | default('false') }}"
 tasks:
   docker_compose_install:
     type: "task"
