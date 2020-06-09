@@ -827,11 +827,13 @@ pod_params:
     certbot:
       task:
         type: "certbot"
+      certbot_task:
+        certbot_cmd: "setup"
       certbot_run:
         toolbox_service: "toolbox"
         certbot_service: "certbot"
         webservice_type: "nginx"
-        data_base_path: "/var/main/data/vol/tasks/certbot/"
+        data_base_path: "/var/main/data/vol/certbot/"
         main_domain: "{{ params.env_params.wp_full_domain }}"
         domains: >-
           {{ params.env_params.wp_full_domain }}
@@ -844,11 +846,13 @@ pod_params:
     certbot_local:
       task:
         type: "certbot"
+      certbot_task:
+        certbot_cmd: "setup"
       certbot_run:
         toolbox_service: "toolbox"
         certbot_service: "certbot"
         webservice_type: "nginx"
-        data_base_path: "/var/main/data/vol/tasks/certbot/"
+        data_base_path: "/var/main/data/vol/certbot/"
         main_domain: "localhost"
         domains: "localhost"
         rsa_key_size: "4096"
