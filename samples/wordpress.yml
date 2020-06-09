@@ -284,8 +284,8 @@ pods:
       custom_images: "wp_custom_images"
       custom_memory: "wp_custom_memory_app"
       meta: "wp_meta"
-      run_dict: wp_run_dict
-      run_tasks_dict: wp_run_tasks_dict
+      run_dict: "wp_run_dict"
+      run_tasks_dict: "wp_run_tasks_dict"
 pod_params:
   wp_custom_args:
     mysql:
@@ -549,7 +549,7 @@ pod_params:
         restore_zip_pass: "{{ params.credentials.wp_uploads_zip_file_pass | default('') }}"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
-        restore_zip_inner_dir: "uploads"
+        restore_zip_inner_dir: "images"
     uploads_setup_s3:
       task:
         type: "setup"
