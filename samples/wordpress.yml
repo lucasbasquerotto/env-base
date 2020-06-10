@@ -236,8 +236,10 @@ nodes:
         custom_domain: "wp_custom_domain"
     params:
       dns:
-      - record: "{{ params.env_params.dns_record }}"
-        name: "{{ params.env_params.dns_name }}"
+      - record: "{{ params.env_params.main_dns_record }}"
+        name: "{{ params.env_params.main_dns_name }}"
+      - record: "{{ params.env_params.pma_dns_record }}"
+        name: "{{ params.env_params.pma_dns_name }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -313,7 +315,7 @@ pod_params:
     private_https_port: "9443"
     main_domain: "{{ params.env_params.wp_full_domain }}"
     main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "{{ params.env_params.wp_full_domain }}"
+    pma_domain: "{{ params.env_params.pma_full_domain }}"
     pma_ssl: "{{ params.env_params.ssl }}"
   wp_custom_domain_local:
     public_http_port: "8080"
@@ -835,7 +837,7 @@ pod_params:
         webservice_type: "nginx"
         data_base_path: "/var/main/data/vol/certbot/"
         main_domain: "{{ params.env_params.wp_full_domain }}"
-        domains: "{{ params.env_params.wp_full_domain }}"
+        domains: "{{ params.env_params.certbot_domains }}"
         rsa_key_size: "4096"
         email: "{{ params.env_params.certbot_email | default('') }}"
         staging: "{{ params.env_params.certbot_staging | default('false') }}"
