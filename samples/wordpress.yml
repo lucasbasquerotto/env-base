@@ -445,6 +445,8 @@ pod_params:
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
     certbot: "certbot"
   wp_run_tasks_app_local:
     group_setup: "group_setup_app_local"
@@ -473,6 +475,8 @@ pod_params:
     db_setup_new: "db_setup_new_local"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
     certbot: "certbot_local"
   wp_run_tasks_db:
     group_setup: "group_setup_db"
@@ -491,6 +495,8 @@ pod_params:
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
   wp_run_tasks_web:
     group_setup: "group_setup_web"
     group_setup_new_db: "group_setup_web_new_db"
@@ -508,14 +514,16 @@ pod_params:
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
     certbot: "certbot"
   wp_run_tasks_dict:
     group_setup_app:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,uploads_setup,db_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,uploads_setup,db_setup" }
     group_backup_app:
       task: { type: "group" }
-      group_task: { task_names: "db_backup,uploads_backup,logs_backup" }
+      group_task: { task_names: "db_backup,uploads_backup,sync_backup,logs_backup" }
     group_setup_app_new_db:
       task: { type: "group" }
       group_task: { task_names: "db_setup_new" }
@@ -530,19 +538,19 @@ pod_params:
       group_task: { task_names: "db_setup_new" }
     group_setup_db:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,db_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,db_setup" }
     group_backup_db:
       task: { type: "group" }
-      group_task: { task_names: "db_backup,logs_backup" }
+      group_task: { task_names: "db_backup,sync_backup,logs_backup" }
     group_setup_db_new_db:
       task: { type: "group" }
       group_task: { task_names: "db_setup_new" }
     group_setup_web:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,uploads_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,uploads_setup" }
     group_backup_web:
       task: { type: "group" }
-      group_task: { task_names: "uploads_backup,logs_backup" }
+      group_task: { task_names: "uploads_backup,sync_backup,logs_backup" }
     group_setup_web_new_db:
       task: { type: "group" }
       group_task: { task_names: "db_setup_new" }
@@ -826,6 +834,46 @@ pod_params:
         service: "s3_backup"
         cli: "awscli"
         cli_cmd: "run"
+    sync_setup:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/sync/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/sync/main"
+      setup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/sync"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "sync"
+      s3_run:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    sync_backup:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/sync"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "main"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "sync"
+      s3_run:
+        endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
     certbot:
       task:
         type: "certbot"
@@ -835,7 +883,7 @@ pod_params:
         toolbox_service: "toolbox"
         certbot_service: "certbot"
         webservice_type: "nginx"
-        data_base_path: "/var/main/data/vol/certbot/"
+        data_base_path: "/var/main/data/sync/certbot/"
         main_domain: "{{ params.env_params.wp_full_domain }}"
         domains: "{{ params.env_params.certbot_domains }}"
         rsa_key_size: "4096"
@@ -851,9 +899,9 @@ pod_params:
         toolbox_service: "toolbox"
         certbot_service: "certbot"
         webservice_type: "nginx"
-        data_base_path: "/var/main/data/vol/certbot/"
+        data_base_path: "/var/main/data/sync/certbot/"
         main_domain: "localhost"
-        domains: "localhost"
+        domains: "localhost www.localhost"
         rsa_key_size: "4096"
         email: "{{ params.env_params.certbot_email | default('') }}"
         dev: "true"
