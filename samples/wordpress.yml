@@ -561,7 +561,7 @@ pod_params:
         restore_zip_pass: "{{ params.credentials.wp_uploads_zip_file_pass | default('') }}"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
-        restore_zip_inner_dir: "images"
+        restore_zip_inner_dir: "uploads"
     uploads_setup_s3:
       task:
         type: "setup"
