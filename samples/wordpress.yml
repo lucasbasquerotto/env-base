@@ -236,8 +236,8 @@ nodes:
         custom_domain: "wp_custom_domain"
     params:
       dns:
-      - record: "{{ params.env_params.main_dns_record }}"
-        name: "{{ params.env_params.main_dns_name }}"
+      - record: "{{ params.env_params.dns_record }}"
+        name: "{{ params.env_params.dns_name }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
