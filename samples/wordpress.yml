@@ -202,10 +202,12 @@ buckets:
   wp_uploads:
     name: "{{ params.env_params.wp_uploads_bucket_name }}"
     endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
+    region: "{{ params.env_params.wp_uploads_bucket_region }}"
     credentials: "wp_uploads_bucket"
   wp_backup:
     name: "{{ params.env_params.wp_backup_bucket_name }}"
     endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+    region: "{{ params.env_params.wp_backup_bucket_region }}"
     credentials: "wp_backup_bucket"
 nodes:
   wp_local:
