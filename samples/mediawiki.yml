@@ -213,9 +213,8 @@ nodes:
       params:
         local: true
       group_params:
-        custom_args: "mediawiki_custom_args_local"
+        custom_args: "mediawiki_custom_args"
         custom_domain: "mediawiki_custom_domain_local"
-        run: "mediawiki_custom_run_app_local"
     params:
       size:
         memory: "2gb"
@@ -231,11 +230,12 @@ nodes:
       group_params:
         custom_args: "mediawiki_custom_args"
         custom_domain: "mediawiki_custom_domain"
-        run: "mediawiki_custom_run_app"
     params:
       dns:
-      - record: "{{ params.env_params.dns_record }}"
-        name: "{{ params.env_params.dns_name }}"
+      - record: "{{ params.env_params.main_dns_record }}"
+        name: "{{ params.env_params.main_dns_name }}"
+      - record: "{{ params.env_params.pma_dns_record }}"
+        name: "{{ params.env_params.pma_dns_name }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -277,6 +277,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      use_certbot: "{{ params.env_params.use_certbot }}"
       mediawiki: "{{ params.env_params.mediawiki }}"
     group_params:
       custom_images: "mediawiki_custom_images"
@@ -286,37 +287,29 @@ pods:
       run_tasks_dict: "mediawiki_run_tasks_dict"
 pod_params:
   mediawiki_custom_args:
-    nginx:
-      http_port: "80"
-      https_port: "443"
-      private_http_port: "9080"
-      private_https_port: "9443"
     mysql:
       host: "mysql"
       port: "3306"
     fluentd:
       port: "24224"
-  mediawiki_custom_args_local:
-    nginx:
-      http_port: "8080"
-      https_port: "8443"
-      private_http_port: "9080"
-      private_https_port: "9443"
-    mysql:
-      host: "mysql"
-      port: "3306"
   mediawiki_custom_domain:
-    ssl: "{{ params.env_params.ssl }}"
+    public_http_port: "80"
+    public_https_port: "443"
+    private_http_port: "9080"
+    private_https_port: "9443"
     main_domain: "{{ params.env_params.mediawiki_full_domain }}"
-    main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
+    main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.mediawiki_full_domain }}"
-    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
+    pma_ssl: "{{ params.env_params.ssl }}"
   mediawiki_custom_domain_local:
-    ssl: "{{ params.env_params.ssl }}"
+    public_http_port: "8080"
+    public_https_port: "8443"
+    private_http_port: "9080"
+    private_https_port: "9443"
     main_domain: "localhost"
-    main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
+    main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "localhost"
-    pma_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
+    pma_ssl: "{{ params.env_params.ssl }}"
   mediawiki_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -328,6 +321,8 @@ pod_params:
     mysql_version: "10.5.3-bionic"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200513"
+    certbot_image: "certbot/certbot"
+    certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
     fluentd_image: "lucasbasquerotto/mediawiki"
@@ -338,6 +333,7 @@ pod_params:
     pma: 512mb
     mysql: 1gb
     toolbox: 512mb
+    certbot: 256mb
     s3_backup: 512mb
     s3_uploads: 512mb
     fluentd: 256mb
@@ -352,125 +348,10 @@ pod_params:
     mediawiki: 1gb
     pma: 512mb
     toolbox: 512mb
+    certbot: 256mb
     s3_backup: 512mb
     s3_uploads: 512mb
     fluentd: 256mb
-  mediawiki_custom_run_app:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_app_restore_db', 'tasks_app_new_db')
-      }}
-    general: "general"
-    migrate: "migrate"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_db: "s3_db"
-    db_db: "db_db"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
-  mediawiki_custom_run_app_local:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_restore_local', 'tasks_new_db_local')
-      }}
-    general: "general"
-    migrate: "migrate"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_no_sync"
-    s3_db: "s3_db"
-    db_db: "db_db"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_no_sync"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
-  mediawiki_custom_run_db:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_db_restore_db', 'tasks_db_new_db')
-      }}
-    general: "general"
-    migrate: "migrate"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_db: "s3_db"
-    db_db: "db_db"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
-  mediawiki_custom_run_web:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_web_restore_db', 'tasks_web_new_db')
-      }}
-    general: "general"
-    migrate: "migrate"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    s3_db: "s3_db"
-    db_db: "db_db"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
   mediawiki_meta:
     use_run_dict: true
     use_run_tasks_dict: true
@@ -541,6 +422,7 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    certbot: "certbot"
   mediawiki_run_tasks_app_local:
     group_setup: "group_setup_app_local"
     group_backup: "group_backup_app_local"
@@ -566,6 +448,7 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    certbot: "certbot_local"
   mediawiki_run_tasks_db:
     group_setup: "group_setup_db"
     group_backup: "group_backup_db"
@@ -596,6 +479,7 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    certbot: "certbot"
   mediawiki_run_tasks_dict:
     group_setup_app:
       task: { type: "group" }

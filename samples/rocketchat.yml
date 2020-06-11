@@ -4,7 +4,13 @@ main:
     clouds:
     - "local"
     nodes:
-    - "rocketchat_local"
+    - name: "app"
+      key: "rocketchat_local"
+      pods:
+        rocketchat:
+          group_params:
+            run: "rocketchat_run_local"
+            run_tasks: "rocketchat_run_tasks_app_local"
     local:
       pods:
       - "rocketchat"
@@ -28,7 +34,13 @@ main:
     - "rocketchat_uploads"
     - "rocketchat_backup"
     nodes:
-    - "rocketchat"
+    - name: "app"
+      key: "rocketchat"
+      pods:
+        rocketchat:
+          group_params:
+            run: "rocketchat_run"
+            run_tasks: "rocketchat_run_tasks_app"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -48,8 +60,32 @@ main:
         [main]
         localhost ansible_connection=local
         [host:children]
-        rocketchat
-        [rocketchat]
+        app
+        [app]
+  remote_local_test:
+    clouds:
+    - "local"
+    nodes:
+    - name: "app"
+      key: "rocketchat_local"
+      pods:
+        rocketchat:
+          group_params:
+            run: "rocketchat_run"
+            run_tasks: "rocketchat_run_tasks_app"
+    local:
+      pods:
+      - "rocketchat"
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
+      meta:
+        template_no_empty_lines: true
+      repo: "cloud"
   nodes:
     destroy:
       nodes: true
@@ -62,21 +98,54 @@ main:
     nodes:
     - name: "db"
       key: "rocketchat"
-      params:
-        type: "db"
-      group_params:
-        custom_memory: "rocketchat_custom_memory_db"
-        run: "rocketchat_custom_run_db"
+      pods:
+        rocketchat:
+          params:
+            type: "db"
+          group_params:
+            custom_memory: "rocketchat_custom_memory_db"
+            run: "rocketchat_run"
+            run_tasks: "rocketchat_run_tasks_db"
     - name: "web"
       key: "rocketchat"
       dependencies:
       - host: "mysql"
         node: "db"
-      params:
-        type: "web"
-      group_params:
-        custom_memory: "rocketchat_custom_memory_web"
-        run: "rocketchat_custom_run_web"
+      pods:
+        rocketchat:
+          params:
+            type: "web"
+          group_params:
+            custom_memory: "rocketchat_custom_memory_web"
+            run: "rocketchat_run"
+            run_tasks: "rocketchat_run_tasks_web"
+    run_stages:
+    - tasks:
+      - name: "docker_compose_install"
+        all_nodes: true
+        nodes_tasks: true
+      - name: "main_build"
+        all_nodes: true
+        pods_tasks: true
+      - name: "main_upgrade"
+        nodes: ["db"]
+        pods_tasks: true
+    - tasks:
+      - name: "main_upgrade"
+        nodes: ["web"]
+        pods_tasks: true
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      repo: "cloud"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host:children]
+        db
+        web
+        [db]
+        [web]
 clouds:
   local:
     type: "local"
@@ -140,9 +209,8 @@ nodes:
       params:
         local: true
       group_params:
-        custom_args: "rocketchat_custom_args_local"
+        custom_args: "rocketchat_custom_args"
         custom_domain: "rocketchat_custom_domain_local"
-        run: "rocketchat_custom_run_app_local"
     params:
       size:
         memory: "2gb"
@@ -158,11 +226,12 @@ nodes:
       group_params:
         custom_args: "rocketchat_custom_args"
         custom_domain: "rocketchat_custom_domain"
-        run: "rocketchat_custom_run_app"
     params:
       dns:
-      - record: "{{ params.env_params.dns_record }}"
-        name: "{{ params.env_params.dns_name }}"
+      - record: "{{ params.env_params.main_dns_record }}"
+        name: "{{ params.env_params.main_dns_name }}"
+      - record: "{{ params.env_params.mongo_express_dns_record }}"
+        name: "{{ params.env_params.mongo_express_dns_name }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -205,45 +274,39 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      use_certbot: "{{ params.env_params.use_certbot }}"
       use_bot: "{{ params.env_params.use_bot }}"
     group_params:
       custom_images: "rocketchat_custom_images"
       custom_memory: "rocketchat_custom_memory_app"
       meta: "rocketchat_meta"
       run_dict: "rocketchat_run_dict"
+      run_tasks_dict: "mediawiki_run_tasks_dict"
 pod_params:
   rocketchat_custom_args:
-    nginx:
-      http_port: "80"
-      https_port: "443"
-      private_http_port: "9080"
-      private_https_port: "9443"
     mongo:
       host: "mongo"
       port: "27017"
     fluentd:
       port: "24224"
-  rocketchat_custom_args_local:
-    nginx:
-      http_port: "8080"
-      https_port: "8443"
-      private_http_port: "9080"
-      private_https_port: "9443"
-    mongo:
-      host: "mongo"
-      port: "27017"
   rocketchat_custom_domain:
-    ssl: "{{ params.env_params.ssl }}"
+    public_http_port: "80"
+    public_https_port: "443"
+    private_http_port: "9080"
+    private_https_port: "9443"
     main_domain: "{{ params.env_params.rocketchat_full_domain }}"
-    main_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
-    mongo_express_domain: "{{ params.env_params.rocketchat_full_domain }}"
-    mongo_express_port: "{{ params.env_params.ssl | bool | ternary(443, 80) }}"
+    main_ssl: "{{ params.env_params.ssl }}"
+    me_domain: "{{ params.env_params.mongo_express_full_domain }}"
+    me_ssl: "{{ params.env_params.ssl }}"
   rocketchat_custom_domain_local:
-    ssl: "{{ params.env_params.ssl }}"
+    public_http_port: "8080"
+    public_https_port: "8443"
+    private_http_port: "9080"
+    private_https_port: "9443"
     main_domain: "localhost"
-    main_port: "{{ params.env_params.ssl | bool | ternary(8443, 8080) }}"
-    mongo_express_domain: "localhost"
-    mongo_express_port: "{{ params.env_params.ssl | bool | ternary(9443, 9080) }}"
+    main_ssl: "{{ params.env_params.ssl }}"
+    me_domain: "localhost"
+    me_ssl: "{{ params.env_params.ssl }}"
   rocketchat_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -257,6 +320,8 @@ pod_params:
     mongo_version: "4.0"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200513"
+    certbot_image: "certbot/certbot"
+    certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
     fluentd_image: "lucasbasquerotto/wordpress"
@@ -268,6 +333,7 @@ pod_params:
     mongo_express: 512mb
     mongo: 1gb
     toolbox: 512mb
+    certbot: 256mb
     mongo_init: 512mb
     s3_uploads: 512mb
     s3_backup: 512mb
@@ -284,260 +350,478 @@ pod_params:
     hubot: 512mb
     mongo_express: 512mb
     toolbox: 512mb
+    certbot: 256mb
     s3_uploads: 512mb
     s3_backup: 512mb
     fluentd: 256mb
-  rocketchat_custom_run_app:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_app_restore_db', 'tasks_app_new_db')
-      }}
-    general: "general"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
-  rocketchat_custom_run_app_local:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_restore_local', 'tasks_new_db_local')
-      }}
-    general: "general"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_no_sync"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_no_sync"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
-  rocketchat_custom_run_db:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_db_restore_db', 'tasks_db_new_db')
-      }}
-    general: "general"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
-  rocketchat_custom_run_web:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks_web_restore_db', 'tasks_web_new_db')
-      }}
-    general: "general"
-    s3_uploads: "s3_uploads"
-    setup_task_uploads: "setup_task_uploads"
-    setup_verify_uploads: "setup_verify_uploads"
-    setup_remote_uploads: "setup_remote_uploads_file"
-    backup_task_uploads: "backup_task_uploads"
-    backup_remote_uploads: "backup_remote_uploads_sync_dir"
-    setup_task_db: "setup_task_db"
-    setup_verify_db: "setup_verify_db"
-    setup_remote_db: "setup_remote_db_file"
-    setup_local_db: "setup_local_db"
-    backup_task_db: "backup_task_db"
-    backup_remote_db: "backup_remote_db_sync_file"
-    backup_local_db: "backup_local_db"
-    s3_logs: "s3_logs"
-    setup_task_logs: "setup_task_logs"
-    setup_verify_logs: "setup_verify_logs"
-    setup_remote_logs: "setup_remote_logs"
-    backup_task_logs: "backup_task_logs"
-    backup_remote_logs: "backup_remote_logs"
   rocketchat_meta:
     use_run_dict: true
+    use_run_tasks_dict: true
+  rocketchat_run:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks', 'tasks_new_db')
+      }}
+    general: "general"
+    migrate: "migrate"
+  rocketchat_run_local:
+    tasks: >-
+      {{
+      params.env_params.restore_db | default(false) | bool |
+      ternary('tasks', 'tasks_new_db')
+      }}
+    general: "general_local"
+    migrate: "migrate"
   rocketchat_run_dict:
-    tasks_app_new_db:
-      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
-      setup: "setup:main:network"
-    tasks_app_restore_db:
-      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
-      setup: "setup:main:network,setup:task:uploads,setup:task:db,setup:task:logs"
-    tasks_new_db_local:
-      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
-      setup: "setup:main:network"
-    tasks_restore_local:
-      backup: "backup:task:uploads,backup:task:db,backup:task:logs"
-      setup: "setup:main:network,setup:task:uploads,setup:task:db"
-    tasks_db_new_db:
-      backup: "backup:task:db,backup:task:logs"
-      setup: "setup:main:network"
-    tasks_db_restore_db:
-      backup: "backup:task:db,backup:task:logs"
-      setup: "setup:main:network,setup:task:db,setup:task:logs"
-    tasks_web_new_db:
-      backup: "backup:task:uploads,backup:task:logs"
-      setup: "setup:main:network"
-    tasks_web_restore_db:
-      backup: "backup:task:uploads,backup:task:logs"
-      setup: "setup:main:network,setup:task:uploads,setup:task:logs"
+    tasks:
+      backup: "group_backup"
+      setup: "group_setup"
+    tasks_new_db:
+      backup: "group_backup"
     general:
+      backup_delete_old_days: 3
+      backup_local_base_dir: "/tmp/rocketchat/backup"
+      orchestration: "compose"
+      script_dir: "custom-pod/rocketchat/scripts"
+      script_env_file: "remote.sh"
+      toolbox_service: "toolbox"
+    general_local:
       backup_delete_old_days: 3
       backup_local_base_dir: "/tmp/main/backup"
       orchestration: "compose"
-      script_dir: "custom-pod/rocketchat"
-      script_env_file: "main.sh"
+      script_dir: "custom-pod/rocketchat/scripts"
+      script_env_file: "local.sh"
       toolbox_service: "toolbox"
-    s3_uploads:
-      endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
-      service: "s3_uploads"
-      cli: "awscli"
-      cli_cmd: "run"
-    setup_task_uploads:
-      subtask_cmd_verify: "setup:verify:default:uploads"
-      subtask_cmd_remote: "setup:remote:default:uploads"
-      setup_dest_base_dir: "/var/main/data/rocketchat/images"
-    setup_verify_uploads:
-      setup_dest_dir_to_verify: "/var/main/data/rocketchat/images"
-    setup_remote_uploads_file:
-      task_kind: "dir"
-      restore_tmp_dir: "/tmp/main/restore/rocketchat/images"
-      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200602_194452.zip?raw=true"
-      restore_is_zip_file: "true"
-      restore_zip_pass: "{{ params.credentials.rocketchat_uploads_zip_file_pass | default('') }}"
-      restore_recursive_mode_dir: "777"
-      restore_recursive_mode_file: "666"
-      restore_zip_inner_dir: "uploads"
-    backup_task_uploads:
-      subtask_cmd_remote: "backup:remote:default:uploads"
-      backup_src_base_dir: "/var/main/data/rocketchat"
-      backup_local_static_dir:  "/tmp/main/backup/static"
-    backup_remote_uploads_sync_dir:
-      task_kind: "dir"
-      subtask_cmd_s3: "s3:run:uploads"
-      backup_src_dir: "uploads"
-      backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "uploads"
-    backup_remote_uploads_no_sync:
-      task_kind: "dir"
-      subtask_cmd_s3: "s3:run:uploads"
-      backup_src_dir: "uploads"
-      backup_bucket_static_dir: "files"
-      backup_zip_file: "rocketchat-uploads.zip"
-    s3_db:
-      endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
-      service: "s3_backup"
-      cli: "awscli"
-      cli_cmd: "run"
-    setup_task_db:
-      subtask_cmd_verify: "setup:verify:db:db"
-      subtask_cmd_remote: "setup:remote:default:db"
-      subtask_cmd_local: "setup:local:db:db"
-      setup_dest_base_dir: "/tmp/main/mongo/restore"
-    setup_verify_db:
-      db_subtask_cmd: "db:restore:verify:mongo"
-    setup_remote_db_file:
-      task_kind: "file"
-      restore_dest_file: "{{ params.credentials.rocketchat.db.name }}.sql"
-      restore_tmp_dir: "/tmp/main/restore/mongo"
-      restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200602_194452.zip?raw=true"
-      restore_is_zip_file: "true"
-      restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
-      restore_zip_inner_file: "{{ params.credentials.rocketchat.db.name }}.sql"
-    setup_local_db:
-      db_subtask_cmd: "db:restore:file:mongo"
-      db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
-    backup_task_db:
-      subtask_cmd_local: "backup:local:db:db"
-      subtask_cmd_remote: "backup:remote:default:db"
-      backup_src_base_dir: "/tmp/main/mongo/backup"
-      backup_local_static_dir:  "/tmp/main/backup/static"
-    backup_remote_db_no_sync:
-      task_kind: "file"
-      subtask_cmd_s3: "s3:run:db"
-      backup_src_file: "{{ params.credentials.rocketchat.db.name }}.sql"
-      backup_bucket_static_dir: "files"
-      backup_zip_file: "rocketchat-db.zip"
-    backup_remote_db_sync_file:
-      task_kind: "file"
-      subtask_cmd_s3: "s3:run:db"
-      backup_src_file: "{{ params.credentials.rocketchat.db.name }}.sql"
-      backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "db"
-    backup_local_db:
-      db_subtask_cmd: "db:backup:file:mongo"
-      db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
-    db_db:
+    migrate:
       db_service: "mongo"
       db_name: "{{ params.credentials.rocketchat.db.name }}"
       db_user: "{{ params.credentials.rocketchat.db.user }}"
       db_pass: "{{ params.credentials.rocketchat.db.password }}"
       db_connect_wait_secs: 90
-    s3_logs:
-      endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
-      bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
-      service: "s3_backup"
-      cli: "awscli"
-      cli_cmd: "run"
-    setup_task_logs:
-      subtask_cmd_verify: "setup:verify:default:logs"
-      subtask_cmd_remote: "setup:remote:default:logs"
-      setup_dest_base_dir: "/var/log/main"
-    setup_verify_logs:
-      setup_dest_dir_to_verify: "/var/log/main"
-    setup_remote_logs:
-      task_kind: "dir"
-      subtask_cmd_s3: "s3:run:logs"
-      restore_tmp_dir: "/tmp/main/restore/log"
-      restore_recursive_mode_dir: "777"
-      restore_recursive_mode_file: "666"
-      restore_remote_bucket_path_dir: "logs"
-    backup_task_logs:
-      subtask_cmd_remote: "backup:remote:default:logs"
-      backup_src_base_dir: "/var/log"
-      backup_local_static_dir:  "/tmp/main/backup/static"
-    backup_remote_logs:
-      task_kind: "dir"
-      subtask_cmd_s3: "s3:run:logs"
-      backup_src_dir: "main"
-      backup_bucket_sync: "true"
-      backup_bucket_sync_dir: "log"
+  rocketchat_run_tasks_app:
+    group_setup: "group_setup_app"
+    group_backup: "group_backup_app"
+    uploads_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
+      }}
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+    certbot: "certbot"
+  rocketchat_run_tasks_app_local:
+    group_setup: "group_setup_app_local"
+    group_backup: "group_backup_app_local"
+    uploads_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
+      }}
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+    certbot: "certbot_local"
+  rocketchat_run_tasks_db:
+    group_setup: "group_setup_db"
+    group_backup: "group_backup_db"
+    db_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('db_setup_restore_file', 'db_setup_restore_s3')
+      }}
+    db_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('db_backup_no_sync', 'db_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+  rocketchat_run_tasks_web:
+    group_setup: "group_setup_web"
+    group_backup: "group_backup_web"
+    uploads_setup: >-
+      {{
+      params.env_params.non_s3_setup | default(false) | bool |
+      ternary('uploads_setup_file', 'uploads_setup_s3')
+      }}
+    uploads_backup: >-
+      {{
+      params.env_params.backup_no_sync | default(false) | bool |
+      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
+      }}
+    logs_setup: "logs_setup"
+    logs_backup: "logs_backup"
+    certbot: "certbot"
+  rocketchat_run_tasks_dict:
+    group_setup_app:
+      task: { type: "group" }
+      group_task: { task_names: "logs_setup,uploads_setup,db_setup" }
+    group_backup_app:
+      task: { type: "group" }
+      group_task: { task_names: "db_backup,uploads_backup,logs_backup" }
+    group_setup_app_local:
+      task: { type: "group" }
+      group_task: { task_names: "uploads_setup,db_setup" }
+    group_backup_app_local:
+      task: { type: "group" }
+      group_task: { task_names: "db_backup,uploads_backup" }
+    group_setup_db:
+      task: { type: "group" }
+      group_task: { task_names: "logs_setup,db_setup" }
+    group_backup_db:
+      task: { type: "group" }
+      group_task: { task_names: "db_backup,logs_backup" }
+    group_setup_web:
+      task: { type: "group" }
+      group_task: { task_names: "logs_setup,uploads_setup" }
+    group_backup_web:
+      task: { type: "group" }
+      group_task: { task_names: "uploads_backup,logs_backup" }
+    uploads_setup_file:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:default"
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/main/data/rocketchat/uploads"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/main/data/rocketchat/uploads"
+      setup_remote:
+        task_kind: "dir"
+        restore_tmp_dir: "/tmp/main/restore/rocketchat/uploads"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200602_194452.zip?raw=true"
+        restore_is_zip_file: "true"
+        restore_zip_pass: "{{ params.credentials.rocketchat_uploads_zip_file_pass | default('') }}"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_zip_inner_dir: "images"
+    uploads_setup_s3:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:default"
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/log/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/main/data/rocketchat/uploads"
+      setup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/rocketchat/uploads"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "uploads"
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    uploads_backup_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/main/data/rocketchat"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "uploads"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "uploads"
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    uploads_backup_no_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/main/data/rocketchat"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "uploads"
+        backup_bucket_static_dir: "files"
+        backup_zip_file: "rocketchat-uploads.zip"
+      db_run:
+        db_service: "mongo"
+        db_name: "{{ params.credentials.rocketchat.db.name }}"
+        db_user: "{{ params.credentials.rocketchat.db.user }}"
+        db_pass: "{{ params.credentials.rocketchat.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_setup_restore_file:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:db"
+        subtask_cmd_remote: "setup:remote:default"
+        subtask_cmd_local: "setup:local:db"
+        setup_dest_base_dir: "/tmp/main/mysql/restore"
+      setup_verify:
+        db_subtask_cmd: "db:restore:verify:mysql"
+      setup_remote:
+        task_kind: "file"
+        restore_dest_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+        restore_tmp_dir: "/tmp/main/restore/mysql"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200602_194452.zip?raw=true"
+        restore_is_zip_file: "true"
+        restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
+        restore_zip_inner_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+      setup_local:
+        db_subtask_cmd: "db:restore:file:mysql"
+        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+      db_run:
+        db_service: "mongo"
+        db_name: "{{ params.credentials.rocketchat.db.name }}"
+        db_user: "{{ params.credentials.rocketchat.db.user }}"
+        db_pass: "{{ params.credentials.rocketchat.db.password }}"
+        db_connect_wait_secs: 90
+    db_setup_restore_s3:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:db"
+        subtask_cmd_remote: "setup:remote:default"
+        subtask_cmd_local: "setup:local:db"
+        setup_dest_base_dir: "/tmp/main/mysql/restore"
+      setup_verify:
+        db_subtask_cmd: "db:restore:verify:mysql"
+      setup_remote:
+        task_kind: "file"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/mysql"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "db"
+      setup_local:
+        db_subtask_cmd: "db:restore:file:mysql"
+        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+      db_run:
+        db_service: "mongo"
+        db_name: "{{ params.credentials.rocketchat.db.name }}"
+        db_user: "{{ params.credentials.rocketchat.db.user }}"
+        db_pass: "{{ params.credentials.rocketchat.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_backup_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_local: "backup:local:db"
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_local:
+        db_subtask_cmd: "db:backup:file:mysql"
+        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+      backup_remote:
+        task_kind: "file"
+        subtask_cmd_s3: "s3:run"
+        backup_src_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "db"
+      db_run:
+        db_service: "mongo"
+        db_name: "{{ params.credentials.rocketchat.db.name }}"
+        db_user: "{{ params.credentials.rocketchat.db.user }}"
+        db_pass: "{{ params.credentials.rocketchat.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_backup_no_sync:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_local: "backup:local:db"
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_local:
+        db_subtask_cmd: "db:backup:file:mysql"
+        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+      backup_remote:
+        task_kind: "file"
+        subtask_cmd_s3: "s3:run"
+        backup_src_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+        backup_bucket_static_dir: "files"
+        backup_zip_file: "rocketchat-db.zip"
+      db_run:
+        db_service: "mongo"
+        db_name: "{{ params.credentials.rocketchat.db.name }}"
+        db_user: "{{ params.credentials.rocketchat.db.user }}"
+        db_pass: "{{ params.credentials.rocketchat.db.password }}"
+        db_connect_wait_secs: 90
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    logs_setup:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_verify: "setup:verify:default"
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/log/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/log/main"
+      setup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/log"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "logs"
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    logs_backup:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/log"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "main"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "log"
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    sync_setup:
+      task:
+        type: "setup"
+      setup_task:
+        subtask_cmd_remote: "setup:remote:default"
+        setup_dest_base_dir: "/var/sync/main"
+      setup_verify:
+        setup_dest_dir_to_verify: "/var/sync/main"
+      setup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        restore_tmp_dir: "/tmp/main/restore/sync"
+        restore_recursive_mode_dir: "777"
+        restore_recursive_mode_file: "666"
+        restore_remote_bucket_path_dir: "sync"
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    sync_backup:
+      task:
+        type: "backup"
+      backup_task:
+        subtask_cmd_remote: "backup:remote:default"
+        backup_src_base_dir: "/var/sync"
+        backup_local_static_dir:  "/tmp/main/backup/static"
+      backup_remote:
+        task_kind: "dir"
+        subtask_cmd_s3: "s3:run"
+        backup_src_dir: "main"
+        backup_bucket_sync: "true"
+        backup_bucket_sync_dir: "sync"
+      s3_run:
+        endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    certbot:
+      task:
+        type: "certbot"
+      certbot_task:
+        certbot_cmd: "setup"
+      certbot_run:
+        toolbox_service: "toolbox"
+        certbot_service: "certbot"
+        webservice_type: "nginx"
+        data_base_path: "/var/main/data/sync/certbot/"
+        main_domain: "{{ params.env_params.rocketchat_full_domain }}"
+        domains: "{{ params.env_params.certbot_domains }}"
+        rsa_key_size: "4096"
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        staging: "{{ params.env_params.certbot_staging | default('false') }}"
+        force: "{{ params.env_params.certbot_force | default('false') }}"
+    certbot_local:
+      task:
+        type: "certbot"
+      certbot_task:
+        certbot_cmd: "setup"
+      certbot_run:
+        toolbox_service: "toolbox"
+        certbot_service: "certbot"
+        webservice_type: "nginx"
+        data_base_path: "/var/main/data/sync/certbot/"
+        main_domain: "localhost"
+        domains: "localhost www.localhost"
+        rsa_key_size: "4096"
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        dev: "true"
+        staging: "true"
+        force: "{{ params.env_params.certbot_force | default('false') }}"
 tasks:
   docker_compose_install:
     type: "task"
