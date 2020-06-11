@@ -249,9 +249,9 @@ nodes:
         user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
         ipv6: "yes"
       region:
-        name: "nyc3"
+        name: "nyc1"
         region: "nyc"
-        zone: "3"
+        zone: "1"
       size:
         name: "s-1vcpu-1gb"
         memory: "1gb"
