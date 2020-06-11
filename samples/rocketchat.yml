@@ -281,7 +281,7 @@ pods:
       custom_memory: "rocketchat_custom_memory_app"
       meta: "rocketchat_meta"
       run_dict: "rocketchat_run_dict"
-      run_tasks_dict: "mediawiki_run_tasks_dict"
+      run_tasks_dict: "rocketchat_run_tasks_dict"
 pod_params:
   rocketchat_custom_args:
     mongo:
