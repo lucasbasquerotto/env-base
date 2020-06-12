@@ -501,7 +501,7 @@ pod_params:
       setup_remote:
         task_kind: "dir"
         restore_tmp_dir: "/tmp/main/restore/mediawiki/uploads"
-        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200602_194452.zip?raw=true"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
         restore_is_zip_file: "true"
         restore_zip_pass: "{{ params.credentials.mediawiki_uploads_zip_file_pass | default('') }}"
         restore_recursive_mode_dir: "777"
@@ -587,7 +587,7 @@ pod_params:
         task_kind: "file"
         restore_dest_file: "{{ params.credentials.mediawiki.db.name }}.sql"
         restore_tmp_dir: "/tmp/main/restore/mysql"
-        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200602_194452.zip?raw=true"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
         restore_is_zip_file: "true"
         restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
         restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
