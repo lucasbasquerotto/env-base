@@ -1,8 +1,8 @@
 name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
-main: 
-  remote: 
-    destroy: 
+main:
+  remote:
+    destroy:
       nodes: true
     clouds:
     - "{{ params.env_params.cloud_name }}"
@@ -25,10 +25,10 @@ main:
         [main]
         localhost ansible_connection=local
         [host:children]
-        ctl        
+        ctl
         [ctl]
   external:
-    destroy: 
+    destroy:
       nodes: true
     clouds:
     - "{{ params.env_params.cloud_name }}"
@@ -121,7 +121,7 @@ node_shared_params:
     size:
       memory: "1gb"
       cpu: 1
-    cron: 
+    cron:
     - user: "root"
       src_file: "{{ params.env.repo_dir }}/cron/main.cron"
       dest_dir: "/var/spool/cron/crontabs"
@@ -131,8 +131,8 @@ node_shared_params:
       user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
       ipv6: "yes"
     region:
-      name: "nyc3"
-      region: "nyc"
+      name: "ams3"
+      region: "ams"
       zone: "3"
     size:
       name: "s-1vcpu-1gb"
@@ -165,7 +165,7 @@ tasks:
     compose_params:
       version: "1.25.3"
       remote: true
-  main_build: 
+  main_build:
     type: "task"
     root: "true"
     file: "docker-compose.build.yml"
