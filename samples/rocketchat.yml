@@ -241,8 +241,8 @@ nodes:
         user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
         ipv6: "yes"
       region:
-        name: "nyc3"
-        region: "nyc"
+        name: "ams3"
+        region: "ams"
         zone: "3"
       size:
         name: "s-1vcpu-1gb"
@@ -411,21 +411,13 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    uploads_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
-      }}
+    uploads_backup: "uploads_backup_sync"
     db_setup: >-
       {{
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    db_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('db_backup_no_sync', 'db_backup_sync')
-      }}
+    db_backup: "db_backup_no_sync"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
     sync_setup: "sync_setup"
@@ -439,21 +431,13 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    uploads_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
-      }}
+    uploads_backup: "uploads_backup_no_sync"
     db_setup: >-
       {{
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    db_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('db_backup_no_sync', 'db_backup_sync')
-      }}
+    db_backup: "db_backup_no_sync"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
     sync_setup: "sync_setup"
@@ -467,11 +451,7 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    db_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('db_backup_no_sync', 'db_backup_sync')
-      }}
+    db_backup: "db_backup_no_sync"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
     sync_setup: "sync_setup"
@@ -484,11 +464,7 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    uploads_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
-      }}
+    uploads_backup: "uploads_backup_sync"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
     sync_setup: "sync_setup"

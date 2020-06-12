@@ -427,21 +427,13 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    uploads_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
-      }}
+    uploads_backup: "uploads_backup_sync"
     db_setup: >-
       {{
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    db_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('db_backup_no_sync', 'db_backup_sync')
-      }}
+    db_backup: "db_backup_no_sync"
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
@@ -457,21 +449,13 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    uploads_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
-      }}
+    uploads_backup: "uploads_backup_no_sync"
     db_setup: >-
       {{
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    db_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('db_backup_no_sync', 'db_backup_sync')
-      }}
+    db_backup: "db_backup_no_sync"
     db_setup_new: "db_setup_new_local"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
@@ -487,11 +471,7 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('db_setup_restore_file', 'db_setup_restore_s3')
       }}
-    db_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('db_backup_no_sync', 'db_backup_sync')
-      }}
+    db_backup: "db_backup_no_sync"
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
@@ -506,11 +486,7 @@ pod_params:
       params.env_params.non_s3_setup | default(false) | bool |
       ternary('uploads_setup_file', 'uploads_setup_s3')
       }}
-    uploads_backup: >-
-      {{
-      params.env_params.backup_no_sync | default(false) | bool |
-      ternary('uploads_backup_no_sync', 'uploads_backup_sync')
-      }}
+    uploads_backup: "uploads_backup_sync"
     db_setup_new: "db_setup_new"
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"

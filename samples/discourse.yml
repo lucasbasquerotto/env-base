@@ -1,8 +1,8 @@
 name: "{{ params.name }}"
 ctxs: ["app"]
-main: 
-  app: 
-    destroy: 
+main:
+  app:
+    destroy:
       nodes: true
       buckets: true
     clouds:
@@ -27,7 +27,7 @@ main:
         [main]
         localhost ansible_connection=local
         [host:children]
-        discourse        
+        discourse
         [discourse]
 clouds:
   digital_ocean:
@@ -67,15 +67,15 @@ clouds:
           sources:
             addresses: ["0.0.0.0/0", "::/0"]
 dns:
-  cloudflare: 
+  cloudflare:
     type: "cloudflare"
     zone: "{{ params.env_params.domain }}"
     credentials: "cloudflare"
-  godaddy: 
+  godaddy:
     type: "godaddy"
     zone: "{{ params.env_params.domain }}"
     credentials: "godaddy"
-buckets: 
+buckets:
   discourse_backup:
     name: "{{ params.env_params.discourse_backup_bucket_name }}"
     endpoint: "{{ params.env_params.discourse_backup_bucket_endpoint }}"
@@ -89,14 +89,14 @@ nodes:
     params:
       dns:
       - record: "forum"
-        name: "{{ params.env_params.dns_name }}"        
+        name: "{{ params.env_params.dns_name }}"
       instance:
         image: "ubuntu-18-04-x64"
         user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
         ipv6: "yes"
       region:
-        name: "nyc3"
-        region: "nyc"
+        name: "ams3"
+        region: "ams"
         zone: "3"
       size:
         name: "s-1vcpu-1gb"
