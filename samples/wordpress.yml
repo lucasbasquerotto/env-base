@@ -520,7 +520,7 @@ pod_params:
   wp_run_tasks_dict:
     group_setup_app:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,sync_setup,uploads_setup,db_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,sync_backup,uploads_setup,db_setup" }
     group_backup_app:
       task: { type: "group" }
       group_task: { task_names: "db_backup,uploads_backup,sync_backup,logs_backup" }
@@ -538,7 +538,7 @@ pod_params:
       group_task: { task_names: "db_setup_new" }
     group_setup_db:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,sync_setup,db_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,sync_backup,db_setup" }
     group_backup_db:
       task: { type: "group" }
       group_task: { task_names: "db_backup,sync_backup,logs_backup" }
@@ -547,7 +547,7 @@ pod_params:
       group_task: { task_names: "db_setup_new" }
     group_setup_web:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,sync_setup,uploads_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,sync_backup,uploads_setup" }
     group_backup_web:
       task: { type: "group" }
       group_task: { task_names: "uploads_backup,sync_backup,logs_backup" }
@@ -838,7 +838,6 @@ pod_params:
       task:
         type: "setup"
       setup_task:
-        subtask_cmd_verify: "setup:verify:default"
         subtask_cmd_remote: "setup:remote:default"
         setup_dest_base_dir: "/var/sync/main"
       setup_verify:

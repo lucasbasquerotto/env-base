@@ -284,6 +284,10 @@ pods:
       run_tasks_dict: "rocketchat_run_tasks_dict"
 pod_params:
   rocketchat_custom_args:
+    rocketchat:
+      storage_type: "{{ params.env_params.s3_uploads | bool | ternary('AmazonS3', 'FileSystem') }}"
+      uploads_bucket_endpoint: "{{ params.env_params.rocketchat_uploads_bucket_endpoint }}"
+      uploads_bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
     mongo:
       host: "mongo"
       port: "27017"
@@ -424,6 +428,8 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
     certbot: "certbot"
   rocketchat_run_tasks_app_local:
     group_setup: "group_setup_app_local"
@@ -450,6 +456,8 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
     certbot: "certbot_local"
   rocketchat_run_tasks_db:
     group_setup: "group_setup_db"
@@ -466,6 +474,8 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
   rocketchat_run_tasks_web:
     group_setup: "group_setup_web"
     group_backup: "group_backup_web"
@@ -481,11 +491,13 @@ pod_params:
       }}
     logs_setup: "logs_setup"
     logs_backup: "logs_backup"
+    sync_setup: "sync_setup"
+    sync_backup: "sync_backup"
     certbot: "certbot"
   rocketchat_run_tasks_dict:
     group_setup_app:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,uploads_setup,db_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,sync_backup,uploads_setup,db_setup" }
     group_backup_app:
       task: { type: "group" }
       group_task: { task_names: "db_backup,uploads_backup,logs_backup" }
@@ -497,13 +509,13 @@ pod_params:
       group_task: { task_names: "db_backup,uploads_backup" }
     group_setup_db:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,db_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,sync_backup,db_setup" }
     group_backup_db:
       task: { type: "group" }
       group_task: { task_names: "db_backup,logs_backup" }
     group_setup_web:
       task: { type: "group" }
-      group_task: { task_names: "logs_setup,uploads_setup" }
+      group_task: { task_names: "logs_setup,sync_setup,sync_backup,uploads_setup" }
     group_backup_web:
       task: { type: "group" }
       group_task: { task_names: "uploads_backup,logs_backup" }
