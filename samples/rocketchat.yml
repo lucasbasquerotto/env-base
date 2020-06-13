@@ -109,7 +109,7 @@ main:
     - name: "web"
       key: "rocketchat"
       dependencies:
-      - host: "mysql"
+      - host: "mongo"
         node: "db"
       pods:
         rocketchat:
@@ -402,7 +402,7 @@ pod_params:
       db_name: "{{ params.credentials.rocketchat.db.name }}"
       db_user: "{{ params.credentials.rocketchat.db.user }}"
       db_pass: "{{ params.credentials.rocketchat.db.password }}"
-      db_connect_wait_secs: 90
+      db_connect_wait_secs: 300
   rocketchat_run_tasks_app:
     group_setup: "group_setup_app"
     group_backup: "group_backup_app"
@@ -507,7 +507,7 @@ pod_params:
       setup_remote:
         task_kind: "dir"
         restore_tmp_dir: "/tmp/main/restore/rocketchat/uploads"
-        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200602_194452.zip?raw=true"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200612_221938.zip?raw=true"
         restore_is_zip_file: "true"
         restore_zip_pass: "{{ params.credentials.rocketchat_uploads_zip_file_pass | default('') }}"
         restore_recursive_mode_dir: "777"
@@ -567,12 +567,6 @@ pod_params:
         backup_src_dir: "uploads"
         backup_bucket_static_dir: "files"
         backup_zip_file: "rocketchat-uploads.zip"
-      db_run:
-        db_service: "mongo"
-        db_name: "{{ params.credentials.rocketchat.db.name }}"
-        db_user: "{{ params.credentials.rocketchat.db.user }}"
-        db_pass: "{{ params.credentials.rocketchat.db.password }}"
-        db_connect_wait_secs: 90
       s3_run:
         endpoint: "{{ params.env_params.rocketchat_uploads_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
@@ -586,26 +580,26 @@ pod_params:
         subtask_cmd_verify: "setup:verify:db"
         subtask_cmd_remote: "setup:remote:default"
         subtask_cmd_local: "setup:local:db"
-        setup_dest_base_dir: "/tmp/main/mysql/restore"
+        setup_dest_base_dir: "/tmp/main/mongo/restore"
       setup_verify:
-        db_subtask_cmd: "db:restore:verify:mysql"
+        db_subtask_cmd: "db:restore:verify:mongo"
       setup_remote:
         task_kind: "file"
-        restore_dest_file: "{{ params.credentials.rocketchat.db.name }}.sql"
-        restore_tmp_dir: "/tmp/main/restore/mysql"
-        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200602_194452.zip?raw=true"
+        restore_dest_file: "{{ params.credentials.rocketchat.db.name }}.bson"
+        restore_tmp_dir: "/tmp/main/restore/mongo"
+        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200612_221938.zip?raw=true"
         restore_is_zip_file: "true"
         restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
-        restore_zip_inner_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+        restore_zip_inner_file: "{{ params.credentials.rocketchat.db.name }}.bson"
       setup_local:
-        db_subtask_cmd: "db:restore:file:mysql"
-        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+        db_subtask_cmd: "db:restore:file:mongo"
       db_run:
         db_service: "mongo"
+        authentication_database: "admin"
         db_name: "{{ params.credentials.rocketchat.db.name }}"
         db_user: "{{ params.credentials.rocketchat.db.user }}"
         db_pass: "{{ params.credentials.rocketchat.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
     db_setup_restore_s3:
       task:
         type: "setup"
@@ -613,25 +607,25 @@ pod_params:
         subtask_cmd_verify: "setup:verify:db"
         subtask_cmd_remote: "setup:remote:default"
         subtask_cmd_local: "setup:local:db"
-        setup_dest_base_dir: "/tmp/main/mysql/restore"
+        setup_dest_base_dir: "/tmp/main/mongo/restore"
       setup_verify:
-        db_subtask_cmd: "db:restore:verify:mysql"
+        db_subtask_cmd: "db:restore:verify:mongo"
       setup_remote:
         task_kind: "file"
         subtask_cmd_s3: "s3:run"
-        restore_tmp_dir: "/tmp/main/restore/mysql"
+        restore_tmp_dir: "/tmp/main/restore/mongo"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
         restore_remote_bucket_path_dir: "db"
       setup_local:
-        db_subtask_cmd: "db:restore:file:mysql"
-        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+        db_subtask_cmd: "db:restore:file:mongo"
       db_run:
         db_service: "mongo"
+        authentication_database: "admin"
         db_name: "{{ params.credentials.rocketchat.db.name }}"
         db_user: "{{ params.credentials.rocketchat.db.user }}"
         db_pass: "{{ params.credentials.rocketchat.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
@@ -644,23 +638,23 @@ pod_params:
       backup_task:
         subtask_cmd_local: "backup:local:db"
         subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_src_base_dir: "/tmp/main/mongo/backup"
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_local:
-        db_subtask_cmd: "db:backup:file:mysql"
-        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+        db_subtask_cmd: "db:backup:mongo"
       backup_remote:
-        task_kind: "file"
+        task_kind: "dir"
         subtask_cmd_s3: "s3:run"
-        backup_src_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+        backup_src_dir: "rocketchat"
         backup_bucket_sync: "true"
         backup_bucket_sync_dir: "db"
       db_run:
         db_service: "mongo"
+        authentication_database: "admin"
         db_name: "{{ params.credentials.rocketchat.db.name }}"
         db_user: "{{ params.credentials.rocketchat.db.user }}"
         db_pass: "{{ params.credentials.rocketchat.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
@@ -673,23 +667,23 @@ pod_params:
       backup_task:
         subtask_cmd_local: "backup:local:db"
         subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/tmp/main/mysql/backup"
+        backup_src_base_dir: "/tmp/main/mongo/backup"
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_local:
-        db_subtask_cmd: "db:backup:file:mysql"
-        db_file_name: "{{ params.credentials.rocketchat.db.name }}.sql"
+        db_subtask_cmd: "db:backup:mongo"
       backup_remote:
-        task_kind: "file"
+        task_kind: "dir"
         subtask_cmd_s3: "s3:run"
-        backup_src_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+        backup_src_dir: "rocketchat"
         backup_bucket_static_dir: "files"
         backup_zip_file: "rocketchat-db.zip"
       db_run:
         db_service: "mongo"
+        authentication_database: "admin"
         db_name: "{{ params.credentials.rocketchat.db.name }}"
         db_user: "{{ params.credentials.rocketchat.db.user }}"
         db_pass: "{{ params.credentials.rocketchat.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.rocketchat_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"

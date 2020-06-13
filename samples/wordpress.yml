@@ -602,12 +602,6 @@ pod_params:
         backup_src_dir: "uploads"
         backup_bucket_static_dir: "files"
         backup_zip_file: "wordpress-uploads.zip"
-      db_run:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.wordpress.db.name }}"
-        db_user: "{{ params.credentials.wordpress.db.user }}"
-        db_pass: "{{ params.credentials.wordpress.db.password }}"
-        db_connect_wait_secs: 90
       s3_run:
         endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
@@ -678,7 +672,7 @@ pod_params:
         db_name: "{{ params.credentials.wordpress.db.name }}"
         db_user: "{{ params.credentials.wordpress.db.user }}"
         db_pass: "{{ params.credentials.wordpress.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
     db_setup_restore_s3:
       task:
         type: "setup"
@@ -704,7 +698,7 @@ pod_params:
         db_name: "{{ params.credentials.wordpress.db.name }}"
         db_user: "{{ params.credentials.wordpress.db.user }}"
         db_pass: "{{ params.credentials.wordpress.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
@@ -733,7 +727,7 @@ pod_params:
         db_name: "{{ params.credentials.wordpress.db.name }}"
         db_user: "{{ params.credentials.wordpress.db.user }}"
         db_pass: "{{ params.credentials.wordpress.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
@@ -762,7 +756,7 @@ pod_params:
         db_name: "{{ params.credentials.wordpress.db.name }}"
         db_user: "{{ params.credentials.wordpress.db.user }}"
         db_pass: "{{ params.credentials.wordpress.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"

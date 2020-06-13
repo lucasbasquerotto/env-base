@@ -396,7 +396,7 @@ pod_params:
       db_name: "{{ params.credentials.mediawiki.db.name }}"
       db_user: "{{ params.credentials.mediawiki.db.user }}"
       db_pass: "{{ params.credentials.mediawiki.db.password }}"
-      db_connect_wait_secs: 90
+      db_connect_wait_secs: 300
   mediawiki_run_tasks_app:
     group_setup: "group_setup_app"
     group_backup: "group_backup_app"
@@ -561,12 +561,6 @@ pod_params:
         backup_src_dir: "uploads"
         backup_bucket_static_dir: "files"
         backup_zip_file: "mediawiki-uploads.zip"
-      db_run:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.mediawiki.db.name }}"
-        db_user: "{{ params.credentials.mediawiki.db.user }}"
-        db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 90
       s3_run:
         endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
@@ -599,7 +593,7 @@ pod_params:
         db_name: "{{ params.credentials.mediawiki.db.name }}"
         db_user: "{{ params.credentials.mediawiki.db.user }}"
         db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
     db_setup_restore_s3:
       task:
         type: "setup"
@@ -625,7 +619,7 @@ pod_params:
         db_name: "{{ params.credentials.mediawiki.db.name }}"
         db_user: "{{ params.credentials.mediawiki.db.user }}"
         db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
@@ -654,7 +648,7 @@ pod_params:
         db_name: "{{ params.credentials.mediawiki.db.name }}"
         db_user: "{{ params.credentials.mediawiki.db.user }}"
         db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
@@ -683,7 +677,7 @@ pod_params:
         db_name: "{{ params.credentials.mediawiki.db.name }}"
         db_user: "{{ params.credentials.mediawiki.db.user }}"
         db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 90
+        db_connect_wait_secs: 300
       s3_run:
         endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
         bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
