@@ -70,6 +70,8 @@ main:
       key: "rocketchat_local"
       pods:
         rocketchat:
+          params:
+            remote_test: true
           group_params:
             run: "rocketchat_run"
             run_tasks: "rocketchat_run_tasks_app"
@@ -579,6 +581,7 @@ pod_params:
         db_subtask_cmd: "db:restore:verify:mongo"
       setup_remote:
         task_kind: "dir"
+        restore_dest_dir: "{{ params.credentials.rocketchat.db.name }}"
         restore_tmp_dir: "/tmp/main/restore/mongo"
         restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200612_221938.zip?raw=true"
         restore_is_zip_file: "true"
@@ -600,6 +603,7 @@ pod_params:
         db_subtask_cmd: "db:restore:verify:mongo"
       setup_remote:
         task_kind: "dir"
+        restore_dest_dir: "{{ params.credentials.rocketchat.db.name }}"
         subtask_cmd_s3: "s3:subtask:s3_backup"
         restore_tmp_dir: "/tmp/main/restore/mongo"
         restore_recursive_mode_dir: "777"
