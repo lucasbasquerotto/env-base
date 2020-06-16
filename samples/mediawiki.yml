@@ -417,6 +417,9 @@ pod_params:
     sync_setup: "sync_setup"
     sync_backup: "sync_backup"
     certbot: "certbot"
+    s3_uploads: "s3_uploads"
+    s3_backup: "s3_backup"
+    db_main: "db_main"
   mediawiki_run_tasks_app_local:
     group_setup: "group_setup_app_local"
     group_backup: "group_backup_app_local"
@@ -437,6 +440,9 @@ pod_params:
     sync_setup: "sync_setup"
     sync_backup: "sync_backup"
     certbot: "certbot_local"
+    s3_uploads: "s3_uploads"
+    s3_backup: "s3_backup"
+    db_main: "db_main"
   mediawiki_run_tasks_db:
     group_setup: "group_setup_db"
     group_backup: "group_backup_db"
@@ -450,6 +456,8 @@ pod_params:
     logs_backup: "logs_backup"
     sync_setup: "sync_setup"
     sync_backup: "sync_backup"
+    s3_backup: "s3_backup"
+    db_main: "db_main"
   mediawiki_run_tasks_web:
     group_setup: "group_setup_web"
     group_backup: "group_backup_web"
@@ -464,6 +472,9 @@ pod_params:
     sync_setup: "sync_setup"
     sync_backup: "sync_backup"
     certbot: "certbot"
+    s3_uploads: "s3_uploads"
+    s3_backup: "s3_backup"
+    db_main: "db_main"
   mediawiki_run_tasks_dict:
     group_setup_app:
       task: { type: "group" }
@@ -518,17 +529,11 @@ pod_params:
         setup_dest_dir_to_verify: "/var/main/data/mediawiki/uploads"
       setup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_uploads"
         restore_tmp_dir: "/tmp/main/restore/mediawiki/uploads"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
         restore_remote_bucket_path_dir: "uploads"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
-        service: "s3_uploads"
-        cli: "awscli"
-        cli_cmd: "run"
     uploads_backup_sync:
       task:
         type: "backup"
@@ -538,16 +543,10 @@ pod_params:
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_uploads"
         backup_src_dir: "uploads"
         backup_bucket_sync: "true"
         backup_bucket_sync_dir: "uploads"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
-        service: "s3_uploads"
-        cli: "awscli"
-        cli_cmd: "run"
     uploads_backup_no_sync:
       task:
         type: "backup"
@@ -557,16 +556,10 @@ pod_params:
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_uploads"
         backup_src_dir: "uploads"
         backup_bucket_static_dir: "files"
         backup_zip_file: "mediawiki-uploads.zip"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
-        service: "s3_uploads"
-        cli: "awscli"
-        cli_cmd: "run"
     db_setup_restore_file:
       task:
         type: "setup"
@@ -576,6 +569,7 @@ pod_params:
         subtask_cmd_local: "setup:local:db"
         setup_dest_base_dir: "/tmp/main/mysql/restore"
       setup_verify:
+        task_name: "db_main"
         db_subtask_cmd: "db:restore:verify:mysql"
       setup_remote:
         task_kind: "file"
@@ -586,14 +580,9 @@ pod_params:
         restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
         restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
       setup_local:
+        task_name: "db_main"
         db_subtask_cmd: "db:restore:file:mysql"
         db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
-      db_run:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.mediawiki.db.name }}"
-        db_user: "{{ params.credentials.mediawiki.db.user }}"
-        db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 300
     db_setup_restore_s3:
       task:
         type: "setup"
@@ -603,29 +592,19 @@ pod_params:
         subtask_cmd_local: "setup:local:db"
         setup_dest_base_dir: "/tmp/main/mysql/restore"
       setup_verify:
+        task_name: "db_main"
         db_subtask_cmd: "db:restore:verify:mysql"
       setup_remote:
         task_kind: "file"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         restore_tmp_dir: "/tmp/main/restore/mysql"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
         restore_remote_bucket_path_dir: "db"
       setup_local:
+        task_name: "db_main"
         db_subtask_cmd: "db:restore:file:mysql"
         db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
-      db_run:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.mediawiki.db.name }}"
-        db_user: "{{ params.credentials.mediawiki.db.user }}"
-        db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 300
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     db_backup_sync:
       task:
         type: "backup"
@@ -635,26 +614,15 @@ pod_params:
         backup_src_base_dir: "/tmp/main/mysql/backup"
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_local:
+        task_name: "db_main"
         db_subtask_cmd: "db:backup:file:mysql"
         db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
       backup_remote:
         task_kind: "file"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
         backup_bucket_sync: "true"
         backup_bucket_sync_dir: "db"
-      db_run:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.mediawiki.db.name }}"
-        db_user: "{{ params.credentials.mediawiki.db.user }}"
-        db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 300
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     db_backup_no_sync:
       task:
         type: "backup"
@@ -664,26 +632,15 @@ pod_params:
         backup_src_base_dir: "/tmp/main/mysql/backup"
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_local:
+        task_name: "db_main"
         db_subtask_cmd: "db:backup:file:mysql"
         db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
       backup_remote:
         task_kind: "file"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
         backup_bucket_static_dir: "files"
         backup_zip_file: "mediawiki-db.zip"
-      db_run:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.mediawiki.db.name }}"
-        db_user: "{{ params.credentials.mediawiki.db.user }}"
-        db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 300
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     logs_setup:
       task:
         type: "setup"
@@ -695,17 +652,11 @@ pod_params:
         setup_dest_dir_to_verify: "/var/log/main"
       setup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         restore_tmp_dir: "/tmp/main/restore/log"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
         restore_remote_bucket_path_dir: "logs"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     logs_backup:
       task:
         type: "backup"
@@ -715,16 +666,10 @@ pod_params:
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         backup_src_dir: "main"
         backup_bucket_sync: "true"
         backup_bucket_sync_dir: "log"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     sync_setup:
       task:
         type: "setup"
@@ -735,17 +680,11 @@ pod_params:
         setup_dest_dir_to_verify: "/var/sync/main"
       setup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         restore_tmp_dir: "/tmp/main/restore/sync"
         restore_recursive_mode_dir: "777"
         restore_recursive_mode_file: "666"
         restore_remote_bucket_path_dir: "sync"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     sync_backup:
       task:
         type: "backup"
@@ -755,26 +694,20 @@ pod_params:
         backup_local_static_dir:  "/tmp/main/backup/static"
       backup_remote:
         task_kind: "dir"
-        subtask_cmd_s3: "s3:run"
+        subtask_cmd_s3: "s3:subtask:s3_backup"
         backup_src_dir: "main"
         backup_bucket_sync: "true"
         backup_bucket_sync_dir: "sync"
-      s3_run:
-        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
     certbot:
       task:
         type: "certbot"
       certbot_task:
         certbot_cmd: "setup"
-      certbot_run:
+      certbot_subtask:
         toolbox_service: "toolbox"
         certbot_service: "certbot"
         webservice_type: "nginx"
-        data_base_path: "/var/main/data/sync/certbot/"
+        data_base_path: "/var/main/data/sync/certbot"
         main_domain: "{{ params.env_params.mediawiki_full_domain }}"
         domains: "{{ params.env_params.certbot_domains }}"
         rsa_key_size: "4096"
@@ -786,11 +719,11 @@ pod_params:
         type: "certbot"
       certbot_task:
         certbot_cmd: "setup"
-      certbot_run:
+      certbot_subtask:
         toolbox_service: "toolbox"
         certbot_service: "certbot"
         webservice_type: "nginx"
-        data_base_path: "/var/main/data/sync/certbot/"
+        data_base_path: "/var/main/data/sync/certbot"
         main_domain: "localhost"
         domains: "localhost www.localhost"
         rsa_key_size: "4096"
@@ -798,6 +731,27 @@ pod_params:
         dev: "true"
         staging: "true"
         force: "{{ params.env_params.certbot_force | default('false') }}"
+    s3_uploads:
+      s3_subtask:
+        endpoint: "{{ params.env_params.mediawiki_uploads_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
+        service: "s3_uploads"
+        cli: "awscli"
+        cli_cmd: "run"
+    s3_backup:
+      s3_subtask:
+        endpoint: "{{ params.env_params.mediawiki_backup_bucket_endpoint }}"
+        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
+        service: "s3_backup"
+        cli: "awscli"
+        cli_cmd: "run"
+    db_main:
+      db_subtask:
+        db_service: "mysql"
+        db_name: "{{ params.credentials.mediawiki.db.name }}"
+        db_user: "{{ params.credentials.mediawiki.db.user }}"
+        db_pass: "{{ params.credentials.mediawiki.db.password }}"
+        db_connect_wait_secs: 300
 tasks:
   docker_compose_install:
     type: "task"
