@@ -73,8 +73,8 @@ main:
           params:
             remote_test: true
           group_params:
-            run: "rocketchat_run"
-            run_tasks: "rocketchat_run_tasks_app"
+            run: "rocketchat_run_local"
+            run_tasks: "rocketchat_run_tasks_app_local"
     local:
       pods:
       - "rocketchat"
