@@ -330,8 +330,8 @@ pod_params:
     certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
-    fluentd_image: "lucasbasquerotto/wordpress"
-    fluentd_version: "fluentd-1.7.4-01"
+    fluentd_image: "lucasbasquerotto/image"
+    fluentd_version: "fluentd-20200617"
   rocketchat_custom_memory_app:
     nginx: 512mb
     rocketchat: 1gb
