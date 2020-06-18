@@ -282,6 +282,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
     group_params:
       custom_images: "wp_custom_images"
