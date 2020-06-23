@@ -71,7 +71,7 @@ main:
       pods:
         rocketchat:
           params:
-            remote_test: true
+            use_fluentd: true
           group_params:
             run: "rocketchat_run_local"
             run_tasks: "rocketchat_run_tasks_app_local"
@@ -210,6 +210,7 @@ nodes:
     - name: "rocketchat"
       params:
         local: true
+        use_fluentd: false
       group_params:
         custom_args: "rocketchat_custom_args"
         custom_domain: "rocketchat_custom_domain_local"
@@ -225,6 +226,7 @@ nodes:
     - name: "rocketchat"
       params:
         local: false
+        use_fluentd: true
       group_params:
         custom_args: "rocketchat_custom_args"
         custom_domain: "rocketchat_custom_domain"
