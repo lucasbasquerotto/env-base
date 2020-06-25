@@ -70,6 +70,8 @@ main:
       key: "mediawiki_local"
       pods:
         mediawiki:
+          params:
+            use_fluentd: true
           group_params:
             run: "mediawiki_run"
             run_tasks: "mediawiki_run_tasks_app"
@@ -212,6 +214,7 @@ nodes:
     - name: "mediawiki"
       params:
         local: true
+        use_fluentd: false
       group_params:
         custom_args: "mediawiki_custom_args"
         custom_domain: "mediawiki_custom_domain_local"
@@ -227,6 +230,7 @@ nodes:
     - name: "mediawiki"
       params:
         local: false
+        use_fluentd: true
       group_params:
         custom_args: "mediawiki_custom_args"
         custom_domain: "mediawiki_custom_domain"
