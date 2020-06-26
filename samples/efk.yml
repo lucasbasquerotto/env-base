@@ -209,7 +209,7 @@ nodes:
     - name: "efk"
       params:
         local: true
-        use_fluentd: false
+        use_fluentd: "{{ params.env_params.use_fluentd | default('false') }}"
       group_params:
         custom_args: "efk_custom_args"
         custom_domain: "efk_custom_domain_local"
@@ -275,6 +275,7 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
+      auth_file: "{{ params.env_params.auth_file }}"
       use_nginx: true
     group_params:
       custom_images: "efk_custom_images"
@@ -286,6 +287,7 @@ pod_params:
   efk_custom_args:
     fluentd:
       port: "24224"
+      output_plugin: "{{ params.env_params.fluentd_output_plugin | default('elasticsearch') }}"
     elasticsearch:
       port: "9200"
       java_opts: "-Xms700m -Xmx700m"

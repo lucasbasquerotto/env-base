@@ -288,6 +288,7 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
+      auth_file: "{{ params.env_params.auth_file }}"
     group_params:
       custom_images: "wp_custom_images"
       custom_memory: "wp_custom_memory_app"

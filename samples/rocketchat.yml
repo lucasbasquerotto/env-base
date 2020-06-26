@@ -280,6 +280,7 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
+      auth_file: "{{ params.env_params.auth_file }}"
       use_bot: "{{ params.env_params.use_bot }}"
     group_params:
       custom_images: "rocketchat_custom_images"
