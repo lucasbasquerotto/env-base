@@ -70,8 +70,6 @@ main:
       key: "rocketchat_local"
       pods:
         rocketchat:
-          params:
-            use_fluentd: true
           group_params:
             run: "rocketchat_run_local"
             run_tasks: "rocketchat_run_tasks_app_local"
@@ -210,7 +208,6 @@ nodes:
     - name: "rocketchat"
       params:
         local: true
-        use_fluentd: false
       group_params:
         custom_args: "rocketchat_custom_args"
         custom_domain: "rocketchat_custom_domain_local"
@@ -226,7 +223,6 @@ nodes:
     - name: "rocketchat"
       params:
         local: false
-        use_fluentd: true
       group_params:
         custom_args: "rocketchat_custom_args"
         custom_domain: "rocketchat_custom_domain"
@@ -279,9 +275,12 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
+      use_bot: "{{ params.env_params.use_bot }}"
+      use_mongo_express: "{{ params.env_params.use_mongo_express }}"
+      use_theia: "{{ params.env_params.use_theia }}"
+      use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
-      use_bot: "{{ params.env_params.use_bot }}"
     group_params:
       custom_images: "rocketchat_custom_images"
       custom_memory: "rocketchat_custom_memory_app"

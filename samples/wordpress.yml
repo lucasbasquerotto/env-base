@@ -72,8 +72,6 @@ main:
       key: "wp_local"
       pods:
         wp:
-          params:
-            use_fluentd: true
           group_params:
             run: "wp_run"
             run_tasks: "wp_run_tasks_app"
@@ -218,7 +216,6 @@ nodes:
     - name: "wp"
       params:
         local: true
-        use_fluentd: false
       group_params:
         custom_args: "wp_custom_args_local"
         custom_domain: "wp_custom_domain_local"
@@ -234,7 +231,6 @@ nodes:
     - name: "wp"
       params:
         local: false
-        use_fluentd: true
       group_params:
         custom_args: "wp_custom_args"
         custom_domain: "wp_custom_domain"
@@ -289,9 +285,11 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
-      use_certbot: "{{ params.env_params.use_certbot }}"
+      use_composer: "{{ params.env_params.use_composer | default('false') }}"
       use_pma: "{{ params.env_params.use_pma }}"
       use_theia: "{{ params.env_params.use_theia }}"
+      use_fluentd: "{{ params.env_params.use_fluentd }}"
+      use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
     group_params:
       custom_images: "wp_custom_images"

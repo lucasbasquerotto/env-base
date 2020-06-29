@@ -69,8 +69,6 @@ main:
       key: "efk_local"
       pods:
         efk:
-          params:
-            use_fluentd: true
           group_params:
             run: "efk_run"
             run_tasks: "efk_run_tasks_app"
@@ -209,7 +207,6 @@ nodes:
     - name: "efk"
       params:
         local: true
-        use_fluentd: "{{ params.env_params.use_fluentd | default('false') }}"
       group_params:
         custom_args: "efk_custom_args"
         custom_domain: "efk_custom_domain_local"
@@ -225,7 +222,6 @@ nodes:
     - name: "efk"
       params:
         local: false
-        use_fluentd: true
       group_params:
         custom_args: "efk_custom_args"
         custom_domain: "efk_custom_domain"
@@ -274,9 +270,11 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
+      use_nginx: "{{ params.env_params.use_nginx | default('true') }}"
+      use_theia: "{{ params.env_params.use_theia }}"
+      use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
-      use_nginx: true
     group_params:
       custom_images: "efk_custom_images"
       custom_memory: "efk_custom_memory_app"
