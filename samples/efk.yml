@@ -298,6 +298,8 @@ pod_params:
     private_https_port: "9443"
     kibana_domain: "{{ params.env_params.kibana_full_domain }}"
     kibana_ssl: "{{ params.env_params.ssl }}"
+    theia_domain: "{{ params.env_params.theia_full_domain }}"
+    theia_ssl: "{{ params.env_params.ssl }}"
   efk_custom_domain_local:
     public_http_port: "8080"
     public_https_port: "8443"
@@ -305,6 +307,8 @@ pod_params:
     private_https_port: "9443"
     kibana_domain: "localhost"
     kibana_ssl: "{{ params.env_params.ssl }}"
+    theia_domain: "theia.localhost"
+    theia_ssl: "{{ params.env_params.ssl }}"
   efk_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -312,6 +316,8 @@ pod_params:
     elasticsearch_version: "7.5.0"
     kibana_image: "docker.elastic.co/kibana/kibana"
     kibana_version: "7.5.0"
+    theia_image: "theiaide/theia"
+    theia_version: "1.3.0"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200513"
     certbot_image: "certbot/certbot"
