@@ -282,6 +282,7 @@ pods:
     credentials:
       wordpress: "wordpress"
       mysql: "mysql"
+      nextcloud: "nextcloud"
       wp_backup_bucket: "wp_backup_bucket"
       wp_uploads_bucket: "wp_uploads_bucket"
     params:
@@ -297,6 +298,10 @@ pods:
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
+      backup_bucket_endpoint: "{{ params.env_params.wp_backup_bucket_endpoint }}"
+      backup_bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
+      uploads_bucket_endpoint: "{{ params.env_params.wp_uploads_bucket_endpoint }}"
+      uploads_bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
     group_params:
       custom_images: "wp_custom_images"
       custom_memory: "wp_custom_memory_app"
