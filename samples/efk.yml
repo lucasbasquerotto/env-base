@@ -196,7 +196,6 @@ dns:
 buckets:
   efk_backup:
     name: "{{ params.env_params.efk_backup_bucket_name }}"
-    endpoint: "{{ params.env_params.efk_backup_bucket_endpoint }}"
     credentials: "efk_backup_bucket"
 nodes:
   efk_local:
@@ -229,6 +228,18 @@ nodes:
       dns:
       - record: "{{ params.env_params.kibana_dns_record }}"
         name: "{{ params.env_params.kibana_dns_name }}"
+      - record: "{{ params.env_params.theia_dns_record }}"
+        name: "{{ params.env_params.theia_dns_name }}"
+        when: "{{ params.env_params.use_theia }}"
+      - record: "{{ params.env_params.minio_gateway_dns_record }}"
+        name: "{{ params.env_params.minio_gateway_dns_name }}"
+        when: "{{ params.env_params.use_minio_gateway }}"
+      - record: "{{ params.env_params.filestash_dns_record }}"
+        name: "{{ params.env_params.filestash_dns_name }}"
+        when: "{{ params.env_params.use_filestash }}"
+      - record: "{{ params.env_params.nextcloud_dns_record }}"
+        name: "{{ params.env_params.nextcloud_dns_name }}"
+        when: "{{ params.env_params.use_nextcloud }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -264,6 +275,8 @@ pods:
       dir: "custom-pod"
     credentials:
       efk: "efk"
+      minio_gateway: "minio_gateway"
+      nextcloud: "nextcloud"
       efk_backup_bucket: "efk_backup_bucket"
     params:
       type: "app"
@@ -272,9 +285,13 @@ pods:
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_nginx: "{{ params.env_params.use_nginx | default('true') }}"
       use_theia: "{{ params.env_params.use_theia }}"
+      use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
+      use_filestash: "{{ params.env_params.use_filestash }}"
+      use_nextcloud: "{{ params.env_params.use_nextcloud }}"
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
+      backup_bucket_name: "{{ params.env_params.efk_backup_bucket_name }}"
     group_params:
       custom_images: "efk_custom_images"
       custom_memory: "efk_custom_memory_app"
@@ -301,6 +318,12 @@ pod_params:
     kibana_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "{{ params.env_params.theia_full_domain }}"
     theia_ssl: "{{ params.env_params.ssl }}"
+    minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
+    minio_gateway_ssl: "{{ params.env_params.ssl }}"
+    filestash_domain: "{{ params.env_params.filestash_full_domain }}"
+    filestash_ssl: "{{ params.env_params.ssl }}"
+    nextcloud_domain: "{{ params.env_params.nextcloud_full_domain }}"
+    nextcloud_ssl: "{{ params.env_params.ssl }}"
   efk_custom_domain_local:
     public_http_port: "8080"
     public_https_port: "8443"
@@ -311,6 +334,12 @@ pod_params:
     kibana_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "theia.localhost"
     theia_ssl: "{{ params.env_params.ssl }}"
+    minio_gateway_domain: "minio.localhost"
+    minio_gateway_ssl: "{{ params.env_params.ssl }}"
+    filestash_domain: "filestash.localhost"
+    filestash_ssl: "{{ params.env_params.ssl }}"
+    nextcloud_domain: "nextcloud.localhost"
+    nextcloud_ssl: "{{ params.env_params.ssl }}"
   efk_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -320,6 +349,12 @@ pod_params:
     kibana_version: "7.5.0"
     theia_image: "theiaide/theia"
     theia_version: "1.3.0"
+    minio_gateway_image: "minio/minio"
+    minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
+    filestash_image: "machines/filestash"
+    filestash_version: "4cbeb2c"
+    nextcloud_image: "nextcloud"
+    nextcloud_version: "19.0.0-apache"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200513"
     certbot_image: "certbot/certbot"
@@ -332,6 +367,10 @@ pod_params:
     nginx: 512mb
     kibana: 512mb
     elasticsearch: 1gb
+    theia: 512mb
+    minio_gateway: 512mb
+    filestash: 512mb
+    nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
     s3_backup: 512mb
@@ -344,6 +383,10 @@ pod_params:
   efk_custom_memory_web:
     nginx: 512mb
     kibana: 512mb
+    theia: 512mb
+    minio_gateway: 512mb
+    filestash: 512mb
+    nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
     s3_backup: 512mb
@@ -647,7 +690,7 @@ pod_params:
         force: "{{ params.env_params.certbot_force | default('false') }}"
     s3_backup:
       s3_subtask:
-        endpoint: "{{ params.env_params.efk_backup_bucket_endpoint }}"
+        endpoint: "{{ params.credentials.efk_backup_bucket.endpoint }}"
         bucket_name: "{{ params.env_params.efk_backup_bucket_name }}"
         service: "s3_backup"
         cli: "awscli"
