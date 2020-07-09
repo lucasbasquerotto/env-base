@@ -300,6 +300,8 @@ pods:
       run_tasks_dict: "efk_run_tasks_dict"
 pod_params:
   efk_custom_args:
+    nginx:
+      enable_validate_origin: true
     fluentd:
       port: "24224"
       output_plugin: "{{ params.env_params.fluentd_output_plugin | default('elasticsearch') }}"

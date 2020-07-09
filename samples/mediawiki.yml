@@ -310,6 +310,8 @@ pods:
       run_tasks_dict: "mediawiki_run_tasks_dict"
 pod_params:
   mediawiki_custom_args:
+    nginx:
+      enable_validate_origin: true
     mysql:
       host: "mysql"
       port: "3306"

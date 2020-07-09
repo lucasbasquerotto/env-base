@@ -308,6 +308,8 @@ pods:
       run_tasks_dict: "rocketchat_run_tasks_dict"
 pod_params:
   rocketchat_custom_args:
+    nginx:
+      enable_validate_origin: true
     rocketchat:
       storage_type: "{{ params.env_params.s3_uploads | bool | ternary('AmazonS3', 'FileSystem') }}"
       uploads_bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"

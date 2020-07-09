@@ -315,6 +315,8 @@ pods:
       run_tasks_dict: "wp_run_tasks_dict"
 pod_params:
   wp_custom_args:
+    nginx:
+      enable_validate_origin: true
     mysql:
       host: "mysql"
       port: "3306"
@@ -325,6 +327,8 @@ pod_params:
     fluentd:
       port: "24224"
   wp_custom_args_local:
+    nginx:
+      enable_validate_origin: true
     mysql:
       host: "mysql"
       port: "3306"
