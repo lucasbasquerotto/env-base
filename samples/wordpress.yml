@@ -407,6 +407,8 @@ pod_params:
     certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
+    logrotator_image: "python"
+    logrotator_version: "3.8.4-buster"
     fluentd_image: "lucasbasquerotto/image"
     fluentd_version: "fluentd-20200617"
   wp_custom_memory_app:
