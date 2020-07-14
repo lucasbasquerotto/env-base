@@ -251,6 +251,9 @@ nodes:
       - record: "{{ params.env_params.pma_dns_record }}"
         name: "{{ params.env_params.pma_dns_name }}"
         when: "{{ params.env_params.use_pma }}"
+      - record: "{{ params.env_params.adminer_dns_record }}"
+        name: "{{ params.env_params.adminer_dns_name }}"
+        when: "{{ params.env_params.use_adminer }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -298,6 +301,7 @@ pods:
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_composer: "{{ params.env_params.use_composer | default('false') }}"
       use_pma: "{{ params.env_params.use_pma }}"
+      use_adminer: "{{ params.env_params.use_adminer }}"
       use_theia: "{{ params.env_params.use_theia }}"
       use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
       use_filestash: "{{ params.env_params.use_filestash }}"
@@ -347,6 +351,8 @@ pod_params:
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.pma_full_domain }}"
     pma_ssl: "{{ params.env_params.ssl }}"
+    adminer_domain: "{{ params.env_params.adminer_full_domain }}"
+    adminer_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "{{ params.env_params.theia_full_domain }}"
     theia_ssl: "{{ params.env_params.ssl }}"
     minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
@@ -364,6 +370,8 @@ pod_params:
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "pma.localhost"
     pma_ssl: "{{ params.env_params.ssl }}"
+    adminer_domain: "adminer.localhost"
+    adminer_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "theia.localhost"
     theia_ssl: "{{ params.env_params.ssl }}"
     minio_gateway_domain: "minio.localhost"
@@ -379,6 +387,8 @@ pod_params:
     wordpress_version: "0.0.2"
     pma_image: "phpmyadmin/phpmyadmin"
     pma_version: "4.8.5"
+    adminer_image: "lucasbasquerotto/image"
+    adminer_version: "adminer-20200713-03"
     mysql_image: "lucasbasquerotto/wordpress"
     mysql_version: "mysql-8.0.16-02"
     theia_image: "theiaide/theia"
@@ -403,6 +413,7 @@ pod_params:
     nginx: 512mb
     wordpress: 512mb
     pma: 512mb
+    adminer: 512mb
     mysql: 758gb
     theia: 512mb
     minio_gateway: 512mb
@@ -423,6 +434,7 @@ pod_params:
     nginx: 512mb
     wordpress: 1gb
     pma: 512mb
+    adminer: 512mb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
