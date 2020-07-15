@@ -400,7 +400,7 @@ pod_params:
     nextcloud_image: "nextcloud"
     nextcloud_version: "19.0.0-apache"
     toolbox_image: "lucasbasquerotto/image"
-    toolbox_version: "toolbox-20200513"
+    toolbox_version: "toolbox-20200715"
     composer_image: "lucasbasquerotto/wordpress"
     composer_version: "composer-1.8.6"
     certbot_image: "certbot/certbot"
