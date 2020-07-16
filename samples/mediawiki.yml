@@ -247,6 +247,9 @@ nodes:
       - record: "{{ params.env_params.pma_dns_record }}"
         name: "{{ params.env_params.pma_dns_name }}"
         when: "{{ params.env_params.use_pma }}"
+      - record: "{{ params.env_params.adminer_dns_record }}"
+        name: "{{ params.env_params.adminer_dns_name }}"
+        when: "{{ params.env_params.use_adminer }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -292,12 +295,14 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_pma: "{{ params.env_params.use_pma }}"
+      use_adminer: "{{ params.env_params.use_adminer }}"
       use_theia: "{{ params.env_params.use_theia }}"
       use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
       use_filestash: "{{ params.env_params.use_filestash }}"
       use_nextcloud: "{{ params.env_params.use_nextcloud }}"
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
+      block_ips: "{{ params.env_params.block_ips }}"
       auth_file: "{{ params.env_params.auth_file }}"
       mediawiki: "{{ params.env_params.mediawiki }}"
       backup_bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
@@ -326,6 +331,8 @@ pod_params:
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "{{ params.env_params.mediawiki_full_domain }}"
     pma_ssl: "{{ params.env_params.ssl }}"
+    adminer_domain: "{{ params.env_params.adminer_full_domain }}"
+    adminer_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "{{ params.env_params.theia_full_domain }}"
     theia_ssl: "{{ params.env_params.ssl }}"
     minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
@@ -343,6 +350,8 @@ pod_params:
     main_ssl: "{{ params.env_params.ssl }}"
     pma_domain: "pma.localhost"
     pma_ssl: "{{ params.env_params.ssl }}"
+    adminer_domain: "adminer.localhost"
+    adminer_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "theia.localhost"
     theia_ssl: "{{ params.env_params.ssl }}"
     minio_gateway_domain: "minio.localhost"
@@ -358,6 +367,8 @@ pod_params:
     mediawiki_version: "1.34.1"
     pma_image: "phpmyadmin/phpmyadmin"
     pma_version: "4.8.5"
+    adminer_image: "lucasbasquerotto/image"
+    adminer_version: "adminer-20200713-03"
     mysql_image: "mariadb"
     mysql_version: "10.5.3-bionic"
     theia_image: "theiaide/theia"
@@ -369,17 +380,20 @@ pod_params:
     nextcloud_image: "nextcloud"
     nextcloud_version: "19.0.0-apache"
     toolbox_image: "lucasbasquerotto/image"
-    toolbox_version: "toolbox-20200513"
+    toolbox_version: "toolbox-20200715-02"
     certbot_image: "certbot/certbot"
     certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
     awscli_version: "1.0.0"
+    logrotator_image: "python"
+    logrotator_version: "3.8.4-buster"
     fluentd_image: "lucasbasquerotto/image"
     fluentd_version: "fluentd-20200617"
   mediawiki_custom_memory_app:
     nginx: 512mb
     mediawiki: 1gb
     pma: 512mb
+    adminer: 512mb
     mysql: 1gb
     theia: 512mb
     minio_gateway: 512mb
@@ -400,6 +414,7 @@ pod_params:
     nginx: 512mb
     mediawiki: 1gb
     pma: 512mb
+    adminer: 512mb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
