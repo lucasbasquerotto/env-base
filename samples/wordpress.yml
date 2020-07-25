@@ -6,11 +6,6 @@ main:
     nodes:
     - name: "app"
       key: "wp_local"
-      pods:
-        wp:
-          group_params:
-            run: "wp_run_local"
-            run_tasks: "wp_run_tasks_app_local"
     local:
       pods:
       - "wp"
@@ -38,11 +33,6 @@ main:
     nodes:
     - name: "app"
       key: "wp"
-      pods:
-        wp:
-          group_params:
-            run: "wp_run"
-            run_tasks: "wp_run_tasks_app"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -70,11 +60,6 @@ main:
     nodes:
     - name: "app"
       key: "wp_local"
-      pods:
-        wp:
-          group_params:
-            run: "wp_run"
-            run_tasks: "wp_run_tasks_app"
     local:
       pods:
       - "wp"
@@ -108,8 +93,6 @@ main:
             type: "db"
           group_params:
             custom_memory: "wp_custom_memory_db"
-            run: "wp_run"
-            run_tasks: "wp_run_tasks_db"
     - name: "web"
       key: "wp"
       dependencies:
@@ -121,8 +104,6 @@ main:
             type: "web"
           group_params:
             custom_memory: "wp_custom_memory_web"
-            run: "wp_run"
-            run_tasks: "wp_run_tasks_web"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -321,6 +302,16 @@ pods:
       auth_file: "{{ params.env_params.auth_file }}"
       backup_bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
       uploads_bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
+      restore_db: "{{ params.env_params.restore_db }}"
+      enable_db_backup: true
+      enable_db_setup: true
+      enable_db_setup_new: true
+      enable_logs_backup: true
+      enable_logs_setup: true
+      enable_sync_backup: true
+      enable_sync_setup: true
+      enable_uploads_backup: true
+      enable_uploads_setup: true
       migrate:
         old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
         new_domain_host: "{{ params.env_params.wp_new_domain_host | default('') }}"
@@ -340,14 +331,7 @@ pods:
         ternary('uploads_setup_file', 'uploads_setup_s3')
         }}
       uploads_backup: "uploads_backup_sync"
-      logs_setup: "logs_setup"
-      logs_backup: "logs_backup"
-      sync_setup: "sync_setup"
-      sync_backup: "sync_backup"
       certbot: "certbot"
-      s3_uploads: "s3_uploads"
-      s3_backup: "s3_backup"
-      db_main: "db_main"
 pod_params:
   wp_custom_args:
     nginx:
@@ -518,6 +502,12 @@ pod_params:
     title: "{{ params.env_params.wp_title }}"
     restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
     remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
+  uploads_backup_sync:
+    backup_bucket_sync: "true"
+    backup_bucket_sync_dir: "uploads"
+  uploads_backup_no_sync:
+    backup_bucket_static_dir: "files"
+    backup_zip_file: "wordpress-uploads.zip"
   uploads_setup_file:
     restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/uploads/20200624_214700.zip?raw=true"
     restore_is_zip_file: true
