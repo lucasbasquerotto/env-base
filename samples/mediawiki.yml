@@ -6,11 +6,6 @@ main:
     nodes:
     - name: "app"
       key: "mediawiki_local"
-      pods:
-        mediawiki:
-          group_params:
-            run: "mediawiki_run_local"
-            run_tasks: "mediawiki_run_tasks_app_local"
     local:
       pods:
       - "mediawiki"
@@ -36,11 +31,6 @@ main:
     nodes:
     - name: "app"
       key: "mediawiki"
-      pods:
-        mediawiki:
-          group_params:
-            run: "mediawiki_run"
-            run_tasks: "mediawiki_run_tasks_app"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -68,11 +58,6 @@ main:
     nodes:
     - name: "app"
       key: "mediawiki_local"
-      pods:
-        mediawiki:
-          group_params:
-            run: "mediawiki_run"
-            run_tasks: "mediawiki_run_tasks_app"
     local:
       pods:
       - "mediawiki"
@@ -104,8 +89,6 @@ main:
             type: "db"
           group_params:
             custom_memory: "mediawiki_custom_memory_db"
-            run: "mediawiki_run"
-            run_tasks: "mediawiki_run_tasks_db"
     - name: "web"
       key: "mediawiki"
       dependencies:
@@ -117,8 +100,6 @@ main:
             type: "web"
           group_params:
             custom_memory: "mediawiki_custom_memory_web"
-            run: "mediawiki_run"
-            run_tasks: "mediawiki_run_tasks_web"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -213,6 +194,9 @@ nodes:
       group_params:
         custom_args: "mediawiki_custom_args"
         custom_domain: "mediawiki_custom_domain_local"
+        db_backup: "db_backup_no_sync"
+        uploads_backup: "uploads_backup_no_sync"
+        certbot: "certbot_local"
     params:
       size:
         memory: "2gb"
@@ -307,12 +291,31 @@ pods:
       mediawiki: "{{ params.env_params.mediawiki }}"
       backup_bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
       uploads_bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
+      restore_db: "{{ params.env_params.restore_db }}"
+      enable_db_backup: true
+      enable_db_setup: true
+      enable_logs_backup: true
+      enable_logs_setup: true
+      enable_sync_backup: true
+      enable_sync_setup: true
+      enable_uploads_backup: true
+      enable_uploads_setup: true
     group_params:
       custom_images: "mediawiki_custom_images"
       custom_memory: "mediawiki_custom_memory_app"
-      meta: "mediawiki_meta"
-      run_dict: "mediawiki_run_dict"
-      run_tasks_dict: "mediawiki_run_tasks_dict"
+      db_setup: >-
+        {{
+        params.env_params.non_s3_setup | default(false) | bool |
+        ternary('db_setup_restore_file', 'db_setup_restore_s3')
+        }}
+      db_backup: "db_backup_no_sync"
+      uploads_setup: >-
+        {{
+        params.env_params.non_s3_setup | default(false) | bool |
+        ternary('uploads_setup_file', 'uploads_setup_s3')
+        }}
+      uploads_backup: "uploads_backup_sync"
+      certbot: "certbot"
 pod_params:
   mediawiki_custom_args:
     nginx:
@@ -424,406 +427,48 @@ pod_params:
     s3_backup: 512mb
     s3_uploads: 512mb
     fluentd: 256mb
-  mediawiki_meta:
-    use_run_dict: true
-    use_run_tasks_dict: true
-  mediawiki_run:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks', 'tasks_new_db')
-      }}
-    general: "general"
-    migrate: "migrate"
-  mediawiki_run_local:
-    tasks: >-
-      {{
-      params.env_params.restore_db | default(false) | bool |
-      ternary('tasks', 'tasks_new_db')
-      }}
-    general: "general_local"
-    migrate: "migrate"
-  mediawiki_run_dict:
-    tasks:
-      backup: "group_backup"
-      setup: "group_setup"
-    tasks_new_db:
-      backup: "group_backup"
-    general:
-      backup_delete_old_days: 3
-      backup_local_base_dir: "/tmp/mediawiki/backup"
-      orchestration: "compose"
-      script_dir: "custom-pod/mediawiki/scripts"
-      script_env_file: "remote.sh"
-      toolbox_service: "toolbox"
-    general_local:
-      backup_delete_old_days: 3
-      backup_local_base_dir: "/tmp/main/backup"
-      orchestration: "compose"
-      script_dir: "custom-pod/mediawiki/scripts"
-      script_env_file: "local.sh"
-      toolbox_service: "toolbox"
-    migrate:
-      db_service: "mysql"
-      db_name: "{{ params.credentials.mediawiki.db.name }}"
-      db_user: "{{ params.credentials.mediawiki.db.user }}"
-      db_pass: "{{ params.credentials.mediawiki.db.password }}"
-      db_connect_wait_secs: 300
-  mediawiki_run_tasks_app:
-    group_setup: "group_setup_app"
-    group_backup: "group_backup_app"
-    uploads_setup: >-
-      {{
-      params.env_params.non_s3_setup | default(false) | bool |
-      ternary('uploads_setup_file', 'uploads_setup_s3')
-      }}
-    uploads_backup: "uploads_backup_sync"
-    db_setup: >-
-      {{
-      params.env_params.non_s3_setup | default(false) | bool |
-      ternary('db_setup_restore_file', 'db_setup_restore_s3')
-      }}
-    db_backup: "db_backup_no_sync"
-    logs_setup: "logs_setup"
-    logs_backup: "logs_backup"
-    sync_setup: "sync_setup"
-    sync_backup: "sync_backup"
-    certbot: "certbot"
-    s3_uploads: "s3_uploads"
-    s3_backup: "s3_backup"
-    db_main: "db_main"
-  mediawiki_run_tasks_app_local:
-    group_setup: "group_setup_app_local"
-    group_backup: "group_backup_app_local"
-    uploads_setup: >-
-      {{
-      params.env_params.non_s3_setup | default(false) | bool |
-      ternary('uploads_setup_file', 'uploads_setup_s3')
-      }}
-    uploads_backup: "uploads_backup_no_sync"
-    db_setup: >-
-      {{
-      params.env_params.non_s3_setup | default(false) | bool |
-      ternary('db_setup_restore_file', 'db_setup_restore_s3')
-      }}
-    db_backup: "db_backup_no_sync"
-    logs_setup: "logs_setup"
-    logs_backup: "logs_backup"
-    sync_setup: "sync_setup"
-    sync_backup: "sync_backup"
-    certbot: "certbot_local"
-    s3_uploads: "s3_uploads"
-    s3_backup: "s3_backup"
-    db_main: "db_main"
-  mediawiki_run_tasks_db:
-    group_setup: "group_setup_db"
-    group_backup: "group_backup_db"
-    db_setup: >-
-      {{
-      params.env_params.non_s3_setup | default(false) | bool |
-      ternary('db_setup_restore_file', 'db_setup_restore_s3')
-      }}
-    db_backup: "db_backup_no_sync"
-    logs_setup: "logs_setup"
-    logs_backup: "logs_backup"
-    sync_setup: "sync_setup"
-    sync_backup: "sync_backup"
-    s3_backup: "s3_backup"
-    db_main: "db_main"
-  mediawiki_run_tasks_web:
-    group_setup: "group_setup_web"
-    group_backup: "group_backup_web"
-    uploads_setup: >-
-      {{
-      params.env_params.non_s3_setup | default(false) | bool |
-      ternary('uploads_setup_file', 'uploads_setup_s3')
-      }}
-    uploads_backup: "uploads_backup_sync"
-    logs_setup: "logs_setup"
-    logs_backup: "logs_backup"
-    sync_setup: "sync_setup"
-    sync_backup: "sync_backup"
-    certbot: "certbot"
-    s3_uploads: "s3_uploads"
-    s3_backup: "s3_backup"
-    db_main: "db_main"
-  mediawiki_run_tasks_dict:
-    group_setup_app:
-      task: { type: "group" }
-      group_task: { task_names: "logs_setup,sync_setup,sync_backup,uploads_setup,db_setup" }
-    group_backup_app:
-      task: { type: "group" }
-      group_task: { task_names: "db_backup,uploads_backup,sync_backup,logs_backup" }
-    group_setup_app_local:
-      task: { type: "group" }
-      group_task: { task_names: "uploads_setup,db_setup" }
-    group_backup_app_local:
-      task: { type: "group" }
-      group_task: { task_names: "db_backup,uploads_backup" }
-    group_setup_db:
-      task: { type: "group" }
-      group_task: { task_names: "logs_setup,sync_setup,sync_backup,db_setup" }
-    group_backup_db:
-      task: { type: "group" }
-      group_task: { task_names: "db_backup,sync_backup,logs_backup" }
-    group_setup_web:
-      task: { type: "group" }
-      group_task: { task_names: "logs_setup,sync_setup,sync_backup,uploads_setup" }
-    group_backup_web:
-      task: { type: "group" }
-      group_task: { task_names: "uploads_backup,sync_backup,logs_backup" }
-    uploads_setup_file:
-      task:
-        type: "setup"
-      setup_task:
-        subtask_cmd_verify: "setup:verify:default"
-        subtask_cmd_remote: "setup:remote:default"
-        setup_dest_base_dir: "/var/main/data/mediawiki/uploads"
-      setup_verify:
-        setup_dest_dir_to_verify: "/var/main/data/mediawiki/uploads"
-      setup_remote:
-        task_kind: "dir"
-        restore_tmp_dir: "/tmp/main/restore/mediawiki/uploads"
-        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
-        restore_is_zip_file: "true"
-        restore_zip_pass: "{{ params.credentials.mediawiki_uploads_zip_file_pass | default('') }}"
-        restore_recursive_mode_dir: "777"
-        restore_recursive_mode_file: "666"
-        restore_zip_inner_dir: "uploads"
-    uploads_setup_s3:
-      task:
-        type: "setup"
-      setup_task:
-        subtask_cmd_verify: "setup:verify:default"
-        subtask_cmd_remote: "setup:remote:default"
-        setup_dest_base_dir: "/var/log/main"
-      setup_verify:
-        setup_dest_dir_to_verify: "/var/main/data/mediawiki/uploads"
-      setup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_uploads"
-        restore_tmp_dir: "/tmp/main/restore/mediawiki/uploads"
-        restore_recursive_mode_dir: "777"
-        restore_recursive_mode_file: "666"
-        restore_remote_bucket_path_dir: "uploads"
-    uploads_backup_sync:
-      task:
-        type: "backup"
-      backup_task:
-        subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/var/main/data/mediawiki"
-        backup_local_static_dir:  "/tmp/main/backup/static"
-      backup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_uploads"
-        backup_src_dir: "uploads"
-        backup_bucket_sync: "true"
-        backup_bucket_sync_dir: "uploads"
-    uploads_backup_no_sync:
-      task:
-        type: "backup"
-      backup_task:
-        subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/var/main/data/mediawiki"
-        backup_local_static_dir:  "/tmp/main/backup/static"
-      backup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_uploads"
-        backup_src_dir: "uploads"
-        backup_bucket_static_dir: "files"
-        backup_zip_file: "mediawiki-uploads.zip"
-    db_setup_restore_file:
-      task:
-        type: "setup"
-      setup_task:
-        subtask_cmd_verify: "setup:verify:db"
-        subtask_cmd_remote: "setup:remote:default"
-        subtask_cmd_local: "setup:local:db"
-        setup_dest_base_dir: "/tmp/main/mysql/restore"
-      setup_verify:
-        task_name: "db_main"
-        db_subtask_cmd: "db:restore:verify:mysql"
-      setup_remote:
-        task_kind: "file"
-        restore_dest_file: "{{ params.credentials.mediawiki.db.name }}.sql"
-        restore_tmp_dir: "/tmp/main/restore/mysql"
-        restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
-        restore_is_zip_file: "true"
-        restore_zip_pass: "{{ params.credentials.db_zip_file_pass | default('') }}"
-        restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
-      setup_local:
-        task_name: "db_main"
-        db_subtask_cmd: "db:restore:file:mysql"
-        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
-    db_setup_restore_s3:
-      task:
-        type: "setup"
-      setup_task:
-        subtask_cmd_verify: "setup:verify:db"
-        subtask_cmd_remote: "setup:remote:default"
-        subtask_cmd_local: "setup:local:db"
-        setup_dest_base_dir: "/tmp/main/mysql/restore"
-      setup_verify:
-        task_name: "db_main"
-        db_subtask_cmd: "db:restore:verify:mysql"
-      setup_remote:
-        task_kind: "file"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        restore_tmp_dir: "/tmp/main/restore/mysql"
-        restore_recursive_mode_dir: "777"
-        restore_recursive_mode_file: "666"
-        restore_remote_bucket_path_dir: "db"
-      setup_local:
-        task_name: "db_main"
-        db_subtask_cmd: "db:restore:file:mysql"
-        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
-    db_backup_sync:
-      task:
-        type: "backup"
-      backup_task:
-        subtask_cmd_local: "backup:local:db"
-        subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/tmp/main/mysql/backup"
-        backup_local_static_dir:  "/tmp/main/backup/static"
-      backup_local:
-        task_name: "db_main"
-        db_subtask_cmd: "db:backup:file:mysql"
-        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
-      backup_remote:
-        task_kind: "file"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
-        backup_bucket_sync: "true"
-        backup_bucket_sync_dir: "db"
-    db_backup_no_sync:
-      task:
-        type: "backup"
-      backup_task:
-        subtask_cmd_local: "backup:local:db"
-        subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/tmp/main/mysql/backup"
-        backup_local_static_dir:  "/tmp/main/backup/static"
-      backup_local:
-        task_name: "db_main"
-        db_subtask_cmd: "db:backup:file:mysql"
-        db_file_name: "{{ params.credentials.mediawiki.db.name }}.sql"
-      backup_remote:
-        task_kind: "file"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        backup_src_file: "{{ params.credentials.mediawiki.db.name }}.sql"
-        backup_bucket_static_dir: "files"
-        backup_zip_file: "mediawiki-db.zip"
-    logs_setup:
-      task:
-        type: "setup"
-      setup_task:
-        subtask_cmd_verify: "setup:verify:default"
-        subtask_cmd_remote: "setup:remote:default"
-        setup_dest_base_dir: "/var/log/main"
-      setup_verify:
-        setup_dest_dir_to_verify: "/var/log/main"
-      setup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        restore_tmp_dir: "/tmp/main/restore/log"
-        restore_recursive_mode_dir: "777"
-        restore_recursive_mode_file: "666"
-        restore_remote_bucket_path_dir: "logs"
-    logs_backup:
-      task:
-        type: "backup"
-      backup_task:
-        subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/var/log"
-        backup_local_static_dir:  "/tmp/main/backup/static"
-      backup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        backup_src_dir: "main"
-        backup_bucket_sync: "true"
-        backup_bucket_sync_dir: "log"
-    sync_setup:
-      task:
-        type: "setup"
-      setup_task:
-        subtask_cmd_remote: "setup:remote:default"
-        setup_dest_base_dir: "/var/sync/main"
-      setup_verify:
-        setup_dest_dir_to_verify: "/var/sync/main"
-      setup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        restore_tmp_dir: "/tmp/main/restore/sync"
-        restore_recursive_mode_dir: "777"
-        restore_recursive_mode_file: "666"
-        restore_remote_bucket_path_dir: "sync"
-    sync_backup:
-      task:
-        type: "backup"
-      backup_task:
-        subtask_cmd_remote: "backup:remote:default"
-        backup_src_base_dir: "/var/sync"
-        backup_local_static_dir:  "/tmp/main/backup/static"
-      backup_remote:
-        task_kind: "dir"
-        subtask_cmd_s3: "s3:subtask:s3_backup"
-        backup_src_dir: "main"
-        backup_bucket_sync: "true"
-        backup_bucket_sync_dir: "sync"
-    certbot:
-      task:
-        type: "certbot"
-      certbot_task:
-        certbot_cmd: "setup"
-      certbot_subtask:
-        toolbox_service: "toolbox"
-        certbot_service: "certbot"
-        webservice_type: "nginx"
-        data_base_path: "/var/main/data/sync/certbot"
-        main_domain: "{{ params.env_params.mediawiki_full_domain }}"
-        domains: "{{ params.env_params.certbot_domains }}"
-        rsa_key_size: "4096"
-        email: "{{ params.env_params.certbot_email | default('') }}"
-        staging: "{{ params.env_params.certbot_staging | default('false') }}"
-        force: "{{ params.env_params.certbot_force | default('false') }}"
-    certbot_local:
-      task:
-        type: "certbot"
-      certbot_task:
-        certbot_cmd: "setup"
-      certbot_subtask:
-        toolbox_service: "toolbox"
-        certbot_service: "certbot"
-        webservice_type: "nginx"
-        data_base_path: "/var/main/data/sync/certbot"
-        main_domain: "localhost"
-        domains: "localhost www.localhost"
-        rsa_key_size: "4096"
-        email: "{{ params.env_params.certbot_email | default('') }}"
-        dev: "true"
-        staging: "true"
-        force: "{{ params.env_params.certbot_force | default('false') }}"
-    s3_uploads:
-      s3_subtask:
-        endpoint: "{{ params.credentials.mediawiki_uploads_bucket.endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
-        service: "s3_uploads"
-        cli: "awscli"
-        cli_cmd: "run"
-    s3_backup:
-      s3_subtask:
-        endpoint: "{{ params.credentials.mediawiki_backup_bucket.endpoint }}"
-        bucket_name: "{{ params.env_params.mediawiki_backup_bucket_name }}"
-        service: "s3_backup"
-        cli: "awscli"
-        cli_cmd: "run"
-    db_main:
-      db_subtask:
-        db_service: "mysql"
-        db_name: "{{ params.credentials.mediawiki.db.name }}"
-        db_user: "{{ params.credentials.mediawiki.db.user }}"
-        db_pass: "{{ params.credentials.mediawiki.db.password }}"
-        db_connect_wait_secs: 300
+  certbot:
+    main_domain: "{{ params.env_params.mediawiki_full_domain }}"
+    domains: "{{ params.env_params.certbot_domains }}"
+    email: "{{ params.env_params.certbot_email | default('') }}"
+    staging: "{{ params.env_params.certbot_staging | default('false') }}"
+    force: "{{ params.env_params.certbot_force | default('false') }}"
+  certbot_local:
+    main_domain: "localhost"
+    domains: "localhost www.localhost"
+    email: "{{ params.env_params.certbot_email | default('') }}"
+    force: "{{ params.env_params.certbot_force | default('false') }}"
+  db_backup_sync:
+    backup_bucket_sync: "true"
+    backup_bucket_sync_dir: "db"
+  db_backup_no_sync:
+    backup_bucket_static_dir: "files"
+    backup_zip_file: "mediawiki-db.zip"
+  db_setup_restore_file:
+    restore_use_s3: false
+    restore_dest_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
+    restore_is_zip_file: "true"
+    restore_zip_inner_file: "{{ params.credentials.mediawiki.db.name }}.sql"
+  db_setup_restore_s3:
+    restore_use_s3: true
+    restore_s3_sync: true
+    restore_remote_bucket_path_dir: "db"
+  uploads_backup_sync:
+    backup_bucket_sync: "true"
+    backup_bucket_sync_dir: "uploads"
+  uploads_backup_no_sync:
+    backup_bucket_static_dir: "files"
+    backup_zip_file: "mediawiki-uploads.zip"
+  uploads_setup_file:
+    restore_use_s3: false
+    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
+    restore_is_zip_file: true
+    restore_zip_inner_dir: "uploads"
+  uploads_setup_s3:
+    restore_use_s3: true
+    restore_s3_sync: true
+    restore_remote_bucket_path_dir: "uploads"
 tasks:
   docker_compose_install:
     type: "task"
