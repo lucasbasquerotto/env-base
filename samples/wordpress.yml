@@ -476,13 +476,15 @@ pod_params:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
     backup_bucket_static_dir: "files"
-    backup_zip_file: "wordpress-db.zip"
+    backup_compressed_type: "zip"
+    backup_compressed_file: "wordpress-db.zip"
   db_setup_restore_file:
     restore_use_s3: false
     restore_dest_file: "{{ params.credentials.wordpress.db.name }}.sql"
     restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/db/20200624_214700.zip?raw=true"
-    restore_is_zip_file: "true"
-    restore_zip_inner_file: "{{ params.credentials.wordpress.db.name }}.sql"
+    is_compressed_file: "true"
+    compress_type: "zip"
+    restore_compressed_inner_file: "{{ params.credentials.wordpress.db.name }}.sql"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
@@ -506,12 +508,14 @@ pod_params:
     backup_bucket_sync_dir: "uploads"
   uploads_backup_no_sync:
     backup_bucket_static_dir: "files"
-    backup_zip_file: "wordpress-uploads.zip"
+    backup_compressed_type: "zip"
+    backup_compressed_file: "wordpress-uploads.zip"
   uploads_setup_file:
     restore_use_s3: false
     restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/uploads/20200624_214700.zip?raw=true"
-    restore_is_zip_file: true
-    restore_zip_inner_dir: "uploads"
+    is_compressed_file: true
+    compress_type: "zip"
+    restore_compressed_inner_dir: "uploads"
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
