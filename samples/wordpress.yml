@@ -338,7 +338,6 @@ pod_params:
     nginx:
       enable_validate_origin: true
     mysql:
-      host: "mysql"
       port: "3306"
     wordpress:
       app_name: "wp_remote"
@@ -350,7 +349,6 @@ pod_params:
     nginx:
       enable_validate_origin: true
     mysql:
-      host: "mysql"
       port: "3306"
     wordpress:
       app_name: "wp_local"

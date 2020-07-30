@@ -322,7 +322,6 @@ pod_params:
     nginx:
       enable_validate_origin: true
     mysql:
-      host: "mysql"
       port: "3306"
     fluentd:
       port: "24224"
