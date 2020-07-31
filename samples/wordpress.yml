@@ -480,11 +480,10 @@ pod_params:
     backup_compressed_file: "wordpress-db.zip"
   db_setup_restore_file:
     restore_use_s3: false
-    restore_dest_file: "{{ params.credentials.wordpress.db.name }}.sql"
     restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/db/20200624_214700.zip?raw=true"
     is_compressed_file: "true"
     compress_type: "zip"
-    restore_compressed_inner_file: "{{ params.credentials.wordpress.db.name }}.sql"
+    db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
@@ -519,7 +518,7 @@ pod_params:
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_remote_bucket_path_dir: "uploads"
+    restore_bucket_path_dir: "uploads"
 tasks:
   docker_compose_install:
     type: "task"
