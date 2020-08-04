@@ -434,32 +434,27 @@ pod_params:
     email: "{{ params.env_params.certbot_email | default('') }}"
     force: "{{ params.env_params.certbot_force | default('false') }}"
   db_backup_sync:
-    backup_bucket_sync: "true"
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
-    backup_bucket_static_dir: "files"
-    backup_zip_file: "rocketchat-db.zip"
+    is_compressed_file: true
   db_setup_restore_file:
     restore_use_s3: false
-    restore_dest_file: "{{ params.credentials.rocketchat.db.name }}.sql"
     restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200612_221938.zip?raw=true"
-    restore_is_zip_file: "true"
-    restore_zip_inner_file: "{{ params.credentials.rocketchat.db.name }}.sql"
+    is_compressed_file: true
+    restore_compressed_inner_dir: "{{ params.credentials.rocketchat.db.name }}"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
     restore_remote_bucket_path_dir: "db"
   uploads_backup_sync:
-    backup_bucket_sync: "true"
     backup_bucket_sync_dir: "uploads"
   uploads_backup_no_sync:
-    backup_bucket_static_dir: "files"
-    backup_zip_file: "rocketchat-uploads.zip"
+    is_compressed_file: true
   uploads_setup_file:
     restore_use_s3: false
     restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200612_221938.zip?raw=true"
-    restore_is_zip_file: true
-    restore_zip_inner_dir: "uploads"
+    is_compressed_file: true
+    restore_compressed_inner_dir: "uploads"
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
