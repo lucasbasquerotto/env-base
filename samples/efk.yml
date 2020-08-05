@@ -190,7 +190,6 @@ nodes:
       group_params:
         custom_args: "efk_custom_args"
         custom_domain: "efk_custom_domain_local"
-        db_backup: "db_backup_no_sync"
         certbot: "certbot_local"
     params:
       size:
@@ -285,12 +284,8 @@ pods:
     group_params:
       custom_images: "efk_custom_images"
       custom_memory: "efk_custom_memory_app"
-      db_setup: >-
-        {{
-        params.env_params.non_s3_setup | default(false) | bool |
-        ternary('db_setup_restore_file', 'db_setup_restore_s3')
-        }}
-      db_backup: "db_backup_no_sync"
+      db_setup: "db_setup"
+      db_backup: "db_backup"
       certbot: "certbot"
 pod_params:
   efk_custom_args:
@@ -400,19 +395,11 @@ pod_params:
     domains: "localhost www.localhost"
     email: "{{ params.env_params.certbot_email | default('') }}"
     force: "{{ params.env_params.certbot_force | default('false') }}"
-  db_backup_sync:
-    backup_bucket_sync_dir: "db"
-  db_backup_no_sync:
-    is_compressed_file: true
-  db_setup_restore_file:
-    restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/efk/db/20200612_181745.zip?raw=true"
-    is_compressed_file: true
-    db_file_name: "efk.snapshot"
-  db_setup_restore_s3:
-    restore_use_s3: true
-    restore_s3_sync: true
-    restore_remote_bucket_path_dir: "db"
+  db_backup:
+    use_s3: "{{ params.env_params.db_backup_use_s3 }}"
+  db_setup:
+    use_s3: "{{ params.env_params.db_setup_use_s3 | default(params.env_params.db_backup_use_s3) }}"
+    snapshot_name: "snapshot-20200805-154523"
 tasks:
   docker_compose_install:
     type: "task"
