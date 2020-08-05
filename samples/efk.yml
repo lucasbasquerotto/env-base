@@ -401,17 +401,14 @@ pod_params:
     email: "{{ params.env_params.certbot_email | default('') }}"
     force: "{{ params.env_params.certbot_force | default('false') }}"
   db_backup_sync:
-    backup_bucket_sync: "true"
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
-    backup_bucket_static_dir: "files"
-    backup_zip_file: "efk-db.zip"
+    is_compressed_file: true
   db_setup_restore_file:
     restore_use_s3: false
-    restore_dest_file: "es.snapshot"
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/efk/db/invalid.zip?raw=true"
-    restore_is_zip_file: "true"
-    restore_zip_inner_file: "es.snapshot"
+    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/efk/db/20200612_181745.zip?raw=true"
+    is_compressed_file: true
+    db_file_name: "efk.snapshot"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
