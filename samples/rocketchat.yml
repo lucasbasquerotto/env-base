@@ -1,5 +1,8 @@
 name: "{{ params.name }}"
 main:
+  cloud:
+    clouds:
+    - "{{ params.env_params.cloud_name }}"
   local:
     clouds:
     - "local"
