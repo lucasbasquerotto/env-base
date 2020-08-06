@@ -397,9 +397,11 @@ pod_params:
     force: "{{ params.env_params.certbot_force | default('false') }}"
   db_backup:
     use_s3: "{{ params.env_params.db_backup_use_s3 }}"
+    is_compressed_file: "{{ params.env_params.db_backup_use_s3 | bool | ternary(false, true) }}"
   db_setup:
     use_s3: "{{ params.env_params.db_setup_use_s3 | default(params.env_params.db_backup_use_s3) }}"
-    snapshot_name: "snapshot-20200805-154523"
+    snapshot_name: "{{ params.env_params.snapshot_name | default('') }}"
+    restore_remote_file: "{{ params.env_params.restore_remote_file | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
