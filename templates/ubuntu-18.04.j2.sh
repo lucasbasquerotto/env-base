@@ -6,9 +6,6 @@ set -euo pipefail
 ### SCRIPT VARIABLES ###
 ########################
 
-# Docker version
-DOCKER_CE_VERSION="{{ docker_ce_version | default('5:18.09.0~3-0~ubuntu-bionic') }}"
-
 # Name of the user to create and grant sudo privileges
 USERNAME="{{ host_user }}"
 
@@ -20,9 +17,9 @@ PASSWORD="{{ host_pass }}"
 #	"ssh-rsa AAAAB..."
 #	"ssh-rsa AAAAB..."
 # )
-OTHER_PUBLIC_KEYS_TO_ADD=( 
+OTHER_PUBLIC_KEYS_TO_ADD=(
 {% for item in host_ssh_public_keys %}
-	"{{ item }}" 
+	"{{ item }}"
 {% endfor %}
 )
 
@@ -97,7 +94,7 @@ apt autoremove -y
 echo "
 ClientAliveInterval 60
 TCPKeepAlive yes
-ClientAliveCountMax 10000 
+ClientAliveCountMax 10000
 " >> /etc/ssh/sshd_config
 
 echo "Main logic finished" >> "/var/log/setup.log"
@@ -115,12 +112,6 @@ apt update
 apt install -y python3-pip
 
 echo "Python Installed" >> "/var/log/setup.log"
-
-# pip3 install docker
-
-# sudo -u "$USERNAME" bash <<-EOF 
-# 	yes | pip3 install docker
-# EOF
 
 echo "Ansible Host Prepared" >> "/var/log/setup.log"
 
@@ -160,7 +151,7 @@ echo "Installing Other Depedencies..." >> "/var/log/setup.log"
 apt update
 
 # Next, install the packages
-apt install -y jq gnupg2 pass
+apt install -y jq gnupg2 pass inotify-tools
 
 echo "Other Depedencies Installed" >> "/var/log/setup.log"
 
