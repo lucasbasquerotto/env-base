@@ -281,6 +281,7 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
+      use_varnish: "{{ params.env_params.use_varnish }}"
       use_pma: "{{ params.env_params.use_pma }}"
       use_adminer: "{{ params.env_params.use_adminer }}"
       use_theia: "{{ params.env_params.use_theia }}"
@@ -369,6 +370,8 @@ pod_params:
   mediawiki_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
+    varnish_image: "varnish"
+    varnish_version: "6.4.0-1"
     mediawiki_image: "mediawiki"
     mediawiki_version: "1.34.1"
     pma_image: "phpmyadmin/phpmyadmin"
@@ -397,6 +400,7 @@ pod_params:
     fluentd_version: "fluentd-20200617"
   mediawiki_custom_memory_app:
     nginx: 512mb
+    varnish: 512mb
     mediawiki: 1gb
     pma: 512mb
     adminer: 512mb
@@ -418,6 +422,7 @@ pod_params:
     fluentd: 256mb
   mediawiki_custom_memory_web:
     nginx: 512mb
+    varnish: 512mb
     mediawiki: 1gb
     pma: 512mb
     adminer: 512mb
