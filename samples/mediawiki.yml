@@ -297,6 +297,7 @@ pods:
       uploads_bucket_name: "{{ params.env_params.mediawiki_uploads_bucket_name }}"
       restore_db: "{{ params.env_params.restore_db }}"
       db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
+      use_s3_storage: "{{ params.env_params.use_s3_storage }}"
       enable_db_backup: true
       enable_db_setup: true
       enable_logs_backup: true
@@ -372,8 +373,8 @@ pod_params:
     nginx_version: "1.14.2-alpine"
     varnish_image: "varnish"
     varnish_version: "6.4.0-1"
-    mediawiki_image: "mediawiki"
-    mediawiki_version: "1.34.1"
+    mediawiki_image: "local/mediawiki"
+    mediawiki_version: "latest"
     pma_image: "phpmyadmin/phpmyadmin"
     pma_version: "4.8.5"
     adminer_image: "lucasbasquerotto/image"
