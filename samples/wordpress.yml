@@ -307,6 +307,7 @@ pods:
       uploads_bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
       restore_db: "{{ params.env_params.restore_db }}"
       db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
+      use_s3_storage: "{{ params.env_params.use_s3_storage }}"
       enable_db_backup: true
       enable_db_setup: true
       enable_db_setup_new: true

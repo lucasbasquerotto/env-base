@@ -290,6 +290,7 @@ pods:
       uploads_bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
       restore_db: "{{ params.env_params.restore_db }}"
       db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
+      use_s3_storage: "{{ params.env_params.use_s3_storage }}"
       enable_db_backup: true
       enable_db_setup: true
       enable_logs_backup: true
@@ -318,9 +319,6 @@ pod_params:
   rocketchat_custom_args:
     nginx:
       enable_validate_origin: true
-    rocketchat:
-      storage_type: "{{ params.env_params.s3_uploads | bool | ternary('AmazonS3', 'FileSystem') }}"
-      uploads_bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
     mongo:
       host: "mongo"
       port: "27017"
