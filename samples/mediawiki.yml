@@ -282,6 +282,7 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_varnish: "{{ params.env_params.use_varnish }}"
+      use_memcached: "{{ params.env_params.use_memcached }}"
       use_pma: "{{ params.env_params.use_pma }}"
       use_adminer: "{{ params.env_params.use_adminer }}"
       use_theia: "{{ params.env_params.use_theia }}"
@@ -373,6 +374,8 @@ pod_params:
     nginx_version: "1.14.2-alpine"
     varnish_image: "varnish"
     varnish_version: "6.4.0-1"
+    memcached_image: "memcached"
+    memcached_version: "1.6.6"
     mediawiki_image: "lucasbasquerotto/image"
     mediawiki_version: "mediawiki-20200813"
     pma_image: "phpmyadmin/phpmyadmin"
@@ -402,6 +405,7 @@ pod_params:
   mediawiki_custom_memory_app:
     nginx: 512mb
     varnish: 512mb
+    memcached: 512mb
     mediawiki: 1gb
     pma: 512mb
     adminer: 512mb
@@ -424,6 +428,7 @@ pod_params:
   mediawiki_custom_memory_web:
     nginx: 512mb
     varnish: 512mb
+    memcached: 512mb
     mediawiki: 1gb
     pma: 512mb
     adminer: 512mb
