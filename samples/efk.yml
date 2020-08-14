@@ -423,7 +423,7 @@ pod_params:
   db_setup:
     use_s3: "{{ params.env_params.db_setup_use_s3 | default(params.env_params.db_backup_use_s3) }}"
     snapshot_name: "{{ params.env_params.snapshot_name | default('') }}"
-    restore_remote_file: "{{ params.env_params.restore_remote_file | default('') }}"
+    restore_remote_file: "{{ params.env_params.db_setup_restore_remote_file | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
