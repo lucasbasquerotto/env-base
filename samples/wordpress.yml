@@ -293,6 +293,9 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_composer: "{{ params.env_params.use_composer | default('false') }}"
+      use_varnish: "{{ params.env_params.use_varnish }}"
+      use_redis: "{{ params.env_params.use_redis }}"
+      use_memcached: "{{ params.env_params.use_memcached }}"
       use_pma: "{{ params.env_params.use_pma }}"
       use_adminer: "{{ params.env_params.use_adminer }}"
       use_theia: "{{ params.env_params.use_theia }}"
@@ -401,8 +404,14 @@ pod_params:
   wp_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
+    varnish_image: "varnish"
+    varnish_version: "6.4.0-1"
     wordpress_image: "lucasbasquerotto/wordpress"
     wordpress_version: "0.0.2"
+    redis_image: "redis"
+    redis_version: "6.0.6"
+    memcached_image: "memcached"
+    memcached_version: "1.6.6"
     pma_image: "phpmyadmin/phpmyadmin"
     pma_version: "4.8.5"
     adminer_image: "lucasbasquerotto/image"
@@ -431,7 +440,10 @@ pod_params:
     fluentd_version: "fluentd-20200617"
   wp_custom_memory_app:
     nginx: 512mb
+    varnish: 512mb
     wordpress: 512mb
+    redis: 512mb
+    memcached: 512mb
     pma: 512mb
     adminer: 512mb
     mysql: 758gb
@@ -450,8 +462,12 @@ pod_params:
     toolbox: 512mb
     fluentd: 256mb
     s3_backup: 512mb
+  wp_custom_memory_cache:
+    redis: 512mb
+    memcached: 512mb
   wp_custom_memory_web:
     nginx: 512mb
+    varnish: 512mb
     wordpress: 1gb
     pma: 512mb
     adminer: 512mb

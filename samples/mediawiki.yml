@@ -282,6 +282,7 @@ pods:
       custom_dir: "custom-pod"
       use_prefix: "{{ params.env_params.use_prefix | default('false') }}"
       use_varnish: "{{ params.env_params.use_varnish }}"
+      use_redis: "{{ params.env_params.use_redis }}"
       use_memcached: "{{ params.env_params.use_memcached }}"
       use_pma: "{{ params.env_params.use_pma }}"
       use_adminer: "{{ params.env_params.use_adminer }}"
@@ -374,10 +375,12 @@ pod_params:
     nginx_version: "1.14.2-alpine"
     varnish_image: "varnish"
     varnish_version: "6.4.0-1"
-    memcached_image: "memcached"
-    memcached_version: "1.6.6"
     mediawiki_image: "lucasbasquerotto/image"
     mediawiki_version: "mediawiki-20200813"
+    redis_image: "redis"
+    redis_version: "6.0.6"
+    memcached_image: "memcached"
+    memcached_version: "1.6.6"
     pma_image: "phpmyadmin/phpmyadmin"
     pma_version: "4.8.5"
     adminer_image: "lucasbasquerotto/image"
@@ -405,8 +408,9 @@ pod_params:
   mediawiki_custom_memory_app:
     nginx: 512mb
     varnish: 512mb
-    memcached: 512mb
     mediawiki: 1gb
+    redis: 512mb
+    memcached: 512mb
     pma: 512mb
     adminer: 512mb
     mysql: 1gb
@@ -425,10 +429,12 @@ pod_params:
     s3_backup: 512mb
     s3_uploads: 512mb
     fluentd: 256mb
+  mediawiki_custom_memory_cache:
+    redis: 512mb
+    memcached: 512mb
   mediawiki_custom_memory_web:
     nginx: 512mb
     varnish: 512mb
-    memcached: 512mb
     mediawiki: 1gb
     pma: 512mb
     adminer: 512mb

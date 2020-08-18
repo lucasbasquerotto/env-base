@@ -5,7 +5,7 @@ localhost ansible_connection=local
 ctl
 app
 web
-redis
+cache
 db
 wp_local
 efk_local
@@ -25,9 +25,9 @@ bind
 bind_slave
 
 [ctl]
-[web]
 [app]
-[redis]
+[web]
+[cache]
 [db]
 [wp_local]
 [efk_local]
