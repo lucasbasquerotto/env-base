@@ -352,6 +352,7 @@ pod_params:
       app_name: "wp_remote"
       env: "staging"
       lang: "en_US"
+      debug: "{{ params.env_params.wp_debug | default(false) }}"
     fluentd:
       port: "24224"
   wp_custom_args_local:
@@ -363,6 +364,7 @@ pod_params:
       app_name: "wp_local"
       env: "development"
       lang: "en_US"
+      debug: "{{ params.env_params.wp_debug | default(false) }}"
     fluentd:
       port: "24224"
   wp_custom_domain:
