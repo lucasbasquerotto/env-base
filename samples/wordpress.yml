@@ -203,6 +203,7 @@ nodes:
           new_domain_host: >-
             {{ params.env_params.ssl | bool | ternary('https', 'http')
             }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}/
+          wp_rewrite_structure: "/%year%/%monthnum%/%day%/%postname%"
       group_params:
         custom_args: "wp_custom_args_local"
         custom_domain: "wp_custom_domain_local"
@@ -325,6 +326,7 @@ pods:
       migrate:
         old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
         new_domain_host: "{{ params.env_params.wp_new_domain_host | default('') }}"
+        wp_rewrite_structure: "/%year%/%monthnum%/%day%/%postname%"
     group_params:
       custom_images: "wp_custom_images"
       custom_memory: "wp_custom_memory_app"
