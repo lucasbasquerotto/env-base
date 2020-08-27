@@ -288,7 +288,7 @@ pods:
       custom_dir: "custom-pod"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
-      use_nginx: "{{ params.env_params.use_nginx | default('true') }}"
+      use_nginx: "{{ params.env_params.use_nginx | default(true) }}"
       use_theia: "{{ params.env_params.use_theia }}"
       use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
       use_filestash: "{{ params.env_params.use_filestash }}"

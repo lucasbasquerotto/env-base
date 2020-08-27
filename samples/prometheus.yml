@@ -3,17 +3,25 @@ main:
   cloud:
     clouds:
     - "{{ params.env_params.cloud_name }}"
+    params:
+      entrypoint: "main.yml"
+      entrypoint_template_src: "main.tpl.yml"
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
+      meta:
+        template_no_empty_lines: true
+      repo: "cloud"
   local:
     clouds:
     - "local"
     nodes:
     - name: "app"
-      key: "wp_local"
+      key: "prometheus_local"
     local:
       pods:
-      - "wp"
-      apps:
-      - "wp_local"
+      - "prometheus"
     params:
       entrypoint: "main.yml"
       entrypoint_template_src: "main.tpl.yml"
@@ -31,11 +39,10 @@ main:
     clouds:
     - "{{ params.env_params.cloud_name }}"
     buckets:
-    - "wp_uploads"
-    - "wp_backup"
+    - "prometheus_backup"
     nodes:
     - name: "app"
-      key: "wp"
+      key: "prometheus"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -62,12 +69,10 @@ main:
     - "local"
     nodes:
     - name: "app"
-      key: "wp_local"
+      key: "prometheus_local"
     local:
       pods:
-      - "wp"
-      apps:
-      - "wp_local"
+      - "prometheus"
     params:
       entrypoint: "main.yml"
       entrypoint_template_src: "main.tpl.yml"
@@ -85,28 +90,28 @@ main:
     clouds:
     - "{{ params.env_params.cloud_name }}"
     buckets:
-    - "wp_uploads"
-    - "wp_backup"
+    - "prometheus_backup"
     nodes:
     - name: "db"
-      key: "wp"
+      key: "prometheus"
       pods:
-        wp:
+        prometheus:
           params:
             type: "db"
+            use_nginx: false
           group_params:
-            custom_memory: "wp_custom_memory_db"
+            custom_memory: "prometheus_custom_memory_db"
     - name: "web"
-      key: "wp"
+      key: "prometheus"
       dependencies:
-      - host: "mysql"
+      - host: "prometheus"
         node: "db"
       pods:
-        wp:
+        prometheus:
           params:
             type: "web"
           group_params:
-            custom_memory: "wp_custom_memory_web"
+            custom_memory: "prometheus_custom_memory_web"
     run_stages:
     - tasks:
       - name: "docker_compose_install"
@@ -145,6 +150,15 @@ clouds:
       - "auto"
       - "dmz"
       x_digital_ocean_firewalls:
+      - name: "private"
+        tags: ["auto"]
+        inbound_rules:
+        - ports: "9080"
+          sources:
+            addresses: "{{ params.env_params.private_ips }}"
+        - ports: "9443"
+          sources:
+            addresses: "{{ params.env_params.private_ips }}"
       - name: "auto"
         tags: ["auto"]
         inbound_rules:
@@ -183,51 +197,41 @@ dns:
     zone: "{{ params.env_params.domain }}"
     credentials: "godaddy"
 buckets:
-  wp_uploads:
-    name: "{{ params.env_params.wp_uploads_bucket_name }}"
-    credentials: "wp_uploads_bucket"
-  wp_backup:
-    name: "{{ params.env_params.wp_backup_bucket_name }}"
-    credentials: "wp_backup_bucket"
+  prometheus_backup:
+    name: "{{ params.env_params.prometheus_backup_bucket_name }}"
+    credentials: "prometheus_backup_bucket"
 nodes:
-  wp_local:
+  prometheus_local:
     cloud: "local"
     base_dir: "/var/cloud"
     credentials: "user"
     pods:
-    - name: "wp"
+    - name: "prometheus"
       params:
         local: true
-        migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
-        migrate_new_domain_host: >-
-            {{ params.env_params.ssl | bool | ternary('https', 'http')
-            }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}/
       group_params:
-        custom_args: "wp_custom_args_local"
-        custom_domain: "wp_custom_domain_local"
-        db_setup_new: "db_setup_new_local"
-        db_backup: "db_backup_no_sync"
-        uploads_backup: "uploads_backup_no_sync"
+        custom_args: "prometheus_custom_args"
+        custom_domain: "prometheus_custom_domain_local"
         certbot: "certbot_local"
     params:
       size:
         memory: "2gb"
         cpu: 2
-  wp:
+  prometheus:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
     credentials: "host"
     pods:
-    - name: "wp"
+    - name: "prometheus"
       params:
         local: false
       group_params:
-        custom_args: "wp_custom_args"
-        custom_domain: "wp_custom_domain"
+        custom_args: "prometheus_custom_args"
+        custom_domain: "prometheus_custom_domain"
     params:
       dns:
-      - record: "{{ params.env_params.main_dns_record }}"
-        name: "{{ params.env_params.main_dns_name }}"
+      - record: "{{ params.env_params.grafana_dns_record }}"
+        name: "{{ params.env_params.grafana_dns_name }}"
       - record: "{{ params.env_params.theia_dns_record }}"
         name: "{{ params.env_params.theia_dns_name }}"
         when: "{{ params.env_params.use_theia }}"
@@ -237,15 +241,6 @@ nodes:
       - record: "{{ params.env_params.filestash_dns_record }}"
         name: "{{ params.env_params.filestash_dns_name }}"
         when: "{{ params.env_params.use_filestash }}"
-      - record: "{{ params.env_params.nextcloud_dns_record }}"
-        name: "{{ params.env_params.nextcloud_dns_name }}"
-        when: "{{ params.env_params.use_nextcloud }}"
-      - record: "{{ params.env_params.pma_dns_record }}"
-        name: "{{ params.env_params.pma_dns_name }}"
-        when: "{{ params.env_params.use_pma }}"
-      - record: "{{ params.env_params.adminer_dns_record }}"
-        name: "{{ params.env_params.adminer_dns_name }}"
-        when: "{{ params.env_params.use_adminer }}"
       cron:
       - user: "root"
         src_file: "{{ params.env.repo_dir }}/cron/app.cron"
@@ -257,11 +252,11 @@ nodes:
       region:
         name: "ams3"
         region: "ams"
-        zone: "1"
+        zone: "3"
       size:
-        name: "s-1vcpu-1gb"
-        memory: "1gb"
-        cpu: 1
+        name: "s-2vcpu-2gb"
+        memory: "2gb"
+        cpu: 2
       host_test:
         log_file: "/var/log/setup.log"
         setup_last_line: "Setup Finished"
@@ -271,172 +266,107 @@ nodes:
       - "auto"
       - "dmz"
 pods:
-  wp:
+  prometheus:
     repo: "pod"
     root: "yes"
-    ctx: "custom-pod/wordpress/ctx.yml"
+    ctx: "custom-pod/prometheus/ctx.yml"
     fast_prepare: "true"
     env_repos:
     - repo: "custom_pod"
       dir: "custom-pod"
     credentials:
-      wordpress: "wordpress"
-      mysql: "mysql"
       minio_gateway: "minio_gateway"
-      nextcloud: "nextcloud"
-      wp_backup_bucket: "wp_backup_bucket"
-      wp_uploads_bucket: "wp_uploads_bucket"
+      backup_bucket: "prometheus_backup_bucket"
     params:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
-      wp_dev: "{{ params.env_params.wp_dev | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
-      use_composer: "{{ params.env_params.use_composer | default(false) }}"
-      use_varnish: "{{ params.env_params.use_varnish }}"
-      use_redis: "{{ params.env_params.use_redis }}"
-      use_memcached: "{{ params.env_params.use_memcached }}"
-      use_pma: "{{ params.env_params.use_pma }}"
-      use_adminer: "{{ params.env_params.use_adminer }}"
+      use_node_exporter: "{{ params.env_params.use_node_exporter }}"
+      use_cadvisor: "{{ params.env_params.use_cadvisor }}"
+      use_nginx: "{{ params.env_params.use_nginx | default(true) }}"
       use_theia: "{{ params.env_params.use_theia }}"
       use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
       use_filestash: "{{ params.env_params.use_filestash }}"
-      use_nextcloud: "{{ params.env_params.use_nextcloud }}"
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
-      block_ips: "{{ params.env_params.block_ips }}"
       auth_file: "{{ params.env_params.auth_file }}"
-      backup_bucket_name: "{{ params.env_params.wp_backup_bucket_name }}"
-      uploads_bucket_name: "{{ params.env_params.wp_uploads_bucket_name }}"
+      backup_bucket_name: "{{ params.env_params.prometheus_backup_bucket_name }}"
       restore_db: "{{ params.env_params.restore_db }}"
-      db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
-      use_s3_storage: "{{ params.env_params.use_s3_storage }}"
-      use_w3tc: "{{ params.env_params.use_w3tc }}"
       enable_db_backup: true
       enable_db_setup: true
-      enable_db_setup_new: true
       enable_logs_backup: true
       enable_logs_setup: true
       enable_sync_backup: true
       enable_sync_setup: true
-      enable_uploads_backup: true
-      enable_uploads_setup: true
-      migrate_wp_activate_all_plugins: false
-      migrate_wp_plugins_to_activate: "wpdiscuz contact-form-7"
-      migrate_wp_plugins_to_deactivate: "ewww-image-optimizer jetpack"
-      migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
-      migrate_new_domain_host: "{{ params.env_params.wp_new_domain_host | default('') }}"
-      migrate_wp_rewrite_structure: "/%year%/%monthnum%/%day%/%postname%"
     group_params:
-      custom_images: "wp_custom_images"
-      custom_memory: "wp_custom_memory_app"
-      db_setup_new: "db_setup_new"
-      db_setup: >-
-        {{
-        params.env_params.non_s3_setup | default(false) | bool |
-        ternary('db_setup_restore_file', 'db_setup_restore_s3')
-        }}
-      db_backup: "db_backup_no_sync"
-      uploads_setup: >-
-        {{
-        params.env_params.non_s3_setup | default(false) | bool |
-        ternary('uploads_setup_file', 'uploads_setup_s3')
-        }}
-      uploads_backup: "uploads_backup_sync"
+      custom_images: "prometheus_custom_images"
+      custom_memory: "prometheus_custom_memory_app"
+      db_setup: "db_setup"
+      db_backup: "db_backup"
       certbot: "certbot"
 pod_params:
-  wp_custom_args:
+  prometheus_custom_args:
     nginx:
       enable_validate_origin: true
-    mysql:
-      port: "3306"
-    wordpress:
-      app_name: "wp_remote"
-      env: "staging"
-      lang: "en_US"
-      debug: "{{ params.env_params.wp_debug | default(false) }}"
     fluentd:
       port: "24224"
-  wp_custom_args_local:
-    nginx:
-      enable_validate_origin: true
-    mysql:
-      port: "3306"
-    wordpress:
-      app_name: "wp_local"
-      env: "development"
-      lang: "en_US"
-      debug: "{{ params.env_params.wp_debug | default(false) }}"
-    fluentd:
-      port: "24224"
-  wp_custom_domain:
+    prometheus:
+      port: "9090"
+    grafana:
+      port: "3000"
+  prometheus_custom_domain:
     public_http_port: "80"
     public_https_port: "443"
     private_http_port: "9080"
     private_https_port: "9443"
-    main_domain: "{{ params.env_params.wp_full_domain }}"
-    main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "{{ params.env_params.pma_full_domain }}"
-    pma_ssl: "{{ params.env_params.ssl }}"
-    adminer_domain: "{{ params.env_params.adminer_full_domain }}"
-    adminer_ssl: "{{ params.env_params.ssl }}"
+    main_domain: "{{ params.env_params.grafana_full_domain }}"
+    grafana_domain: "{{ params.env_params.grafana_full_domain }}"
+    grafana_ssl: "{{ params.env_params.ssl }}"
+    prometheus_domain: "{{ params.env_params.prometheus_full_domain }}"
+    prometheus_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "{{ params.env_params.theia_full_domain }}"
     theia_ssl: "{{ params.env_params.ssl }}"
     minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
     minio_gateway_ssl: "{{ params.env_params.ssl }}"
     filestash_domain: "{{ params.env_params.filestash_full_domain }}"
     filestash_ssl: "{{ params.env_params.ssl }}"
-    nextcloud_domain: "{{ params.env_params.nextcloud_full_domain }}"
-    nextcloud_ssl: "{{ params.env_params.ssl }}"
-  wp_custom_domain_local:
+  prometheus_custom_domain_local:
     public_http_port: "8080"
     public_https_port: "8443"
     private_http_port: "9080"
     private_https_port: "9443"
     main_domain: "localhost"
-    main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "pma.localhost"
-    pma_ssl: "{{ params.env_params.ssl }}"
-    adminer_domain: "adminer.localhost"
-    adminer_ssl: "{{ params.env_params.ssl }}"
+    grafana_domain: "localhost"
+    grafana_ssl: "{{ params.env_params.ssl }}"
+    prometheus_domain: "prometheus.localhost"
+    prometheus_ssl: "{{ params.env_params.ssl }}"
     theia_domain: "theia.localhost"
     theia_ssl: "{{ params.env_params.ssl }}"
     minio_gateway_domain: "minio.localhost"
     minio_gateway_ssl: "{{ params.env_params.ssl }}"
     filestash_domain: "filestash.localhost"
     filestash_ssl: "{{ params.env_params.ssl }}"
-    nextcloud_domain: "nextcloud.localhost"
-    nextcloud_ssl: "{{ params.env_params.ssl }}"
-  wp_custom_images:
+  prometheus_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
-    varnish_image: "varnish"
-    varnish_version: "6.4.0-1"
-    wordpress_image: "lucasbasquerotto/wordpress"
-    wordpress_version: "20200825"
-    redis_image: "redis"
-    redis_version: "6.0.6"
-    memcached_image: "memcached"
-    memcached_version: "1.6.6"
-    pma_image: "phpmyadmin/phpmyadmin"
-    pma_version: "4.8.5"
-    adminer_image: "lucasbasquerotto/image"
-    adminer_version: "adminer-20200713-03"
-    mysql_image: "lucasbasquerotto/wordpress"
-    mysql_version: "mysql-8.0.16-02"
+    prometheus_image: "prom/prometheus"
+    prometheus_version: "v2.20.1"
+    grafana_image: "grafana/grafana"
+    grafana_version: "7.1.5"
+    node_exporter_image: "prom/node-exporter"
+    node_exporter_version: "v1.0.1"
+    cadvisor_image: "google/cadvisor"
+    cadvisor_version: "v0.33.0"
     theia_image: "theiaide/theia"
     theia_version: "1.3.0"
     minio_gateway_image: "minio/minio"
     minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
     filestash_image: "machines/filestash"
     filestash_version: "4cbeb2c"
-    nextcloud_image: "nextcloud"
-    nextcloud_version: "19.0.0-apache"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200715-02"
-    composer_image: "lucasbasquerotto/wordpress"
-    composer_version: "composer-1.8.6"
     certbot_image: "certbot/certbot"
     certbot_version: "v1.2.0"
     awscli_image: "lucasbasquerotto/aws-cli"
@@ -445,50 +375,34 @@ pod_params:
     logrotator_version: "3.8.4-buster"
     fluentd_image: "lucasbasquerotto/image"
     fluentd_version: "fluentd-20200617"
-  wp_custom_memory_app:
+  prometheus_custom_memory_app:
     nginx: 512mb
-    varnish: 512mb
-    wordpress: 512mb
-    redis: 512mb
-    memcached: 512mb
-    pma: 512mb
-    adminer: 512mb
-    mysql: 758gb
+    grafana: 512mb
+    prometheus: 1gb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
-    nextcloud: 512mb
     toolbox: 512mb
-    composer: 512mb
-    fluentd: 256mb
     certbot: 256mb
-    s3_uploads: 512mb
     s3_backup: 512mb
-  wp_custom_memory_db:
-    mysql: 1gb
-    toolbox: 512mb
     fluentd: 256mb
+  prometheus_custom_memory_db:
+    prometheus: 1gb
+    toolbox: 512mb
     s3_backup: 512mb
-  wp_custom_memory_cache:
-    redis: 512mb
-    memcached: 512mb
-  wp_custom_memory_web:
+    fluentd: 256mb
+  prometheus_custom_memory_web:
     nginx: 512mb
-    varnish: 512mb
-    wordpress: 1gb
-    pma: 512mb
-    adminer: 512mb
+    grafana: 512mb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
-    nextcloud: 512mb
     toolbox: 512mb
-    fluentd: 256mb
     certbot: 256mb
-    s3_uploads: 512mb
     s3_backup: 512mb
+    fluentd: 256mb
   certbot:
-    main_domain: "{{ params.env_params.wp_full_domain }}"
+    main_domain: "{{ params.env_params.grafana_full_domain }}"
     domains: "{{ params.env_params.certbot_domains }}"
     email: "{{ params.env_params.certbot_email | default('') }}"
     staging: "{{ params.env_params.certbot_staging | default(false) }}"
@@ -498,46 +412,13 @@ pod_params:
     domains: "localhost www.localhost"
     email: "{{ params.env_params.certbot_email | default('') }}"
     force: "{{ params.env_params.certbot_force | default(false) }}"
-  db_backup_sync:
-    backup_bucket_sync_dir: "db"
-  db_backup_no_sync:
-    is_compressed_file: true
-  db_setup_restore_file:
-    restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/db/20200624_214700.zip?raw=true"
-    is_compressed_file: true
-    db_file_name: "{{ params.credentials.wordpress.db.name }}.sql"
-  db_setup_restore_s3:
-    restore_use_s3: true
-    restore_s3_sync: true
-    restore_remote_bucket_path_dir: "db"
-  db_setup_new:
-    url: >-
-      {{ params.env_params.ssl | bool | ternary('https', 'http')
-      }}://{{ params.env_params.wp_full_domain }}
-    title: "{{ params.env_params.wp_title }}"
-    restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
-    remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
-  db_setup_new_local:
-    url: >-
-      {{ params.env_params.ssl | bool | ternary('https', 'http')
-      }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}
-    title: "{{ params.env_params.wp_title }}"
-    restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
-    remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
-  uploads_backup_sync:
-    backup_bucket_sync_dir: "uploads"
-  uploads_backup_no_sync:
-    is_compressed_file: true
-  uploads_setup_file:
-    restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/wordpress/uploads/20200624_214700.zip?raw=true"
-    is_compressed_file: true
-    restore_compressed_inner_dir: "uploads"
-  uploads_setup_s3:
-    restore_use_s3: true
-    restore_s3_sync: true
-    restore_bucket_path_dir: "uploads"
+  db_backup:
+    use_s3: "{{ params.env_params.db_backup_use_s3 }}"
+    is_compressed_file: "{{ params.env_params.db_backup_use_s3 | bool | ternary(false, true) }}"
+  db_setup:
+    use_s3: "{{ params.env_params.db_setup_use_s3 | default(params.env_params.db_backup_use_s3) }}"
+    snapshot_name: "{{ params.env_params.snapshot_name | default('') }}"
+    restore_remote_file: "{{ params.env_params.db_setup_restore_remote_file | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
@@ -554,9 +435,6 @@ tasks:
     type: "shell"
     root: true
     cmd: "./run upgrade"
-apps:
-  wp_local:
-    repo: "app"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/ansible-docker.git"
@@ -566,8 +444,5 @@ repos:
     version: "master"
   custom_pod:
     src: "https://github.com/lucasbasquerotto/custom-pod.git"
-    version: "master"
-  app:
-    src: "https://github.com/lucasbasquerotto/wordpress-docker.git"
     version: "master"
 credentials: "{{ params.credentials }}"
