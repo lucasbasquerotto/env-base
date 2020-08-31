@@ -308,7 +308,7 @@ pods:
         params.env_params.non_s3_setup | default(false) | bool |
         ternary('db_setup_restore_file', 'db_setup_restore_s3')
         }}
-      db_backup: "db_backup_no_sync"
+      db_backup: "db_backup_sync"
       uploads_setup: >-
         {{
         params.env_params.non_s3_setup | default(false) | bool |
