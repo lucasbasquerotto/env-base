@@ -180,8 +180,8 @@ dns:
     credentials: "godaddy"
 buckets:
   rocketchat_backup:
-    name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
-    credentials: "rocketchat_backup_bucket"
+    name: "{{ params.env_params.backup_bucket_name }}"
+    credentials: "backup_bucket"
 nodes:
   rocketchat_local:
     cloud: "local"
@@ -269,8 +269,10 @@ pods:
       hubot: "hubot"
       minio_gateway: "minio_gateway"
       nextcloud: "nextcloud"
-      rocketchat_uploads_bucket: "rocketchat_uploads_bucket"
-      rocketchat_backup_bucket: "rocketchat_backup_bucket"
+      backup_bucket: "backup_bucket"
+      uploads_bucket: "uploads_bucket"
+      backup_replica_bucket: "backup_replica_bucket"
+      uploads_replica_bucket: "uploads_replica_bucket"
     params:
       type: "app"
       orchestration: "docker_compose"
@@ -287,8 +289,15 @@ pods:
       use_certbot: "{{ params.env_params.use_certbot }}"
       block_ips: "{{ params.env_params.block_ips }}"
       auth_file: "{{ params.env_params.auth_file }}"
-      backup_bucket_name: "{{ params.env_params.rocketchat_backup_bucket_name }}"
-      uploads_bucket_name: "{{ params.env_params.rocketchat_uploads_bucket_name }}"
+      s3_cli: "{{ params.env_params.s3_cli }}"
+      backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
+      backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
+      uploads_bucket_name: "{{ params.env_params.uploads_bucket_name }}"
+      uploads_bucket_path: "{{ params.env_params.uploads_bucket_path | default('') }}"
+      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name }}"
+      backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
+      uploads_replica_bucket_name: "{{ params.env_params.uploads_replica_bucket_name }}"
+      uploads_replica_bucket_path: "{{ params.env_params.uploads_replica_bucket_path | default('') }}"
       restore_db: "{{ params.env_params.restore_db }}"
       db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
       use_s3_storage: "{{ params.env_params.use_s3_storage }}"

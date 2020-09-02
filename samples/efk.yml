@@ -198,8 +198,8 @@ dns:
     credentials: "godaddy"
 buckets:
   efk_backup:
-    name: "{{ params.env_params.efk_backup_bucket_name }}"
-    credentials: "efk_backup_bucket"
+    name: "{{ params.env_params.backup_bucket_name }}"
+    credentials: "backup_bucket"
 nodes:
   efk_local:
     cloud: "local"
@@ -281,7 +281,8 @@ pods:
       efk: "efk"
       minio_gateway: "minio_gateway"
       nextcloud: "nextcloud"
-      efk_backup_bucket: "efk_backup_bucket"
+      backup_bucket: "backup_bucket"
+      backup_replica_bucket: "backup_replica_bucket"
     params:
       type: "app"
       orchestration: "docker_compose"
@@ -296,7 +297,11 @@ pods:
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
-      backup_bucket_name: "{{ params.env_params.efk_backup_bucket_name }}"
+      s3_cli: "{{ params.env_params.s3_cli }}"
+      backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
+      backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
+      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name }}"
+      backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
       restore_db: "{{ params.env_params.restore_db }}"
       enable_db_backup: true
       enable_db_setup: true
