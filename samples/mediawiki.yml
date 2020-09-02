@@ -324,6 +324,8 @@ pods:
       enable_sync_setup: true
       enable_uploads_backup: true
       enable_uploads_setup: true
+      enable_backup_replica: true
+      enable_uploads_replica: true
     group_params:
       custom_images: "mediawiki_custom_images"
       custom_memory: "mediawiki_custom_memory_app"
@@ -436,14 +438,12 @@ pod_params:
     nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_backup: 512mb
-    s3_uploads: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   mediawiki_custom_memory_db:
     mysql: 1gb
     toolbox: 512mb
-    s3_backup: 512mb
-    s3_uploads: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   mediawiki_custom_memory_cache:
     redis: 512mb
@@ -460,8 +460,7 @@ pod_params:
     nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_backup: 512mb
-    s3_uploads: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   certbot:
     main_domain: "{{ params.env_params.mediawiki_full_domain }}"

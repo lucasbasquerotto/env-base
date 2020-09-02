@@ -309,6 +309,8 @@ pods:
       enable_sync_setup: true
       enable_uploads_backup: true
       enable_uploads_setup: true
+      enable_backup_replica: true
+      enable_uploads_replica: true
     group_params:
       custom_images: "rocketchat_custom_images"
       custom_memory: "rocketchat_custom_memory_app"
@@ -410,14 +412,13 @@ pod_params:
     toolbox: 512mb
     certbot: 256mb
     mongo_init: 512mb
-    s3_uploads: 512mb
-    s3_backup: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   rocketchat_custom_memory_db:
     mongo: 1gb
     toolbox: 512mb
     mongo_init: 512mb
-    s3_backup: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   rocketchat_custom_memory_web:
     nginx: 512mb
@@ -430,8 +431,7 @@ pod_params:
     nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_uploads: 512mb
-    s3_backup: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   certbot:
     main_domain: "{{ params.env_params.rocketchat_full_domain }}"

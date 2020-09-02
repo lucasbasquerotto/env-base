@@ -306,6 +306,8 @@ pods:
       enable_logs_setup: true
       enable_sync_backup: true
       enable_sync_setup: true
+      enable_backup_replica: true
+      enable_uploads_replica: true
     group_params:
       custom_images: "prometheus_custom_images"
       custom_memory: "prometheus_custom_memory_app"
@@ -396,14 +398,14 @@ pod_params:
     filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_backup: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   prometheus_custom_memory_db:
     prometheus: 1gb
     node_exporter: 512mb
     cadvisor: 512mb
     toolbox: 512mb
-    s3_backup: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   prometheus_custom_memory_web:
     nginx: 512mb
@@ -415,7 +417,7 @@ pod_params:
     filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_backup: 512mb
+    s3_cli: 512mb
     fluentd: 256mb
   certbot:
     main_domain: "{{ params.env_params.grafana_full_domain }}"

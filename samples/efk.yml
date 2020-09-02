@@ -309,6 +309,8 @@ pods:
       enable_logs_setup: true
       enable_sync_backup: true
       enable_sync_setup: true
+      enable_backup_replica: true
+      enable_uploads_replica: true
     group_params:
       custom_images: "efk_custom_images"
       custom_memory: "efk_custom_memory_app"
