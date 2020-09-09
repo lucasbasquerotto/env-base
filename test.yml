@@ -4,11 +4,17 @@ main:
     clouds:
     - "local"
     params:
-      x_use_custom_roles: true
+      x_custom_roles:
+      - "role1"
+      - "role2"
+      x_custom_tasks:
+      - "task1"
+      - "task2"
     group_params:
       env_repos: "test_env_repos"
       hooks: "test_hooks"
       custom_roles: "test_custom_roles"
+      custom_tasks: "test_custom_tasks"
     shared_params: ["local"]
 main_shared_params:
   local:
@@ -25,6 +31,9 @@ main_params:
   test_custom_roles:
     role1: "custom-cloud/roles/role1"
     role2: "custom-cloud/roles/role2"
+  test_custom_tasks:
+    task1: "custom-cloud/tasks/task1.yml"
+    task2: "custom-cloud/tasks/task2.yml"
   test_env_repos:
   - repo: "custom_cloud"
     dir: "custom-cloud"
