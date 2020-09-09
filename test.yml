@@ -1,13 +1,14 @@
 name: "{{ params.name }}"
 main:
   cloud_hooks:
-    hooks: "test"
-    custom_roles: "test"
-    x_use_custom_roles: true
     clouds:
     - "local"
+    params:
+      x_use_custom_roles: true
     group_params:
       env_repos: "test_env_repos"
+      hooks: "test_hooks"
+      custom_roles: "test_custom_roles"
     shared_params: ["local"]
 main_shared_params:
   local:
@@ -21,11 +22,13 @@ main_shared_params:
       template_no_empty_lines: true
     repo: "cloud"
 main_params:
+  test_custom_roles:
+    role1: "custom-cloud/roles/role1"
+    role2: "custom-cloud/roles/role2"
   test_env_repos:
   - repo: "custom_cloud"
     dir: "custom-cloud"
-hooks:
-  test:
+  test_hooks:
     before_cloud_main: "custom-cloud/hooks/before_cloud_main.yml"
     after_cloud_main: "custom-cloud/hooks/after_cloud_main.yml"
     before_dns: "custom-cloud/hooks/before_dns.yml"
@@ -48,10 +51,6 @@ hooks:
     after_delete_tmp: "custom-cloud/hooks/after_delete_tmp.yml"
     before_delete_main: "custom-cloud/hooks/before_delete_main.yml"
     after_delete_main: "custom-cloud/hooks/after_delete_main.yml"
-custom_roles:
-  test:
-    role1: "custom-cloud/roles/role1"
-    role2: "custom-cloud/roles/role2"
 clouds:
   local:
     type: "local"
