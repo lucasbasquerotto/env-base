@@ -16,6 +16,25 @@ main:
       custom_roles: "test_custom_roles"
       custom_tasks: "test_custom_tasks"
     shared_params: ["local"]
+  cloud_custom_tasks:
+    clouds:
+    - "custom"
+    dns:
+    - name: "custom"
+      dns_type: "NS"
+      record: "dev"
+      data_list:
+      - value: "ns1dev.test.com"
+      - value: "ns2dev.test.com"
+    - name: "custom"
+      dns_type: "A"
+      record: "dev"
+      data_list:
+      - value: "1.2.3.4"
+    group_params:
+      env_repos: "test_env_repos"
+      custom_tasks: "main_custom_tasks"
+    shared_params: ["local"]
 main_shared_params:
   local:
     entrypoint: "main.yml"
@@ -34,6 +53,11 @@ main_params:
   test_custom_tasks:
     task1: "custom-cloud/tasks/task1.yml"
     task2: "custom-cloud/tasks/task2.yml"
+  main_custom_tasks:
+    cloud: "custom-cloud/tasks/cloud.yml"
+    dns: "custom-cloud/tasks/dns.yml"
+    node: "custom-cloud/tasks/node.yml"
+    run: "custom-cloud/tasks/run.yml"
   test_env_repos:
   - repo: "custom_cloud"
     dir: "custom-cloud"
@@ -63,6 +87,19 @@ main_params:
 clouds:
   local:
     type: "local"
+  custom:
+    custom_task: true
+    type: "cloud"
+    credentials: "fake"
+    params:
+      x_test_param_1: "test_value_1"
+      x_test_param_2: "test_value_2"
+dns:
+  custom:
+    custom_task: true
+    type: "dns"
+    zone: "test.com"
+    credentials: "fake"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -70,3 +107,5 @@ repos:
   custom_cloud:
     src: "https://github.com/lucasbasquerotto/custom-cloud.git"
     version: "master"
+credentials:
+  fake: {}
