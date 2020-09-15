@@ -31,10 +31,18 @@ main:
       record: "dev"
       data_list:
       - value: "1.2.3.4"
+    nodes:
+    - "custom"
+    - "custom_local"
     group_params:
       env_repos: "test_env_repos"
       custom_tasks: "main_custom_tasks"
     shared_params: ["local"]
+    run_stages:
+    - tasks:
+      - name: "custom"
+        nodes: ["custom_local"]
+        nodes_tasks: true
 main_shared_params:
   local:
     entrypoint: "main.yml"
@@ -42,7 +50,11 @@ main_shared_params:
     hosts_content: |
       [main]
       localhost ansible_connection=local
-      [host]
+      [host:children]
+      custom
+      custom_local
+      [custom]
+      [custom_local]
     meta:
       template_no_empty_lines: true
     repo: "cloud"
@@ -90,6 +102,7 @@ clouds:
   custom:
     custom_task: true
     type: "cloud"
+    node_type: "node"
     credentials: "fake"
     params:
       x_test_param_1: "test_value_1"
@@ -100,6 +113,32 @@ dns:
     type: "dns"
     zone: "test.com"
     credentials: "fake"
+nodes:
+  custom:
+    cloud: "custom"
+    base_dir: "/var/cloud"
+    credentials: "fake_user"
+    params:
+      instance: {}
+      region: {}
+      size: {}
+  custom_local:
+    cloud: "local"
+    base_dir: "/var/cloud"
+    credentials: "user"
+    params:
+      instance: {}
+      region: {}
+      size: {}
+tasks:
+  custom:
+    type: "task"
+    custom_task: true
+    root: true
+    file: "run"
+    custom_params:
+      param1: "value1"
+      param2: "value2"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -109,3 +148,8 @@ repos:
     version: "master"
 credentials:
   fake: {}
+  fake_user:
+    host_user: "test"
+    host_pass: "123456"
+  user:
+    host_user: "root"

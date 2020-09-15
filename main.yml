@@ -163,7 +163,7 @@ tasks:
     root: "true"
     file: "docker.yml"
     compose_params:
-      version: "1.25.3"
+      version: "1.27.2"
       remote: true
   main_build:
     type: "task"
