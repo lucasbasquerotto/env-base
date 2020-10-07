@@ -1,6 +1,10 @@
 name: "{{ params.name }}"
 main:
   cloud_hooks:
+    repo: "cloud"
+    env_repos:
+    - repo: "custom_cloud"
+      dir: "custom-cloud"
     clouds:
     - "local"
     params:
@@ -11,12 +15,15 @@ main:
       - "task1"
       - "task2"
     group_params:
-      env_repos: "test_env_repos"
       hooks: "test_hooks"
       custom_roles: "test_custom_roles"
       custom_tasks: "test_custom_tasks"
     shared_params: ["local"]
   cloud_custom_tasks:
+    repo: "cloud"
+    env_repos:
+    - repo: "custom_cloud"
+      dir: "custom-cloud"
     clouds:
     - "custom"
     dns:
@@ -35,7 +42,6 @@ main:
     - "custom"
     - "custom_local"
     group_params:
-      env_repos: "test_env_repos"
       custom_tasks: "main_custom_tasks"
     shared_params: ["local"]
     run_stages:
@@ -57,7 +63,6 @@ main_shared_params:
       [custom_local]
     meta:
       template_no_empty_lines: true
-    repo: "cloud"
 main_params:
   test_custom_roles:
     role1: "custom-cloud/roles/role1"
@@ -70,9 +75,6 @@ main_params:
     dns: "custom-cloud/tasks/dns.yml"
     node: "custom-cloud/tasks/node.yml"
     run: "custom-cloud/tasks/run.yml"
-  test_env_repos:
-  - repo: "custom_cloud"
-    dir: "custom-cloud"
   test_hooks:
     before_cloud_main: "custom-cloud/hooks/before_cloud_main.yml"
     after_cloud_main: "custom-cloud/hooks/after_cloud_main.yml"
