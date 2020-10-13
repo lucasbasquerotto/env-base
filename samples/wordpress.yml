@@ -384,7 +384,7 @@ pod_params:
     mysql:
       port: "3306"
     wordpress:
-      app_repo: "wp_local"
+      app_repo: "app"
       env: "development"
       lang: "en_US"
       debug: "{{ params.env_params.wp_debug | default(false) }}"
