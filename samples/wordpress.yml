@@ -373,7 +373,6 @@ pod_params:
     mysql:
       port: "3306"
     wordpress:
-      app_name: "wp_remote"
       env: "staging"
       lang: "en_US"
       debug: "{{ params.env_params.wp_debug | default(false) }}"
@@ -385,7 +384,7 @@ pod_params:
     mysql:
       port: "3306"
     wordpress:
-      app_name: "wp_local"
+      app_repo: "wp_local"
       env: "development"
       lang: "en_US"
       debug: "{{ params.env_params.wp_debug | default(false) }}"
