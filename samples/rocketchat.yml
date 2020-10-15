@@ -1,54 +1,51 @@
 name: "{{ params.name }}"
 main:
   cloud:
+    repo: "cloud"
     clouds:
-    - "{{ params.env_params.cloud_name }}"
+      - "{{ params.env_params.cloud_name }}"
   local:
+    repo: "cloud"
     clouds:
-    - "local"
+      - "local"
     nodes:
-    - name: "app"
-      key: "rocketchat_local"
+      - name: "app"
+        key: "rocketchat_local"
     local:
       pods:
-      - "rocketchat"
+        - "rocketchat"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
       hosts_content: |
         [main]
         localhost ansible_connection=local
         [host]
       meta:
         template_no_empty_lines: true
-      repo: "cloud"
   remote:
+    repo: "cloud"
     destroy:
       nodes: true
       buckets: true
     clouds:
-    - "{{ params.env_params.cloud_name }}"
+      - "{{ params.env_params.cloud_name }}"
     buckets:
-    - "rocketchat_uploads"
-    - "rocketchat_backup"
+      - "rocketchat_uploads"
+      - "rocketchat_backup"
     nodes:
-    - name: "app"
-      key: "rocketchat"
+      - name: "app"
+        key: "rocketchat"
     run_stages:
-    - tasks:
-      - name: "docker_compose_install"
-        all_nodes: true
-        nodes_tasks: true
-      - name: "main_build"
-        all_nodes: true
-        pods_tasks: true
-      - name: "main_upgrade"
-        all_nodes: true
-        pods_tasks: true
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            nodes_tasks: true
+          - name: "main_build"
+            all_nodes: true
+            pods_tasks: true
+          - name: "main_upgrade"
+            all_nodes: true
+            pods_tasks: true
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
       hosts_content: |
         [main]
         localhost ansible_connection=local
@@ -56,72 +53,68 @@ main:
         app
         [app]
   remote_local_test:
+    repo: "cloud"
     clouds:
-    - "local"
+      - "local"
     nodes:
-    - name: "app"
-      key: "rocketchat_local"
+      - name: "app"
+        key: "rocketchat_local"
     local:
       pods:
-      - "rocketchat"
+        - "rocketchat"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
       hosts_content: |
         [main]
         localhost ansible_connection=local
         [host]
       meta:
         template_no_empty_lines: true
-      repo: "cloud"
   nodes:
+    repo: "cloud"
     destroy:
       nodes: true
       buckets: true
     clouds:
-    - "{{ params.env_params.cloud_name }}"
+      - "{{ params.env_params.cloud_name }}"
     buckets:
-    - "rocketchat_uploads"
-    - "rocketchat_backup"
+      - "rocketchat_uploads"
+      - "rocketchat_backup"
     nodes:
-    - name: "db"
-      key: "rocketchat"
-      pods:
-        rocketchat:
-          params:
-            type: "db"
-          group_params:
-            custom_memory: "rocketchat_custom_memory_db"
-    - name: "web"
-      key: "rocketchat"
-      dependencies:
-      - host: "mongo"
-        node: "db"
-      pods:
-        rocketchat:
-          params:
-            type: "web"
-          group_params:
-            custom_memory: "rocketchat_custom_memory_web"
+      - name: "db"
+        key: "rocketchat"
+        pods:
+          rocketchat:
+            params:
+              type: "db"
+            group_params:
+              custom_memory: "rocketchat_custom_memory_db"
+      - name: "web"
+        key: "rocketchat"
+        dependencies:
+          - host: "mongo"
+            node: "db"
+        pods:
+          rocketchat:
+            params:
+              type: "web"
+            group_params:
+              custom_memory: "rocketchat_custom_memory_web"
     run_stages:
-    - tasks:
-      - name: "docker_compose_install"
-        all_nodes: true
-        nodes_tasks: true
-      - name: "main_build"
-        all_nodes: true
-        pods_tasks: true
-      - name: "main_upgrade"
-        nodes: ["db"]
-        pods_tasks: true
-    - tasks:
-      - name: "main_upgrade"
-        nodes: ["web"]
-        pods_tasks: true
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            nodes_tasks: true
+          - name: "main_build"
+            all_nodes: true
+            pods_tasks: true
+          - name: "main_upgrade"
+            nodes: ["db"]
+            pods_tasks: true
+      - tasks:
+          - name: "main_upgrade"
+            nodes: ["web"]
+            pods_tasks: true
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
       hosts_content: |
         [main]
         localhost ansible_connection=local
@@ -138,37 +131,37 @@ clouds:
     credentials: "digital_ocean"
     params:
       x_digital_ocean_tags:
-      - "auto"
-      - "dmz"
+        - "auto"
+        - "dmz"
       x_digital_ocean_firewalls:
-      - name: "auto"
-        tags: ["auto"]
-        inbound_rules:
-        - ports: "22"
-          sources:
-            tags: ["main"]
-        outbound_rules:
-        - protocol: "tcp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - protocol: "udp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - protocol: "icmp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-      - name: "dmz"
-        tags: ["dmz"]
-        inbound_rules:
-        - ports: "80"
-          sources:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - ports: "443"
-          sources:
-            addresses: ["0.0.0.0/0", "::/0"]
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "dmz"
+          tags: ["dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
 dns:
   cloudflare:
     type: "cloudflare"
@@ -188,15 +181,15 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "user"
     pods:
-    - name: "rocketchat"
-      params:
-        local: true
-      group_params:
-        custom_args: "rocketchat_custom_args"
-        custom_domain: "rocketchat_custom_domain_local"
-        db_backup: "db_backup_no_sync"
-        uploads_backup: "uploads_backup_no_sync"
-        certbot: "certbot_local"
+      - name: "rocketchat"
+        params:
+          local: true
+        group_params:
+          custom_args: "rocketchat_custom_args"
+          custom_domain: "rocketchat_custom_domain_local"
+          db_backup: "db_backup_no_sync"
+          uploads_backup: "uploads_backup_no_sync"
+          certbot: "certbot_local"
     params:
       size:
         memory: "2gb"
@@ -206,35 +199,35 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "host"
     pods:
-    - name: "rocketchat"
-      params:
-        local: false
-      group_params:
-        custom_args: "rocketchat_custom_args"
-        custom_domain: "rocketchat_custom_domain"
+      - name: "rocketchat"
+        params:
+          local: false
+        group_params:
+          custom_args: "rocketchat_custom_args"
+          custom_domain: "rocketchat_custom_domain"
     params:
       dns:
-      - record: "{{ params.env_params.main_dns_record }}"
-        name: "{{ params.env_params.main_dns_name }}"
-      - record: "{{ params.env_params.theia_dns_record }}"
-        name: "{{ params.env_params.theia_dns_name }}"
-        when: "{{ params.env_params.use_theia }}"
-      - record: "{{ params.env_params.minio_gateway_dns_record }}"
-        name: "{{ params.env_params.minio_gateway_dns_name }}"
-        when: "{{ params.env_params.use_minio_gateway }}"
-      - record: "{{ params.env_params.filestash_dns_record }}"
-        name: "{{ params.env_params.filestash_dns_name }}"
-        when: "{{ params.env_params.use_filestash }}"
-      - record: "{{ params.env_params.nextcloud_dns_record }}"
-        name: "{{ params.env_params.nextcloud_dns_name }}"
-        when: "{{ params.env_params.use_nextcloud }}"
-      - record: "{{ params.env_params.mongo_express_dns_record }}"
-        name: "{{ params.env_params.mongo_express_dns_name }}"
-        when: "{{ params.env_params.use_mongo_express }}"
+        - record: "{{ params.env_params.main_dns_record }}"
+          name: "{{ params.env_params.main_dns_name }}"
+        - record: "{{ params.env_params.theia_dns_record }}"
+          name: "{{ params.env_params.theia_dns_name }}"
+          when: "{{ params.env_params.use_theia }}"
+        - record: "{{ params.env_params.minio_gateway_dns_record }}"
+          name: "{{ params.env_params.minio_gateway_dns_name }}"
+          when: "{{ params.env_params.use_minio_gateway }}"
+        - record: "{{ params.env_params.filestash_dns_record }}"
+          name: "{{ params.env_params.filestash_dns_name }}"
+          when: "{{ params.env_params.use_filestash }}"
+        - record: "{{ params.env_params.nextcloud_dns_record }}"
+          name: "{{ params.env_params.nextcloud_dns_name }}"
+          when: "{{ params.env_params.use_nextcloud }}"
+        - record: "{{ params.env_params.mongo_express_dns_record }}"
+          name: "{{ params.env_params.mongo_express_dns_name }}"
+          when: "{{ params.env_params.use_mongo_express }}"
       cron:
-      - user: "root"
-        src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-        dest_dir: "/var/spool/cron/crontabs"
+        - user: "root"
+          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest_dir: "/var/spool/cron/crontabs"
       instance:
         image: "ubuntu-18-04-x64"
         user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
@@ -253,8 +246,8 @@ nodes:
         initial_connection_timeout: 90
         setup_finished_timeout: 300
       x_digital_ocean_tags:
-      - "auto"
-      - "dmz"
+        - "auto"
+        - "dmz"
 pods:
   rocketchat:
     repo: "pod"
@@ -262,8 +255,8 @@ pods:
     ctx: "custom-pod/rocketchat/ctx.yml"
     fast_prepare: "true"
     env_repos:
-    - repo: "custom_pod"
-      dir: "custom-pod"
+      - repo: "custom_pod"
+        dir: "custom-pod"
     credentials:
       rocketchat: "rocketchat"
       hubot: "hubot"
