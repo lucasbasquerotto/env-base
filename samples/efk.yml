@@ -1,8 +1,9 @@
 name: "{{ params.name }}"
 main:
   cloud:
+    repo: "cloud"
     clouds:
-    - "{{ params.env_params.cloud_name }}"
+      - "{{ params.env_params.cloud_name }}"
     params:
       entrypoint: "main.yml"
       entrypoint_template_src: "main.tpl.yml"
@@ -12,52 +13,47 @@ main:
         [host]
       meta:
         template_no_empty_lines: true
-      repo: "cloud"
   local:
+    repo: "cloud"
     clouds:
-    - "local"
+      - "local"
     nodes:
-    - name: "app"
-      key: "efk_local"
+      - name: "app"
+        key: "efk_local"
     local:
       pods:
-      - "efk"
+        - "efk"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
       hosts_content: |
         [main]
         localhost ansible_connection=local
         [host]
       meta:
         template_no_empty_lines: true
-      repo: "cloud"
   remote:
+    repo: "cloud"
     destroy:
       nodes: true
       buckets: true
     clouds:
-    - "{{ params.env_params.cloud_name }}"
+      - "{{ params.env_params.cloud_name }}"
     buckets:
-    - "efk_backup"
+      - "efk_backup"
     nodes:
-    - name: "app"
-      key: "efk"
+      - name: "app"
+        key: "efk"
     run_stages:
-    - tasks:
-      - name: "docker_compose_install"
-        all_nodes: true
-        nodes_tasks: true
-      - name: "main_build"
-        all_nodes: true
-        pods_tasks: true
-      - name: "main_upgrade"
-        all_nodes: true
-        pods_tasks: true
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            nodes_tasks: true
+          - name: "main_build"
+            all_nodes: true
+            pods_tasks: true
+          - name: "main_upgrade"
+            all_nodes: true
+            pods_tasks: true
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
       hosts_content: |
         [main]
         localhost ansible_connection=local
@@ -65,72 +61,68 @@ main:
         app
         [app]
   remote_local_test:
+    repo: "cloud"
     clouds:
-    - "local"
+      - "local"
     nodes:
-    - name: "app"
-      key: "efk_local"
+      - name: "app"
+        key: "efk_local"
     local:
       pods:
-      - "efk"
+        - "efk"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
       hosts_content: |
         [main]
         localhost ansible_connection=local
         [host]
       meta:
         template_no_empty_lines: true
-      repo: "cloud"
   nodes:
+    repo: "cloud"
     destroy:
       nodes: true
       buckets: true
     clouds:
-    - "{{ params.env_params.cloud_name }}"
+      - "{{ params.env_params.cloud_name }}"
     buckets:
-    - "efk_backup"
+      - "efk_backup"
     nodes:
-    - name: "db"
-      key: "efk"
-      pods:
-        efk:
-          params:
-            type: "db"
-            use_nginx: false
-          group_params:
-            custom_memory: "efk_custom_memory_db"
-    - name: "web"
-      key: "efk"
-      dependencies:
-      - host: "elasticsearch"
-        node: "db"
-      pods:
-        efk:
-          params:
-            type: "web"
-          group_params:
-            custom_memory: "efk_custom_memory_web"
+      - name: "db"
+        key: "efk"
+        pods:
+          efk:
+            params:
+              type: "db"
+              use_nginx: false
+            group_params:
+              custom_memory: "efk_custom_memory_db"
+      - name: "web"
+        key: "efk"
+        dependencies:
+          - host: "elasticsearch"
+            node: "db"
+        pods:
+          efk:
+            params:
+              type: "web"
+            group_params:
+              custom_memory: "efk_custom_memory_web"
     run_stages:
-    - tasks:
-      - name: "docker_compose_install"
-        all_nodes: true
-        nodes_tasks: true
-      - name: "main_build"
-        all_nodes: true
-        pods_tasks: true
-      - name: "main_upgrade"
-        nodes: ["db"]
-        pods_tasks: true
-    - tasks:
-      - name: "main_upgrade"
-        nodes: ["web"]
-        pods_tasks: true
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            nodes_tasks: true
+          - name: "main_build"
+            all_nodes: true
+            pods_tasks: true
+          - name: "main_upgrade"
+            nodes: ["db"]
+            pods_tasks: true
+      - tasks:
+          - name: "main_upgrade"
+            nodes: ["web"]
+            pods_tasks: true
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
       hosts_content: |
         [main]
         localhost ansible_connection=local
@@ -147,46 +139,46 @@ clouds:
     credentials: "digital_ocean"
     params:
       x_digital_ocean_tags:
-      - "auto"
-      - "dmz"
+        - "auto"
+        - "dmz"
       x_digital_ocean_firewalls:
-      - name: "private"
-        tags: ["auto"]
-        inbound_rules:
-        - ports: "9080"
-          sources:
-            addresses: "{{ params.env_params.private_ips }}"
-        - ports: "9443"
-          sources:
-            addresses: "{{ params.env_params.private_ips }}"
-      - name: "auto"
-        tags: ["auto"]
-        inbound_rules:
-        - ports: "22"
-          sources:
-            tags: ["main"]
-        outbound_rules:
-        - protocol: "tcp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - protocol: "udp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - protocol: "icmp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-      - name: "dmz"
-        tags: ["dmz"]
-        inbound_rules:
-        - ports: "80"
-          sources:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - ports: "443"
-          sources:
-            addresses: ["0.0.0.0/0", "::/0"]
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "dmz"
+          tags: ["dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
 dns:
   cloudflare:
     type: "cloudflare"
@@ -206,13 +198,13 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "user"
     pods:
-    - name: "efk"
-      params:
-        local: true
-      group_params:
-        custom_args: "efk_custom_args"
-        custom_domain: "efk_custom_domain_local"
-        certbot: "certbot_local"
+      - name: "efk"
+        params:
+          local: true
+        group_params:
+          custom_args: "efk_custom_args"
+          custom_domain: "efk_custom_domain_local"
+          certbot: "certbot_local"
     params:
       size:
         memory: "2gb"
@@ -222,32 +214,32 @@ nodes:
     base_dir: "/var/cloud"
     credentials: "host"
     pods:
-    - name: "efk"
-      params:
-        local: false
-      group_params:
-        custom_args: "efk_custom_args"
-        custom_domain: "efk_custom_domain"
+      - name: "efk"
+        params:
+          local: false
+        group_params:
+          custom_args: "efk_custom_args"
+          custom_domain: "efk_custom_domain"
     params:
       dns:
-      - record: "{{ params.env_params.kibana_dns_record }}"
-        name: "{{ params.env_params.kibana_dns_name }}"
-      - record: "{{ params.env_params.theia_dns_record }}"
-        name: "{{ params.env_params.theia_dns_name }}"
-        when: "{{ params.env_params.use_theia }}"
-      - record: "{{ params.env_params.minio_gateway_dns_record }}"
-        name: "{{ params.env_params.minio_gateway_dns_name }}"
-        when: "{{ params.env_params.use_minio_gateway }}"
-      - record: "{{ params.env_params.filestash_dns_record }}"
-        name: "{{ params.env_params.filestash_dns_name }}"
-        when: "{{ params.env_params.use_filestash }}"
-      - record: "{{ params.env_params.nextcloud_dns_record }}"
-        name: "{{ params.env_params.nextcloud_dns_name }}"
-        when: "{{ params.env_params.use_nextcloud }}"
+        - record: "{{ params.env_params.kibana_dns_record }}"
+          name: "{{ params.env_params.kibana_dns_name }}"
+        - record: "{{ params.env_params.theia_dns_record }}"
+          name: "{{ params.env_params.theia_dns_name }}"
+          when: "{{ params.env_params.use_theia }}"
+        - record: "{{ params.env_params.minio_gateway_dns_record }}"
+          name: "{{ params.env_params.minio_gateway_dns_name }}"
+          when: "{{ params.env_params.use_minio_gateway }}"
+        - record: "{{ params.env_params.filestash_dns_record }}"
+          name: "{{ params.env_params.filestash_dns_name }}"
+          when: "{{ params.env_params.use_filestash }}"
+        - record: "{{ params.env_params.nextcloud_dns_record }}"
+          name: "{{ params.env_params.nextcloud_dns_name }}"
+          when: "{{ params.env_params.use_nextcloud }}"
       cron:
-      - user: "root"
-        src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-        dest_dir: "/var/spool/cron/crontabs"
+        - user: "root"
+          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest_dir: "/var/spool/cron/crontabs"
       instance:
         image: "ubuntu-18-04-x64"
         user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
@@ -266,8 +258,8 @@ nodes:
         initial_connection_timeout: 90
         setup_finished_timeout: 300
       x_digital_ocean_tags:
-      - "auto"
-      - "dmz"
+        - "auto"
+        - "dmz"
 pods:
   efk:
     repo: "pod"
@@ -275,8 +267,8 @@ pods:
     ctx: "custom-pod/efk/ctx.yml"
     fast_prepare: "true"
     env_repos:
-    - repo: "custom_pod"
-      dir: "custom-pod"
+      - repo: "custom_pod"
+        dir: "custom-pod"
     credentials:
       efk: "efk"
       minio_gateway: "minio_gateway"
@@ -310,7 +302,6 @@ pods:
       enable_sync_backup: true
       enable_sync_setup: true
       enable_backup_replica: true
-      enable_uploads_replica: true
     group_params:
       custom_images: "efk_custom_images"
       custom_memory: "efk_custom_memory_app"
@@ -396,13 +387,13 @@ pod_params:
     nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_backup: 512mb
     fluentd: 256mb
+    s3_cli: 512mb
   efk_custom_memory_db:
     elasticsearch: 1gb
     toolbox: 512mb
-    s3_backup: 512mb
     fluentd: 256mb
+    s3_cli: 512mb
   efk_custom_memory_web:
     nginx: 512mb
     kibana: 512mb
@@ -412,8 +403,8 @@ pod_params:
     nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_backup: 512mb
     fluentd: 256mb
+    s3_cli: 512mb
   certbot:
     main_domain: "{{ params.env_params.kibana_full_domain }}"
     domains: "{{ params.env_params.certbot_domains }}"
