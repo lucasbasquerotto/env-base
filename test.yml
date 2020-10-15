@@ -3,56 +3,55 @@ main:
   cloud_hooks:
     repo: "cloud"
     env_repos:
-    - repo: "custom_cloud"
-      dir: "custom-cloud"
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     clouds:
-    - "local"
+      - "local"
     params:
       x_custom_roles:
-      - "role1"
-      - "role2"
+        - "role1"
+        - "role2"
       x_custom_tasks:
-      - "task1"
-      - "task2"
+        - "task1"
+        - "task2"
     group_params:
       hooks: "test_hooks"
       custom_roles: "test_custom_roles"
       custom_tasks: "test_custom_tasks"
     shared_params: ["local"]
+    shared_group_params: "test_shared_group_params"
   cloud_custom_tasks:
     repo: "cloud"
     env_repos:
-    - repo: "custom_cloud"
-      dir: "custom-cloud"
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     clouds:
-    - "custom"
+      - "custom"
     dns:
-    - name: "custom"
-      dns_type: "NS"
-      record: "dev"
-      data_list:
-      - value: "ns1dev.test.com"
-      - value: "ns2dev.test.com"
-    - name: "custom"
-      dns_type: "A"
-      record: "dev"
-      data_list:
-      - value: "1.2.3.4"
+      - name: "custom"
+        dns_type: "NS"
+        record: "dev"
+        data_list:
+          - value: "ns1dev.test.com"
+          - value: "ns2dev.test.com"
+      - name: "custom"
+        dns_type: "A"
+        record: "dev"
+        data_list:
+          - value: "1.2.3.4"
     nodes:
-    - "custom"
-    - "custom_local"
+      - "custom"
+      - "custom_local"
     group_params:
       custom_tasks: "main_custom_tasks"
     shared_params: ["local"]
     run_stages:
-    - tasks:
-      - name: "custom"
-        nodes: ["custom_local"]
-        nodes_tasks: true
+      - tasks:
+          - name: "custom"
+            nodes: ["custom_local"]
+            nodes_tasks: true
 main_shared_params:
   local:
-    entrypoint: "main.yml"
-    entrypoint_template_src: "main.tpl.yml"
     hosts_content: |
       [main]
       localhost ansible_connection=local
@@ -63,6 +62,10 @@ main_shared_params:
       [custom_local]
     meta:
       template_no_empty_lines: true
+main_shared_group_params:
+  test_shared_group_params:
+    prop1: "test_custom_roles"
+    prop2: "test_custom_tasks"
 main_params:
   test_custom_roles:
     role1: "custom-cloud/roles/role1"
