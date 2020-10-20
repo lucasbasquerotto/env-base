@@ -289,7 +289,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
-      wp_dev: "{{ params.env_params.wp_dev | default(false) }}"
+      app_dev: "{{ params.env_params.app_dev | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
       use_composer: "{{ params.env_params.use_composer | default(false) }}"
@@ -331,8 +331,10 @@ pods:
       enable_backup_replica: true
       enable_uploads_replica: true
       migrate_wp_activate_all_plugins: false
-      migrate_wp_plugins_to_activate: "wpdiscuz contact-form-7"
-      migrate_wp_plugins_to_deactivate: "ewww-image-optimizer jetpack"
+      migrate_wp_plugins_to_activate: >-
+        {{ params.env_params.migrate_wp_plugins_to_activate | default('') }}
+      migrate_wp_plugins_to_deactivate: >-
+        {{ params.env_params.migrate_wp_plugins_to_deactivate | default('') }}
       migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
       migrate_new_domain_host: "{{ params.env_params.wp_new_domain_host | default('') }}"
       migrate_wp_rewrite_structure: "/%year%/%monthnum%/%day%/%postname%"
