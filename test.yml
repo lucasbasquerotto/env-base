@@ -112,6 +112,7 @@ clouds:
     params:
       x_test_param_1: "test_value_1"
       x_test_param_2: "test_value_2"
+      x_test_param_3: "test_value_3"
 dns:
   custom:
     custom_task: true
