@@ -373,8 +373,7 @@ pod_params:
     mysql:
       port: "3306"
     wordpress:
-      use_wp_dir: true
-      wp_dir: "app-wp"
+      app_repo_dir: "app-wp"
       env: "development"
       lang: "en_US"
       debug: "{{ params.env_params.wp_debug | default(false) }}"
