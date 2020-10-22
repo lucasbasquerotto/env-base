@@ -279,6 +279,7 @@ pods:
       type: "app"
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
+      custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
       use_nginx: "{{ params.env_params.use_nginx | default(true) }}"
