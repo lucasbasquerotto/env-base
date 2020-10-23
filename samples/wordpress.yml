@@ -1,4 +1,6 @@
 name: "{{ params.name }}"
+migration: "20201023"
+container: "lucasbasquerotto/cloud:1.3.0"
 main:
   cloud:
     repo: "cloud"
@@ -195,6 +197,7 @@ nodes:
       - name: "wp"
         params:
           local: true
+          named_volumes: "{{ params.env_params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
           migrate_new_domain_host: >-
