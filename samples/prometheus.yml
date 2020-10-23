@@ -266,6 +266,7 @@ pods:
       - repo: "custom_pod"
         dir: "custom-pod"
     credentials:
+      grafana: "grafana"
       minio_gateway: "minio_gateway"
       backup_bucket: "backup_bucket"
       backup_replica_bucket: "backup_replica_bucket"
