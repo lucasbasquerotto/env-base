@@ -4,6 +4,9 @@ container: "lucasbasquerotto/cloud:1.3.0"
 main:
   cloud:
     repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     clouds:
       - "{{ params.env_params.cloud_name }}"
     params:
@@ -17,6 +20,9 @@ main:
         template_no_empty_lines: true
   local:
     repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     clouds:
       - "local"
     nodes:
@@ -34,6 +40,9 @@ main:
         template_no_empty_lines: true
   remote:
     repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     destroy:
       nodes: true
       buckets: true
@@ -64,6 +73,9 @@ main:
         [app]
   remote_local_test:
     repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     clouds:
       - "local"
     nodes:
@@ -81,6 +93,9 @@ main:
         template_no_empty_lines: true
   nodes:
     repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
     destroy:
       nodes: true
       buckets: true
@@ -448,6 +463,9 @@ tasks:
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    version: "master"
+  custom_cloud:
+    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
     version: "master"
   pod:
     src: "https://github.com/lucasbasquerotto/pod.git"
