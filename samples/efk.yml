@@ -201,6 +201,7 @@ nodes:
       - name: "efk"
         params:
           local: true
+          custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
         group_params:
           custom_args: "efk_custom_args"
           custom_domain: "efk_custom_domain_local"
@@ -290,6 +291,7 @@ pods:
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       auth_file: "{{ params.env_params.auth_file }}"
+      auth_file_encrypted: "{{ params.env_params.auth_file_encrypted | default(false) }}"
       s3_cli: "{{ params.env_params.s3_cli }}"
       backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
