@@ -1,4 +1,0 @@
-# file repo 2
-- prop1: ["{{ params.value1 }}", "{{ params.value2 }}"]
-- prop2: "static value 2"
-- prop3: ["{{ params.value3 }}"]
