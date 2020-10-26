@@ -50,6 +50,66 @@ main:
           - name: "custom"
             nodes: ["custom_local"]
             nodes_tasks: true
+  repos:
+    repo: "cloud"
+    extra_repos:
+      - repo: "env_base"
+        dir: "env-base"
+        env_files:
+          - src: "test/extra-repos/file1.yml"
+            dest: "tmp/ef1.yml"
+        env_templates:
+          - src: "test/extra-repos/template1.yml"
+            dest: "tmp/etpl1.yml"
+            params:
+              value1: "tmp/test/env_base_1_1"
+              value2: "tmp/test/env_base_1_2"
+          - src: "test/extra-repos/template2.yml"
+            dest: "tmp/etpl2.yml"
+            params:
+              value1: "tmp/test/env_base_2_1"
+              value2: "tmp/test/env_base_2_2"
+        files:
+          - src: "test/extra-repos/file1.yml"
+            dest: "tmp/f1.yml"
+          - src: "test/extra-repos/file2.yml"
+            dest: "tmp/f2.yml"
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+        env_files:
+          - src: "test/extra-repos/file2.yml"
+            dest: "tmp/ef2.yml"
+        env_templates:
+          - src: "test/extra-repos/template1.yml"
+            dest: "tmp/etpl1.yml"
+            params:
+              value1: "tmp/test/custom_cloud_1"
+              value2: "tmp/test/custom_cloud_2"
+        files:
+          - src: "test/extra-repos/cloud_file1.yml"
+            dest: "tmp/cf1.yml"
+          - src: "test/extra-repos/cloud_file2.yml"
+            dest: "tmp/cf2.yml"
+        templates:
+          - src: "test/extra-repos/cloud_template1.yml"
+            dest: "tmp/ct1.yml"
+          - src: "test/extra-repos/cloud_template2.yml"
+            dest: "tmp/ct2.yml"
+      - repo: "pod"
+        dir: "pod"
+        env_templates:
+          - src: "test/extra-repos/template2.yml"
+            dest: "tmp/etpl2.yml"
+            params:
+              value1: "tmp/test/pod_1"
+              value2: "tmp/test/pod_2"
+      - repo: "custom_pod"
+        dir: "custom-pod"
+        env_files:
+          - src: "test/extra-repos/file1.yml"
+            dest: "tmp/ef1.yml"
+          - src: "test/extra-repos/file2.yml"
+            dest: "tmp/ef2.yml"
 main_shared_params:
   local:
     hosts_content: |
@@ -146,11 +206,20 @@ tasks:
       param1: "value1"
       param2: "value2"
 repos:
+  env_base:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
   cloud:
-    src: "https://github.com/lucasbasquerotto/cloud.git"
+    src: "https://github.com/lucasbasquerotto/ansible-docker.git"
     version: "master"
   custom_cloud:
     src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+    version: "master"
+  pod:
+    src: "https://github.com/lucasbasquerotto/pod.git"
+    version: "master"
+  custom_pod:
+    src: "https://github.com/lucasbasquerotto/custom-pod.git"
     version: "master"
 credentials:
   fake: {}

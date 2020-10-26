@@ -1,0 +1,6 @@
+# template repo 1
+prop1:
+  prop1_inner1: "{{ params.value1 }}"
+  prop1_inner2: "{{ params.value2 }}"
+prop2: "static value"
+prop3: "{{ params.value3 }}"
