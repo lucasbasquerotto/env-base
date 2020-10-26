@@ -76,13 +76,13 @@ main:
             dest: "tmp/test/f2.yml"
         templates:
           - src: "test/extra-repos/repo_template1.yml"
-            dest: "tmp/test/etpl1.yml"
+            dest: "tmp/test/tpl1.yml"
             params:
               value1: "env_base_1_1 (repo)"
               value2: "env_base_1_2 (repo)"
               value3: "env_base_1_3 (repo)"
           - src: "test/extra-repos/repo_template2.yml"
-            dest: "tmp/test/etpl2.yml"
+            dest: "tmp/test/tpl2.yml"
             params:
               value1: "env_base_2_1 (repo)"
               value2: "env_base_2_2 (repo)"
