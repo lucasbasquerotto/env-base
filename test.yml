@@ -56,60 +56,80 @@ main:
       - repo: "env_base"
         dir: "env-base"
         env_files:
-          - src: "test/extra-repos/file1.yml"
-            dest: "tmp/ef1.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+            dest: "tmp/test/ef1.yml"
         env_templates:
-          - src: "test/extra-repos/template1.yml"
-            dest: "tmp/etpl1.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+            dest: "tmp/test/etpl1.yml"
             params:
-              value1: "tmp/test/env_base_1_1"
-              value2: "tmp/test/env_base_1_2"
-          - src: "test/extra-repos/template2.yml"
-            dest: "tmp/etpl2.yml"
+              value1: "env_base_1_1"
+              value2: "env_base_1_2"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/template2.yml"
+            dest: "tmp/test/etpl2.yml"
             params:
-              value1: "tmp/test/env_base_2_1"
-              value2: "tmp/test/env_base_2_2"
+              value1: "env_base_2_1"
+              value2: "env_base_2_2"
         files:
-          - src: "test/extra-repos/file1.yml"
-            dest: "tmp/f1.yml"
-          - src: "test/extra-repos/file2.yml"
-            dest: "tmp/f2.yml"
+          - src: "test/extra-repos/repo_file1.yml"
+            dest: "tmp/test/f1.yml"
+          - src: "test/extra-repos/repo_file2.yml"
+            dest: "tmp/test/f2.yml"
+        templates:
+          - src: "test/extra-repos/repo_template1.yml"
+            dest: "tmp/test/etpl1.yml"
+            params:
+              value1: "env_base_1_1 (repo)"
+              value2: "env_base_1_2 (repo)"
+              value3: "env_base_1_3 (repo)"
+          - src: "test/extra-repos/repo_template2.yml"
+            dest: "tmp/test/etpl2.yml"
+            params:
+              value1: "env_base_2_1 (repo)"
+              value2: "env_base_2_2 (repo)"
+              value3: "env_base_2_3 (repo)"
       - repo: "custom_cloud"
         dir: "custom-cloud"
         env_files:
-          - src: "test/extra-repos/file2.yml"
-            dest: "tmp/ef2.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
+            dest: "tmp/test/ef2.yml"
         env_templates:
-          - src: "test/extra-repos/template1.yml"
-            dest: "tmp/etpl1.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+            dest: "tmp/test/etpl1.yml"
             params:
-              value1: "tmp/test/custom_cloud_1"
-              value2: "tmp/test/custom_cloud_2"
+              value1: "custom_cloud_1"
+              value2: "custom_cloud_2"
         files:
           - src: "test/extra-repos/cloud_file1.yml"
-            dest: "tmp/cf1.yml"
+            dest: "tmp/test/cf1.yml"
           - src: "test/extra-repos/cloud_file2.yml"
-            dest: "tmp/cf2.yml"
+            dest: "tmp/test/cf2.yml"
         templates:
           - src: "test/extra-repos/cloud_template1.yml"
-            dest: "tmp/ct1.yml"
+            dest: "tmp/test/ct1.yml"
+            params:
+              value1: "custom_cloud_1_1 (repo)"
+              value2: "custom_cloud_1_2 (repo)"
           - src: "test/extra-repos/cloud_template2.yml"
-            dest: "tmp/ct2.yml"
+            dest: "tmp/test/ct2.yml"
+            params:
+              value1: "custom_cloud_2_1 (repo)"
+              value2: "custom_cloud_2_2 (repo)"
       - repo: "pod"
         dir: "pod"
         env_templates:
-          - src: "test/extra-repos/template2.yml"
-            dest: "tmp/etpl2.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/template2.yml"
+            dest: "tmp/test/etpl2.yml"
             params:
-              value1: "tmp/test/pod_1"
-              value2: "tmp/test/pod_2"
+              value1: "pod_1"
+              value2: "pod_2"
       - repo: "custom_pod"
         dir: "custom-pod"
         env_files:
-          - src: "test/extra-repos/file1.yml"
-            dest: "tmp/ef1.yml"
-          - src: "test/extra-repos/file2.yml"
-            dest: "tmp/ef2.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+            dest: "tmp/test/ef1.yml"
+          - src: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
+            dest: "tmp/test/ef2.yml"
+    shared_params: ["local"]
 main_shared_params:
   local:
     hosts_content: |
