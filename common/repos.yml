@@ -1,0 +1,49 @@
+name: "{{ params.name }}"
+main:
+  repos:
+    repo: "cloud"
+    extra_repos:
+      - repo: "env_base"
+        dir: "env-base"
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+      - repo: "pod"
+        dir: "pod"
+      - repo: "custom_pod"
+        dir: "custom-pod"
+      - repo: "app"
+        dir: "app"
+      - repo: "container_images"
+        dir: "container-images"
+      - repo: "backups"
+        dir: "backups"
+    params:
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
+repos:
+  env_base:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  cloud:
+    src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    version: "master"
+  custom_cloud:
+    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+    version: "master"
+  pod:
+    src: "https://github.com/lucasbasquerotto/pod.git"
+    version: "master"
+  custom_pod:
+    src: "https://github.com/lucasbasquerotto/custom-pod.git"
+    version: "master"
+  app:
+    src: "https://github.com/lucasbasquerotto/wordpress-docker.git"
+    version: "master"
+  container_images:
+    src: "https://github.com/lucasbasquerotto/container-images.git"
+    version: "master"
+  backups:
+    src: "https://github.com/lucasbasquerotto/backups.git"
+    version: "master"

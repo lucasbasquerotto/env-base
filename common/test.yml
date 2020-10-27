@@ -1,4 +1,4 @@
-name: "{{ params.name }}"
+name: "test ({{ params.name }})"
 main:
   cloud_hooks:
     repo: "cloud"

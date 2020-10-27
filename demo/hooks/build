@@ -1,0 +1,8 @@
+#!/bin/bash
+REPO_VERSION="$DOCKER_TAG"
+
+if [ "$DOCKER_TAG" = "latest" ]; then
+	REPO_VERSION="master"
+fi
+
+docker build --build-arg REPO_VERSION="$REPO_VERSION" -f "$DOCKERFILE_PATH" -t "$IMAGE_NAME" .

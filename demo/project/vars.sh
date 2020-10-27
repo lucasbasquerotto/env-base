@@ -1,0 +1,9 @@
+key=demo
+dev=true
+root_dir=/lrd
+project_dir_rel=projects/demo
+container="lucasbasquerotto/cloud:$REPO_VERSION"
+container_type=docker
+root=true
+run_file=/usr/local/bin/run
+force_vault=false

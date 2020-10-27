@@ -1,0 +1,25 @@
+ctxs:
+  - demo
+dev: "true"
+env_params:
+  env_dir: common
+init:
+  container: lucasbasquerotto/cloud:$REPO_VERSION
+  container_type: docker
+  root: true
+  run_file: /usr/local/bin/run
+key: demo
+local: false
+migration: ""
+path_params:
+  path_env: repos/env
+project_dir_rel: projects/demo
+repo:
+  env_file: common/demo.yml
+  src: https://github.com/lucasbasquerotto/env-base.git
+  ssh_file: ""
+  version: master
+repo_vault:
+  file: vault
+  force: false
+root_dir: /lrd
