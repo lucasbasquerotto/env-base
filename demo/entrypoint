@@ -1,4 +1,14 @@
 #!/bin/bash
 set -e
 
+mkdir -p /main/files/ctl/
+mkdir -p /main/secrets/ctl/
+
+envsubst < /tmp/main/vars.tpl.yml > /main/files/ctl/vars.yml
+mv /tmp/main/vars.sh /main/files/ctl/vars.sh
+mv /tmp/main/run /main/files/ctl/run
+echo "123456" > /main/secrets/ctl/vault
+
+ln -rsfT "/main/" "/main/link"
+
 exec /main/files/ctl/run --inside "$@"

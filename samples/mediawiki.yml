@@ -1,5 +1,5 @@
 name: "{{ params.name }}"
-migration: "20201023"
+migration: ""
 container: "lucasbasquerotto/cloud:1.3.2"
 main:
   cloud:

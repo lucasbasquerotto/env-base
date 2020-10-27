@@ -6,11 +6,11 @@ RUN apt-get update \
  && apt-get install -y gettext-base \
  && rm -rf /var/lib/apt/lists/*
 
-COPY setup /usr/local/bin/setup
 COPY entrypoint /usr/local/bin/entrypoint
 COPY project/ /tmp/main/
 
-RUN REPO_VERSION=$REPO_VERSION /usr/local/bin/setup
+ARG REPO_VERSION
+ENV REPO_VERSION=${REPO_VERSION}
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 
