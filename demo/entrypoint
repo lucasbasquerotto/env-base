@@ -14,10 +14,11 @@ if [ ! -d /env ]; then
 fi
 
 env_dir="/main/dev/repos/env"
-rm -rf "$env_dir"
 mkdir -p "$env_dir"
 chmod 777 "$env_dir"
+rm -rf "$env_dir/.git"
 mv "/tmp/env/.git" "$env_dir/.git"
+rm -rf "$env_dir/common"
 ln -rsfT "/env" "$env_dir/common"
 
 exec /main/files/ctl/run --inside "$@"
