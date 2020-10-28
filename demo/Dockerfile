@@ -1,6 +1,6 @@
-ARG REPO_VERSION
+ARG CLOUD_IMAGE
 
-FROM lucasbasquerotto/cloud:$REPO_VERSION
+FROM $CLOUD_IMAGE
 
 RUN apt-get update \
  && apt-get install -y gettext-base \
@@ -9,9 +9,13 @@ RUN apt-get update \
 COPY entrypoint /usr/local/bin/entrypoint
 COPY project/ /tmp/main/
 
-ARG REPO_VERSION
-ENV REPO_VERSION=${REPO_VERSION}
+ARG CLOUD_IMAGE
+ENV CLOUD_IMAGE=${CLOUD_IMAGE}
+
+ARG SOURCE_BRANCH
+
+RUN git clone --single-branch --branch $SOURCE_BRANCH https://github.com/lucasbasquerotto/env-base.git /tmp/env
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 
-# docker build -t local/demo --build-arg REPO_VERSION=1.3.2 demo/
+# Ex: SOURCE_BRANCH=master IMAGE_NAME=local/demo bash ./hooks/build

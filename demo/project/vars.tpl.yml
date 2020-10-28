@@ -1,10 +1,8 @@
-ctxs:
-  - demo
 dev: "true"
 env_params:
   env_dir: common
 init:
-  container: lucasbasquerotto/cloud:$REPO_VERSION
+  container: $CLOUD_IMAGE
   container_type: docker
   root: true
   run_file: /usr/local/bin/run

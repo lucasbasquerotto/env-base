@@ -1,6 +1,6 @@
 name: "{{ params.name }}"
 migration: ""
-container: "lucasbasquerotto/cloud:1.3.2"
+container: "lucasbasquerotto/cloud:1.3.3"
 main:
   cloud:
     repo: "cloud"

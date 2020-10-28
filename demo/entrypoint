@@ -9,6 +9,15 @@ mv /tmp/main/vars.sh /main/files/ctl/vars.sh
 mv /tmp/main/run /main/files/ctl/run
 echo "123456" > /main/secrets/ctl/vault
 
-ln -rsfT "/main/" "/main/link"
+if [ ! -d /env ]; then
+	echo "[error] directory /env doesn't exist"
+fi
+
+env_dir="/main/dev/repos/env"
+rm -rf "$env_dir"
+mkdir -p "$env_dir"
+chmod 777 "$env_dir"
+mv "/tmp/env/.git" "$env_dir/.git"
+ln -rsfT "/env" "$env_dir/common"
 
 exec /main/files/ctl/run --inside "$@"
