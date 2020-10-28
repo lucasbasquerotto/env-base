@@ -1,0 +1,146 @@
+name: "{{ project_name }}-wordpress"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "samples/wordpress.yml"
+env_params:
+  cloud_name: "digital_ocean"
+  domain: "lucasbasquerotto.com"
+  main_dns_name: "godaddy"
+  main_dns_record: "blog"
+  wp_full_domain: "blog.lucasbasquerotto.com"
+  pma_dns_name: "godaddy"
+  pma_dns_record: "pma-blog"
+  pma_full_domain: "pma-blog.lucasbasquerotto.com"
+  adminer_dns_name: "godaddy"
+  adminer_dns_record: "adminer-blog"
+  adminer_full_domain: "adminer-blog.lucasbasquerotto.com"
+  theia_dns_name: "godaddy"
+  theia_dns_record: "files-blog"
+  theia_full_domain: "files-blog.lucasbasquerotto.com"
+  filestash_dns_name: "godaddy"
+  filestash_dns_record: "s3-blog"
+  filestash_full_domain: "s3-blog.lucasbasquerotto.com"
+  nextcloud_dns_name: "godaddy"
+  nextcloud_dns_record: "nextcloud-blog"
+  nextcloud_full_domain: "nextcloud-blog.lucasbasquerotto.com"
+  minio_gateway_dns_name: "godaddy"
+  minio_gateway_dns_record: "s3-blog"
+  minio_gateway_full_domain: "s3-blog.lucasbasquerotto.com"
+  certbot_domains: >-
+    blog.lucasbasquerotto.com
+    pma-blog.lucasbasquerotto.com
+    adminer-blog.lucasbasquerotto.com
+    files-blog.lucasbasquerotto.com
+    s3-blog.lucasbasquerotto.com
+  wp_old_domain_host: "http://localhost/"
+  wp_new_domain_host: "http://blog.lucasbasquerotto.com/"
+  pod_custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
+  app_dev: "{{ params.app_dev | default(false) }}"
+  wp_debug: true
+  use_pod_prefix: true
+  restore_db: true
+  db_gui_root_user: true
+  use_s3_storage: false
+  non_s3_setup: true
+  use_varnish: true
+  use_redis: true
+  use_memcached: false
+  use_composer: true
+  use_pma: true
+  use_adminer: true
+  use_theia: true
+  use_minio_gateway: true
+  use_filestash: false
+  use_nextcloud: false
+  use_fluentd: true
+  use_w3tc: false
+  use_certbot: true
+  block_ips: true
+  ssl: true
+  s3_cli: "awscli"
+  certbot_email: "lucasbasquerotto@gmail.com"
+  auth_file: "{{ params.env_dir }}/.htpasswd"
+  auth_file_encrypted: false
+  wp_title: "My Blog Title"
+  backup_bucket_name: "lucasbasquerotto-wp-backup"
+  uploads_bucket_name: "lucasbasquerotto-wp-uploads"
+  backup_replica_bucket_name: "lucasbasquerotto-wp-replica-backup"
+  uploads_replica_bucket_name: "lucasbasquerotto-wp-replica-uploads"
+  named_volumes: "{{ params.named_volumes | default(false) }}"
+  local_custom_ssl:
+    main_domain: "localhost"
+    fullchain: "{{ params.env_dir }}/ssl/bundle.crt"
+    privkey: "{{ params.env_dir }}/ssl/localhost.key"
+credentials:
+  digital_ocean:
+    api_token: "<api_token>"
+  backup_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  uploads_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  backup_replica_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  uploads_replica_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  minio_gateway:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  godaddy:
+    api_server: "https://api.godaddy.com"
+    api_version: "1"
+    api_key: "<api_key>"
+    api_secret: "<api_secret>"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    host_ssh_public_keys_path: "{{ params.env_dir }}/ssh/host.pub"
+    ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
+  user:
+    host_user: "root"
+  wordpress:
+    db:
+      name: "wordpress"
+      user: "wp_user"
+      password: "123456"
+    setup:
+      admin_user: "wp_user"
+      admin_password: "1234556"
+      admin_email: "email@domain.com"
+    config:
+      auth_key: "lX0==1A<^*p*BE:#/cRa?%Cw@%H:<RfBSKL6YE!_!be#.fk|qyR7Qvz,e$65||};"
+      secure_auth_key: "ep(i@hE%1GBqnA9)af.8| 37K+^^Q-Z?`UUt$-#P8YW9/XflG+fUD7=Yf!j+18O."
+      logged_in_key: "U0Mf+>op{cpw0RzKIffnBEsKyb*1{tx5aGyxSU5fP|qJHgzDmd(UhgfY46aT:=&r"
+      nonce_key: "g,v@B p$aKffo`zhAduO:KBL9P$-xKBBBeVU--g.(PscMiox#9[>-5Y9JO?74LvZ"
+      auth_salt: "9#nu,Ls Q(VuG-hJw 0IwjBy/tM W=A8*DDrwde+]dd4+ZG+md-+,N6UGk&#O@U5"
+      secure_auth_salt: ",&YG2w^l{NjS:a1]9u7JW`^BaSv--|%Wah=Osc=NB|)J|)Y^_0G, qAp/6o}DcTi"
+      logged_in_salt: "XoZ-}tS,yO!t>`5]Pd<;4,9h@@mCFH*nZ.VRpuy+O]f!C-h5-L#H.#T3iyS#5Ktf"
+      nonce_salt: "G{|$)=<v(;%zx(cb!%)C*P5T}*}?A^A|}VIG}duyn$QK2!C-TGo7(BK{wAvF:`pM"
+  mysql:
+    root_password: "1234556"
+    viewer_password: "123456"
+  nextcloud:
+    admin_user: "test"
+    admin_pass: "123456"

@@ -1,0 +1,3 @@
+#!/bin/bash
+# ./build
+docker run -it --rm -v "$(pwd)"/data:/main -v "$(pwd)"/env:/env local/demo

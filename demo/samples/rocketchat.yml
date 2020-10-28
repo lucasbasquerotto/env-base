@@ -1,0 +1,127 @@
+name: "{{ project_name }}-rocketchat"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "samples/rocketchat.yml"
+env_params:
+  cloud_name: "digital_ocean"
+  domain: "lucasbasquerotto.com"
+  main_dns_name: "godaddy"
+  main_dns_record: "chat"
+  rocketchat_full_domain: "chat.lucasbasquerotto.com"
+  mongo_express_dns_name: "godaddy"
+  mongo_express_dns_record: "me-chat"
+  mongo_express_full_domain: "me-chat.lucasbasquerotto.com"
+  theia_dns_name: "godaddy"
+  theia_dns_record: "files-chat"
+  theia_full_domain: "files-chat.lucasbasquerotto.com"
+  filestash_dns_name: "godaddy"
+  filestash_dns_record: "s3-chat"
+  filestash_full_domain: "s3-chat.lucasbasquerotto.com"
+  nextcloud_dns_name: "godaddy"
+  nextcloud_dns_record: "nextcloud-chat"
+  nextcloud_full_domain: "nextcloud-chat.lucasbasquerotto.com"
+  minio_gateway_dns_name: "godaddy"
+  minio_gateway_dns_record: "s3-chat"
+  minio_gateway_full_domain: "s3-chat.lucasbasquerotto.com"
+  certbot_domains: >-
+    chat.lucasbasquerotto.com
+    me-chat.lucasbasquerotto.com
+    files-chat.lucasbasquerotto.com
+    s3-chat.lucasbasquerotto.com
+  pod_custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
+  use_pod_prefix: true
+  restore_db: true
+  db_gui_root_user: true
+  use_s3_storage: false
+  non_s3_setup: true
+  use_mongo_express: true
+  use_theia: true
+  use_minio_gateway: true
+  use_filestash: false
+  use_nextcloud: false
+  use_fluentd: true
+  use_certbot: true
+  block_ips: true
+  ssl: true
+  s3_uploads: false
+  s3_cli: "awscli"
+  certbot_email: "lucasbasquerotto@gmail.com"
+  auth_file: "{{ params.env_dir }}/.htpasswd"
+  auth_file_encrypted: false
+  backup_bucket_name: "lucasbasquerotto-rocketchat-backup"
+  uploads_bucket_name: "lucasbasquerotto-rocketchat-uploads"
+  backup_replica_bucket_name: "lucasbasquerotto-rocketchat-replica-backup"
+  uploads_replica_bucket_name: "lucasbasquerotto-rocketchat-replica-uploads"
+  use_bot: true
+  named_volumes: "{{ params.named_volumes | default(false) }}"
+  local_custom_ssl:
+    main_domain: "localhost"
+    fullchain: "{{ params.env_dir }}/ssl/bundle.crt"
+    privkey: "{{ params.env_dir }}/ssl/localhost.key"
+credentials:
+  digital_ocean:
+    api_token: "<api_token>"
+  backup_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  uploads_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  backup_replica_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  uploads_replica_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  minio_gateway:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  godaddy:
+    api_server: "https://api.godaddy.com"
+    api_version: "1"
+    api_key: "<api_key>"
+    api_secret: "<api_secret>"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    host_ssh_public_keys_path: "{{ params.env_dir }}/ssh/host.pub"
+    ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
+  user:
+    host_user: "root"
+  rocketchat:
+    db:
+      name: "rocketchat"
+      user: "rocket"
+      password: "123456"
+      root_user: "root"
+      root_password: "1234556"
+      viewer_password: "123321"
+      oploguser_password: "654321"
+  hubot:
+    email: "hubot@test.internal"
+    room: ""
+    user: "mybot"
+    password: "botpassword"
+    bot_name: "bothere"
+  nextcloud:
+    admin_user: "test"
+    admin_pass: "123456"

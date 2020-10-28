@@ -1,0 +1,135 @@
+name: "{{ project_name }}-mediawiki"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "samples/mediawiki.yml"
+env_params:
+  cloud_name: "digital_ocean"
+  domain: "lucasbasquerotto.com"
+  main_dns_name: "godaddy"
+  main_dns_record: "wiki"
+  mediawiki_full_domain: "wiki.lucasbasquerotto.com"
+  pma_dns_name: "godaddy"
+  pma_dns_record: "pma-wiki"
+  pma_full_domain: "pma-wiki.lucasbasquerotto.com"
+  adminer_dns_name: "godaddy"
+  adminer_dns_record: "adminer-wiki"
+  adminer_full_domain: "adminer-wiki.lucasbasquerotto.com"
+  theia_dns_name: "godaddy"
+  theia_dns_record: "files-wiki"
+  theia_full_domain: "files-wiki.lucasbasquerotto.com"
+  filestash_dns_name: "godaddy"
+  filestash_dns_record: "s3-wiki"
+  filestash_full_domain: "s3-wiki.lucasbasquerotto.com"
+  nextcloud_dns_name: "godaddy"
+  nextcloud_dns_record: "nextcloud-wiki"
+  nextcloud_full_domain: "nextcloud-wiki.lucasbasquerotto.com"
+  minio_gateway_dns_name: "godaddy"
+  minio_gateway_dns_record: "s3-wiki"
+  minio_gateway_full_domain: "s3-wiki.lucasbasquerotto.com"
+  certbot_domains: >-
+    wiki.lucasbasquerotto.com
+    pma-wiki.lucasbasquerotto.com
+    adminer-wiki.lucasbasquerotto.com
+    files-wiki.lucasbasquerotto.com
+    s3-wiki.lucasbasquerotto.com
+  pod_custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
+  use_pod_prefix: true
+  restore_db: true
+  db_gui_root_user: true
+  use_s3_storage: false
+  non_s3_setup: true
+  use_varnish: true
+  use_redis: false
+  use_memcached: true
+  use_pma: true
+  use_adminer: true
+  use_theia: true
+  use_minio_gateway: true
+  use_filestash: false
+  use_nextcloud: false
+  use_fluentd: true
+  use_certbot: true
+  block_ips: true
+  ssl: true
+  s3_cli: "awscli"
+  certbot_email: "lucasbasquerotto@gmail.com"
+  auth_file: "{{ params.env_dir }}/.htpasswd"
+  auth_file_encrypted: false
+  backup_bucket_name: "lucasbasquerotto-mediawiki-backup"
+  uploads_bucket_name: "lucasbasquerotto-mediawiki-uploads"
+  backup_replica_bucket_name: "lucasbasquerotto-mediawiki-replica-backup"
+  uploads_replica_bucket_name: "lucasbasquerotto-mediawiki-replica-uploads"
+  mediawiki:
+    sitename: "My Wiki"
+    meta_namespace: "MyWiki"
+    logo: "https://www.mediawiki.org/static/images/project-logos/mediawikiwiki.png"
+    emergency_contact: "noreply@wiki.lucasbasquerotto.com"
+    password_sender: "noreply@wiki.lucasbasquerotto.com"
+    lang: "en"
+    authentication_token_version: "1"
+    upload_path: ""
+  named_volumes: "{{ params.named_volumes | default(false) }}"
+  local_custom_ssl:
+    main_domain: "localhost"
+    fullchain: "{{ params.env_dir }}/ssl/bundle.crt"
+    privkey: "{{ params.env_dir }}/ssl/localhost.key"
+credentials:
+  digital_ocean:
+    api_token: "<api_token>"
+  backup_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  uploads_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  backup_replica_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  uploads_replica_bucket:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  minio_gateway:
+    host: "<host>"
+    ssl: true
+    endpoint: "<endpoint>"
+    access_key: "<api_token>"
+    secret_key: "<secret_key>"
+  godaddy:
+    api_server: "https://api.godaddy.com"
+    api_version: "1"
+    api_key: "<api_key>"
+    api_secret: "<api_secret>"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    host_ssh_public_keys_path: "{{ params.env_dir }}/ssh/host.pub"
+    ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
+  user:
+    host_user: "root"
+  nextcloud:
+    admin_user: "test"
+    admin_pass: "123456"
+  mediawiki:
+    secret_key: "ce4e374745180efeeb2202833493d13242de589d59209f43f8325d59c7d4ebbe"
+    db:
+      root_password: "1234556"
+      viewer_password: "123456"
+      name: "my_wiki"
+      user: "wikiuser"
+      password: "AULT;1.2;AES2"
