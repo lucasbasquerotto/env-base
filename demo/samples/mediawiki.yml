@@ -55,6 +55,7 @@ env_params:
   use_certbot: true
   block_ips: true
   ssl: true
+  use_pod_full_prefix: true
   s3_cli: "awscli"
   certbot_email: "lucasbasquerotto@gmail.com"
   auth_file: "{{ params.env_dir }}/.htpasswd"
