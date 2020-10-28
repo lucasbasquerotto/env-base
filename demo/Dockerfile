@@ -18,4 +18,3 @@ RUN git clone --single-branch --branch $SOURCE_BRANCH https://github.com/lucasba
 
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 
-# Ex: SOURCE_BRANCH=master IMAGE_NAME=local/demo bash ./hooks/build

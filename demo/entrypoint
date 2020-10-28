@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eou pipefail
 
 mkdir -p /main/files/ctl/
 mkdir -p /main/secrets/ctl/

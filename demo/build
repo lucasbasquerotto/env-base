@@ -1,0 +1,4 @@
+#!/bin/bash
+set -eou pipefail
+dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SOURCE_BRANCH=master IMAGE_NAME=local/demo bash "$dir"/hooks/build
