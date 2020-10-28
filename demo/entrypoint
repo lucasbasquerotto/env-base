@@ -1,19 +1,24 @@
 #!/bin/bash
 set -eou pipefail
 
-mkdir -p /main/files/ctl/
-mkdir -p /main/secrets/ctl/
-
-envsubst < /tmp/main/vars.tpl.yml > /main/files/ctl/vars.yml
-mv /tmp/main/vars.sh /main/files/ctl/vars.sh
-mv /tmp/main/run /main/files/ctl/run
-echo "123456" > /main/secrets/ctl/vault
-
 if [ ! -d /env ]; then
 	echo "[error] directory /env doesn't exist"
+	exit 1
 fi
 
-env_dir="/main/dev/repos/env"
+root_dir="/lrd"
+project_dir="$root_dir/projects/demo"
+
+mkdir -p "$project_dir/files/ctl/"
+mkdir -p "$project_dir/secrets/ctl/"
+
+envsubst < /tmp/main/vars.tpl.yml > "$project_dir/files/ctl/vars.yml"
+mv /tmp/main/vars.sh "$project_dir/files/ctl/vars.sh"
+mv /tmp/ctl/run "$project_dir/files/ctl/run"
+chmod +x "$project_dir/files/ctl/run"
+echo "123456" > "$project_dir/secrets/ctl/vault"
+
+env_dir="$root_dir/repos/env"
 mkdir -p "$env_dir"
 chmod 777 "$env_dir"
 rm -rf "$env_dir/.git"
@@ -21,4 +26,4 @@ mv "/tmp/env/.git" "$env_dir/.git"
 rm -rf "$env_dir/common"
 ln -rsfT "/env" "$env_dir/common"
 
-exec /main/files/ctl/run --inside "$@"
+"$project_dir/files/ctl/run" --inside "$@"

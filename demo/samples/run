@@ -1,6 +1,6 @@
 #!/bin/bash
 # ./build
-docker run -it --rm -v "$(pwd)"/data:/main -v "$(pwd)"/env:/env local/demo
+docker run -it --rm -v "$(pwd)"/env:/env -v "$(pwd)"/data:/lrd local/demo
 
 # sudo docker run --rm -it -v /lrd:/test --workdir "/test" lucasbasquerotto/cloud:1.3.5 /bin/bash
 # ./ctl/run l -id mediawiki-local
