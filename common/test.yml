@@ -147,7 +147,7 @@ main:
         dir: "custom-pod"
         links:
           - repo: "env_base"
-            src: "test.yml"
+            src: "common/test.yml"
             dest: "tmp/test/link-env-base-test.yml"
           - repo: "env_base"
             src: "test/extra-repos/file1.yml"
