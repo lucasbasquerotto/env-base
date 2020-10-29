@@ -22,6 +22,44 @@ main:
       custom_tasks: "test_custom_tasks"
     shared_params: ["local"]
     shared_group_params: "test_shared_group_params"
+  cloud_services:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    initial_services:
+      - name: "test_service_1_initial"
+        key: "test_service_1"
+        params:
+          param1: "value_overriden_1_1"
+        group_params:
+          param1: "overriden_group_1_1"
+          param2: "overriden_group_1_2"
+        shared_params: ["overriden_s1"]
+        shared_group_params: "overriden_g1"
+      - "test_service_1"
+      - name: "test_service_2_initial"
+        key: "test_service_2"
+        params:
+          param1: "value_overriden_2_1"
+        group_params:
+          param1: "overriden_group_2_1"
+          param2: "overriden_group_2_2"
+        shared_params: ["overriden_s2"]
+        shared_group_params: "overriden_g2"
+      - "test_service_2"
+    final_services:
+      - "test_service_2"
+      - name: "test_service_1_initial"
+        key: "test_service_1"
+        params:
+          param1: "value_overriden_1_1"
+        group_params:
+          param1: "overriden_group_1_1"
+          param2: "overriden_group_1_2"
+        shared_params: ["overriden_s1"]
+        shared_group_params: "overriden_g1"
+    shared_params: ["local"]
   cloud_custom_tasks:
     repo: "cloud"
     env_repos:
@@ -44,14 +82,14 @@ main:
     nodes:
       - "custom"
       - "custom_local"
-    group_params:
-      custom_tasks: "main_custom_tasks"
-    shared_params: ["local"]
     run_stages:
       - tasks:
           - name: "custom"
             nodes: ["custom_local"]
             nodes_tasks: true
+    group_params:
+      custom_tasks: "main_custom_tasks"
+    shared_params: ["local"]
   repos:
     repo: "cloud"
     extra_repos:
@@ -187,6 +225,8 @@ main_params:
     node: "custom-cloud/test/tasks/node.yml"
     run: "custom-cloud/test/tasks/run.yml"
   test_hooks:
+    before_initial_services: "custom-cloud/test/hooks/before_initial_services.yml"
+    after_initial_services: "custom-cloud/test/hooks/after_initial_services.yml"
     before_cloud_main: "custom-cloud/test/hooks/before_cloud_main.yml"
     after_cloud_main: "custom-cloud/test/hooks/after_cloud_main.yml"
     before_dns: "custom-cloud/test/hooks/before_dns.yml"
@@ -201,10 +241,94 @@ main_params:
     after_prepare: "custom-cloud/test/hooks/after_prepare.yml"
     before_cron: "custom-cloud/test/hooks/before_cron.yml"
     after_cron: "custom-cloud/test/hooks/after_cron.yml"
+    before_final_services: "custom-cloud/test/hooks/before_final_services.yml"
+    after_final_services: "custom-cloud/test/hooks/after_final_services.yml"
     before_delete_tmp: "custom-cloud/test/hooks/before_delete_tmp.yml"
     after_delete_tmp: "custom-cloud/test/hooks/after_delete_tmp.yml"
     before_delete_main: "custom-cloud/test/hooks/before_delete_main.yml"
     after_delete_main: "custom-cloud/test/hooks/after_delete_main.yml"
+services:
+  test_service_1:
+    type: "custom-cloud/test/services/01"
+    params:
+      param1: "value_1_1"
+    group_params:
+      param1: "group_1_1"
+      param2: "group_1_2"
+    shared_params: ["value_s1"]
+    shared_group_params: "value_g1"
+  test_service_2:
+    type: "custom-cloud/test/services/02"
+    params:
+      param1: "value_2_1"
+    group_params:
+      param1: "group_2_1"
+      param2: "group_2_2"
+    shared_params: ["value_s2"]
+    shared_group_params: "value_g2"
+service_shared_group_params:
+  value_g1:
+    param1: "shared_1_1"
+    param2: "shared_1_2"
+    param3: "shared_1_3"
+    param4: "shared_1_4"
+  overriden_g1:
+    param1: "overriden_shared_1_1"
+    param2: "overriden_shared_1_2"
+    param3: "overriden_shared_1_3"
+    param4: "overriden_shared_1_4"
+  value_g2:
+    param1: "shared_2_1"
+    param2: "shared_2_2"
+    param3: "shared_2_3"
+    param4: "shared_2_4"
+  overriden_g2:
+    param1: "overriden_shared_2_1"
+    param2: "overriden_shared_2_2"
+    param3: "overriden_shared_2_3"
+    param4: "overriden_shared_2_4"
+service_shared_params:
+  value_s1:
+    param1: "value_shared_1_1"
+    param2: "value_shared_1_2"
+    param3: "value_shared_1_3"
+  overriden_s1:
+    param1: "value_overriden_shared_1_1"
+    param2: "value_overriden_shared_1_2"
+    param3: "value_overriden_shared_1_3"
+  value_s2:
+    param1: "value_shared_2_1"
+    param2: "value_shared_2_2"
+    param3: "value_shared_2_3"
+  overriden_s2:
+    param1: "value_overriden_shared_2_1"
+    param2: "value_overriden_shared_2_2"
+    param3: "value_overriden_shared_2_3"
+service_params:
+  group_1_1: "value_group_1_1"
+  group_1_2: "value_group_1_2"
+  overriden_group_1_1: "value_overriden_group_1_1"
+  overriden_group_1_2: "value_overriden_group_1_2"
+  shared_1_1: "value_group_shared_1_1"
+  shared_1_2: "value_group_shared_1_2"
+  shared_1_3: "value_group_shared_1_3"
+  shared_1_4: "value_group_shared_1_4"
+  overriden_shared_1_1: "value_overriden_group_shared_1_1"
+  overriden_shared_1_2: "value_overriden_group_shared_1_2"
+  overriden_shared_1_3: "value_overriden_group_shared_1_3"
+  overriden_shared_1_4: "value_overriden_group_shared_1_4"
+  group_2_1: "value_group_2_1"
+  group_2_2: "value_group_2_2"
+  overriden_group_2_1: "value_overriden_group_2_1"
+  overriden_group_2_2: "value_overriden_group_2_2"
+  shared_2_1: "value_group_shared_2_1"
+  shared_2_2: "value_group_shared_2_2"
+  shared_2_3: "value_group_shared_2_3"
+  shared_2_4: "value_group_shared_2_4"
+  overriden_shared_2_1: "value_overriden_group_shared_2_1"
+  overriden_shared_2_2: "value_overriden_group_shared_2_2"
+  overriden_shared_2_3: "value_overriden_group_shared_2_3"
+  overriden_shared_2_4: "value_overriden_group_shared_2_4"
 clouds:
   local:
     type: "local"
