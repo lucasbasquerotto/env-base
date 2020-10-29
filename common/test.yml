@@ -250,6 +250,9 @@ main_params:
 services:
   test_service_1:
     type: "custom-cloud/test/services/01"
+    credentials:
+      service_credential_1: "my_credential_1_1"
+      service_credential_2: "my_credential_1_2"
     params:
       param1: "value_1_1"
     group_params:
@@ -259,6 +262,9 @@ services:
     shared_group_params: "value_g1"
   test_service_2:
     type: "custom-cloud/test/services/02"
+    credentials:
+      service_credential_1: "my_credential_2_1"
+      service_credential_2: "my_credential_2_2"
     params:
       param1: "value_2_1"
     group_params:
@@ -396,3 +402,7 @@ credentials:
     host_pass: "123456"
   user:
     host_user: "root"
+  my_credential_1_1: "my_secret_1_1"
+  my_credential_1_2: "my_secret_1_2"
+  my_credential_2_1: "my_secret_2_1"
+  my_credential_2_2: "my_secret_2_2"
