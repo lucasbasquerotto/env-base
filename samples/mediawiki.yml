@@ -10,6 +10,11 @@ main:
         dir: "custom-cloud"
     clouds:
       - "{{ params.env_params.cloud_name }}"
+    params:
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
   local:
     repo: "cloud"
     env_repos:

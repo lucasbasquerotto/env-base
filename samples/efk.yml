@@ -11,14 +11,10 @@ main:
     clouds:
       - "{{ params.env_params.cloud_name }}"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
       hosts_content: |
         [main]
         localhost ansible_connection=local
         [host]
-      meta:
-        template_no_empty_lines: true
   local:
     repo: "cloud"
     env_repos:
