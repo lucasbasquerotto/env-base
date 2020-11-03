@@ -350,8 +350,8 @@ pods:
       enable_sync_setup: true
       enable_uploads_backup: true
       enable_uploads_setup: true
-      enable_backup_replica: true
-      enable_uploads_replica: true
+      enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
+      enable_uploads_replica: "{{ params.env_params.enable_uploads_replica | default(false) }}"
       migrate_wp_activate_all_plugins: false
       migrate_wp_plugins_to_activate: >-
         {{ params.env_params.migrate_wp_plugins_to_activate | default('') }}
