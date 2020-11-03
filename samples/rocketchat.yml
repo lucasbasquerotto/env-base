@@ -152,6 +152,15 @@ clouds:
         - "auto"
         - "dmz"
       x_digital_ocean_firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
         - name: "auto"
           tags: ["auto"]
           inbound_rules:

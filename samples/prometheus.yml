@@ -15,8 +15,6 @@ main:
         [main]
         localhost ansible_connection=local
         [host]
-      meta:
-        template_no_empty_lines: true
   local:
     repo: "cloud"
     env_repos:
