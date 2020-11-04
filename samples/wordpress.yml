@@ -8,7 +8,7 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    services:
+    initial_services:
       - "{{ params.env_params.vpn_service }}"
     params:
       hosts_content: |
@@ -150,7 +150,8 @@ main:
         [web]
 services:
   digital_ocean_vpn:
-    type: "custom-cloud/tasks/vpn/digital_ocean"
+    base_dir: "custom-cloud"
+    type: "tasks/vpn/digital_ocean.main.vpn"
     credentials:
       digital_ocean: "digital_ocean"
     params:
