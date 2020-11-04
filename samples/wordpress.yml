@@ -8,8 +8,8 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
+    services:
+      - "{{ params.env_params.vpn_service }}"
     params:
       hosts_content: |
         [main]
@@ -148,6 +148,53 @@ main:
         web
         [db]
         [web]
+services:
+  digital_ocean_vpn:
+    type: "custom-cloud/tasks/vpn/digital_ocean"
+    credentials:
+      digital_ocean: "digital_ocean"
+    params:
+      tags:
+        - "auto"
+        - "dmz"
+      firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "dmz"
+          tags: ["dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
 clouds:
   local:
     type: "local"
