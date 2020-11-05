@@ -249,7 +249,8 @@ main_params:
     after_delete_main: "custom-cloud/test/hooks/after_delete_main.yml"
 services:
   test_service_1:
-    type: "custom-cloud/test/services/01"
+    base_dir: "custom-cloud"
+    type: "test/services/01"
     credentials:
       service_credential_1: "my_credential_1_1"
       service_credential_2: "my_credential_1_2"
@@ -261,7 +262,8 @@ services:
     shared_params: ["value_s1"]
     shared_group_params: "value_g1"
   test_service_2:
-    type: "custom-cloud/test/services/02"
+    base_dir: "custom-cloud"
+    type: "test/services/02"
     credentials:
       service_credential_1: "my_credential_2_1"
       service_credential_2: "my_credential_2_2"
