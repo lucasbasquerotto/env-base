@@ -27,9 +27,14 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    destroy:
+      initial_services: true
+      final_services: true
     initial_services:
+      - "test_list_1"
       - name: "test_service_1_initial"
         key: "test_service_1"
+        tmp: true
         params:
           param1: "value_overriden_1_1"
         group_params:
@@ -37,7 +42,6 @@ main:
           param2: "overriden_group_1_2"
         shared_params: ["overriden_s1"]
         shared_group_params: "overriden_g1"
-      - "test_service_1"
       - name: "test_service_2_initial"
         key: "test_service_2"
         params:
@@ -47,11 +51,11 @@ main:
           param2: "overriden_group_2_2"
         shared_params: ["overriden_s2"]
         shared_group_params: "overriden_g2"
-      - "test_service_2"
     final_services:
-      - "test_service_2"
-      - name: "test_service_1_initial"
+      - "test_service_3"
+      - name: "test_service_1_final"
         key: "test_service_1"
+        tmp: true
         params:
           param1: "value_overriden_1_1"
         group_params:
@@ -59,6 +63,9 @@ main:
           param2: "overriden_group_1_2"
         shared_params: ["overriden_s1"]
         shared_group_params: "overriden_g1"
+      - name: "test_list_2_final"
+        key: "test_list_2"
+        tmp: true
     shared_params: ["local"]
   cloud_custom_tasks:
     repo: "cloud"
@@ -274,6 +281,43 @@ services:
       param2: "group_2_2"
     shared_params: ["value_s2"]
     shared_group_params: "value_g2"
+  test_service_3:
+    base_dir: "custom-cloud"
+    type: "test/services/03"
+    credentials:
+      service_credential_1: "my_credential_3_1"
+      service_credential_2: "my_credential_3_2"
+    params:
+      param1: "value_3_1"
+    group_params:
+      param1: "group_3_1"
+      param2: "group_3_2"
+    shared_params: ["value_s3"]
+    shared_group_params: "value_g3"
+  test_list_1:
+    list: true
+    services:
+      - "test_service_1"
+      - "test_service_2"
+  test_list_2:
+    list: true
+    services:
+      - name: "test_list_2_list_1"
+        key: "test_list_1"
+      - name: "test_list_2_service_2"
+        key: "test_service_2"
+        params:
+          param1: "value_overriden_2_1"
+        group_params:
+          param1: "overriden_group_2_1"
+          param2: "overriden_group_2_2"
+        shared_params: ["overriden_s2"]
+        shared_group_params: "overriden_g2"
+  test_list_3:
+    list: true
+    services:
+      - name: "test_list_3_service_2"
+        key: "test_service_2"
 service_shared_group_params:
   value_g1:
     param1: "shared_1_1"
@@ -295,6 +339,11 @@ service_shared_group_params:
     param2: "overriden_shared_2_2"
     param3: "overriden_shared_2_3"
     param4: "overriden_shared_2_4"
+  value_g3:
+    param1: "shared_3_1"
+    param2: "shared_3_2"
+    param3: "shared_3_3"
+    param4: "shared_3_4"
 service_shared_params:
   value_s1:
     param1: "value_shared_1_1"
@@ -312,6 +361,10 @@ service_shared_params:
     param1: "value_overriden_shared_2_1"
     param2: "value_overriden_shared_2_2"
     param3: "value_overriden_shared_2_3"
+  value_s3:
+    param1: "value_shared_3_1"
+    param2: "value_shared_3_2"
+    param3: "value_shared_3_3"
 service_params:
   group_1_1: "value_group_1_1"
   group_1_2: "value_group_1_2"
@@ -337,6 +390,12 @@ service_params:
   overriden_shared_2_2: "value_overriden_group_shared_2_2"
   overriden_shared_2_3: "value_overriden_group_shared_2_3"
   overriden_shared_2_4: "value_overriden_group_shared_2_4"
+  group_3_1: "value_group_3_1"
+  group_3_2: "value_group_3_2"
+  shared_3_1: "value_group_shared_3_1"
+  shared_3_2: "value_group_shared_3_2"
+  shared_3_3: "value_group_shared_3_3"
+  shared_3_4: "value_group_shared_3_4"
 clouds:
   local:
     type: "local"
@@ -408,3 +467,5 @@ credentials:
   my_credential_1_2: "my_secret_1_2"
   my_credential_2_1: "my_secret_2_1"
   my_credential_2_2: "my_secret_2_2"
+  my_credential_3_1: "my_secret_3_1"
+  my_credential_3_2: "my_secret_3_2"
