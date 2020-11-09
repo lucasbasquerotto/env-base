@@ -365,7 +365,7 @@ service_shared_params:
     param1: "value_shared_3_1"
     param2: "value_shared_3_2"
     param3: "value_shared_3_3"
-service_params:
+service_group_params:
   group_1_1: "value_group_1_1"
   group_1_2: "value_group_1_2"
   overriden_group_1_1: "value_overriden_group_1_1"
