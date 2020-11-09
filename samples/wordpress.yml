@@ -9,7 +9,8 @@ main:
       - repo: "custom_cloud"
         dir: "custom-cloud"
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      # - "{{ params.env_params.vpn_service }}"
+      - "godaddy_dns"
     params:
       hosts_content: |
         [main]
@@ -153,7 +154,7 @@ services:
     base_dir: "custom-cloud"
     type: "tasks/vpn/digital_ocean.main.vpn"
     credentials:
-      digital_ocean: "digital_ocean"
+      vpn: "digital_ocean"
     params:
       tags:
         - "auto"
@@ -196,6 +197,18 @@ services:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
+  godaddy_dns:
+    base_dir: "custom-cloud"
+    type: "tasks/dns/godaddy.main.dns"
+    credentials:
+      dns: "godaddy"
+    params:
+      name: "testdns"
+      zone: "{{ params.env_params.domain }}"
+      dns_type: "A"
+      record: "dev"
+      data_list:
+        - value: "8.8.8.8"
 clouds:
   local:
     type: "local"
