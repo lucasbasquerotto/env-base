@@ -208,6 +208,9 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    destroy:
+      initial_services: true
+      final_services: true
     initial_services: "{{ params.env_params.services }}"
     params:
       hosts_content: |
@@ -323,6 +326,14 @@ services:
       dns_type: "A"
       record: "dev"
       data_list: "{{ params.env_params.dns_records }}"
+  service_s3:
+    base_dir: "custom-cloud"
+    type: "tasks/s3/aws.main.s3"
+    credentials:
+      s3: "s3"
+    params:
+      bucket: "{{ params.env_params.s3_bucket }}"
+      permission: "public-read"
   test_service_1:
     base_dir: "custom-cloud"
     type: "test/services/01"
@@ -538,5 +549,6 @@ credentials:
   my_credential_3_1: "my_secret_3_1"
   my_credential_3_2: "my_secret_3_2"
   digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
+  s3: "{{ params.credentials.s3 | default({}) }}"
   godaddy: "{{ params.credentials.godaddy | default({}) }}"
   cloudflare: "{{ params.credentials.cloudflare | default({}) }}"
