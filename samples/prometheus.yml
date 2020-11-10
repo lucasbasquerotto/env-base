@@ -268,7 +268,8 @@ nodes:
         cpu: 2
       host_test:
         log_file: "/var/log/setup.log"
-        setup_last_line: "Setup Finished"
+        setup_finished_log_regex: "Setup Finished"
+        setup_finished_log_last_line: "Setup Finished"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
       x_digital_ocean_tags:
