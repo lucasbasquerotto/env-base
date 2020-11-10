@@ -203,6 +203,17 @@ main:
           - src: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
             dest: "tmp/test/ef2.yml"
     shared_params: ["local"]
+  services:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    initial_services: "{{ params.env_params.services }}"
+    params:
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
 main_shared_params:
   local:
     hosts_content: |
@@ -255,6 +266,63 @@ main_params:
     before_delete_main: "custom-cloud/test/hooks/before_delete_main.yml"
     after_delete_main: "custom-cloud/test/hooks/after_delete_main.yml"
 services:
+  digital_ocean_vpn:
+    base_dir: "custom-cloud"
+    type: "tasks/vpn/digital_ocean.main.vpn"
+    credentials:
+      vpn: "digital_ocean"
+    params:
+      tags:
+        - "auto"
+        - "dmz"
+      firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "dmz"
+          tags: ["dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+  service_dns:
+    base_dir: "custom-cloud"
+    type: "tasks/dns/{{ params.env_params.dns_name }}.main.dns"
+    credentials:
+      dns: "{{ params.env_params.dns_name }}"
+    params:
+      zone: "{{ params.env_params.domain }}"
+      dns_type: "A"
+      record: "dev"
+      data_list: "{{ params.env_params.dns_records }}"
   test_service_1:
     base_dir: "custom-cloud"
     type: "test/services/01"
@@ -469,3 +537,6 @@ credentials:
   my_credential_2_2: "my_secret_2_2"
   my_credential_3_1: "my_secret_3_1"
   my_credential_3_2: "my_secret_3_2"
+  digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
+  godaddy: "{{ params.credentials.godaddy | default({}) }}"
+  cloudflare: "{{ params.credentials.cloudflare | default({}) }}"
