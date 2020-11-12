@@ -71,11 +71,11 @@ main:
         dir: "custom-cloud"
     initial_services:
       - "test_top_1"
-    #   - name: "test_top_2"
-    #     tmp: true
-    # final_services:
-    #   - name: "test_top_1"
-    #     tmp: true
+      - name: "test_top_2"
+        tmp: true
+    final_services:
+      - name: "test_top_1"
+        tmp: true
     shared_params: ["local"]
   cloud_custom_tasks:
     repo: "cloud"
@@ -410,6 +410,7 @@ services:
   test_top_1:
     base_dir: "custom-cloud"
     type: "test/services/top"
+    namespace: "ext_test_top"
     credentials:
       service_credential_top_1: "my_credential_top_1_1"
       service_credential_top_2: "my_credential_top_1_2"
@@ -428,6 +429,7 @@ services:
   test_middle_1:
     base_dir: "custom-cloud"
     type: "test/services/middle"
+    namespace: "ext_test_middle1"
     credentials:
       service_credential_middle_1: "my_credential_middle_1_1"
       service_credential_middle_2: "my_credential_middle_1_2"
@@ -484,7 +486,7 @@ services:
           key: "test_bottom_1"
         - name: "test_middle_2_bottom_2"
           key: "test_bottom_2"
-      param1: "value_bottom_2_1"
+      param1: "value_middle_2_1"
     group_params:
       param1: "group_middle_2_1"
       param2: "group_middle_2_2"
@@ -544,6 +546,21 @@ service_shared_group_params:
     param2: "shared_bottom_1_2"
     param3: "shared_bottom_1_3"
     param4: "shared_bottom_1_4"
+  value_top_g2:
+    param1: "shared_top_2_1"
+    param2: "shared_top_2_2"
+    param3: "shared_top_2_3"
+    param4: "shared_top_2_4"
+  value_middle_g2:
+    param1: "shared_middle_2_1"
+    param2: "shared_middle_2_2"
+    param3: "shared_middle_2_3"
+    param4: "shared_middle_2_4"
+  value_bottom_g2:
+    param1: "shared_bottom_2_1"
+    param2: "shared_bottom_2_2"
+    param3: "shared_bottom_2_3"
+    param4: "shared_bottom_2_4"
 service_shared_params:
   value_s1:
     param1: "value_shared_1_1"
