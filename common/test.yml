@@ -64,6 +64,19 @@ main:
         key: "test_list_2"
         tmp: true
     shared_params: ["local"]
+  local_cloud_layer_services:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    initial_services:
+      - "test_top_1"
+    #   - name: "test_top_2"
+    #     tmp: true
+    # final_services:
+    #   - name: "test_top_1"
+    #     tmp: true
+    shared_params: ["local"]
   cloud_custom_tasks:
     repo: "cloud"
     env_repos:
@@ -394,6 +407,102 @@ services:
     services:
       - name: "test_list_3_service_2"
         key: "test_service_2"
+  test_top_1:
+    base_dir: "custom-cloud"
+    type: "test/services/top"
+    credentials:
+      service_credential_top_1: "my_credential_top_1_1"
+      service_credential_top_2: "my_credential_top_1_2"
+    params:
+      services:
+        - name: "test_top_1_middle_1"
+          key: "test_middle_1"
+        - name: "test_top_1_bottom_1"
+          key: "test_bottom_1"
+      param1: "value_top_1_1"
+    group_params:
+      param1: "group_top_1_1"
+      param2: "group_top_1_2"
+    shared_params: ["value_top_s1"]
+    shared_group_params: "value_top_g1"
+  test_middle_1:
+    base_dir: "custom-cloud"
+    type: "test/services/middle"
+    credentials:
+      service_credential_middle_1: "my_credential_middle_1_1"
+      service_credential_middle_2: "my_credential_middle_1_2"
+    params:
+      services:
+        - name: "test_middle_1_bottom_1"
+          key: "test_bottom_1"
+      param1: "value_middle_1_1"
+    group_params:
+      param1: "group_middle_1_1"
+      param2: "group_middle_1_2"
+    shared_params: ["value_middle_s1"]
+    shared_group_params: "value_middle_g1"
+  test_bottom_1:
+    base_dir: "custom-cloud"
+    type: "test/services/bottom"
+    credentials:
+      service_credential_bottom_1: "my_credential_bottom_1_1"
+      service_credential_bottom_2: "my_credential_bottom_1_2"
+    params:
+      param1: "value_bottom_1_1"
+    group_params:
+      param1: "group_bottom_1_1"
+      param2: "group_bottom_1_2"
+    shared_params: ["value_bottom_s1"]
+    shared_group_params: "value_bottom_g1"
+  test_top_2:
+    base_dir: "custom-cloud"
+    type: "test/services/top"
+    credentials:
+      service_credential_top_1: "my_credential_top_2_1"
+      service_credential_top_2: "my_credential_top_2_2"
+    params:
+      services:
+        - name: "test_top_2_middle_1"
+          key: "test_middle_1"
+        - name: "test_top_2_middle_2"
+          key: "test_middle_2"
+      param1: "value_top_2_1"
+    group_params:
+      param1: "group_top_2_1"
+      param2: "group_top_2_2"
+    shared_params: ["value_top_s2"]
+    shared_group_params: "value_top_g2"
+  test_middle_2:
+    base_dir: "custom-cloud"
+    type: "test/services/middle"
+    credentials:
+      service_credential_middle_1: "my_credential_middle_2_1"
+      service_credential_middle_2: "my_credential_middle_2_2"
+    params:
+      services:
+        - name: "test_middle_2_bottom_1"
+          key: "test_bottom_1"
+        - name: "test_middle_2_bottom_2"
+          key: "test_bottom_2"
+      param1: "value_bottom_2_1"
+    group_params:
+      param1: "group_middle_2_1"
+      param2: "group_middle_2_2"
+    shared_params: ["value_middle_s2"]
+    shared_group_params: "value_middle_g2"
+  test_bottom_2:
+    base_dir: "custom-cloud"
+    type: "test/services/bottom"
+    credentials:
+      service_credential_bottom_1: "my_credential_bottom_2_1"
+      service_credential_bottom_2: "my_credential_bottom_2_2"
+    params:
+      param1: "value_bottom_2_1"
+    group_params:
+      param1: "group_bottom_2_1"
+      param2: "group_bottom_2_2"
+    shared_params: ["value_bottom_s2"]
+    shared_group_params: "value_bottom_g2"
 service_shared_group_params:
   value_g1:
     param1: "shared_1_1"
@@ -420,6 +529,21 @@ service_shared_group_params:
     param2: "shared_3_2"
     param3: "shared_3_3"
     param4: "shared_3_4"
+  value_top_g1:
+    param1: "shared_top_1_1"
+    param2: "shared_top_1_2"
+    param3: "shared_top_1_3"
+    param4: "shared_top_1_4"
+  value_middle_g1:
+    param1: "shared_middle_1_1"
+    param2: "shared_middle_1_2"
+    param3: "shared_middle_1_3"
+    param4: "shared_middle_1_4"
+  value_bottom_g1:
+    param1: "shared_bottom_1_1"
+    param2: "shared_bottom_1_2"
+    param3: "shared_bottom_1_3"
+    param4: "shared_bottom_1_4"
 service_shared_params:
   value_s1:
     param1: "value_shared_1_1"
@@ -441,6 +565,30 @@ service_shared_params:
     param1: "value_shared_3_1"
     param2: "value_shared_3_2"
     param3: "value_shared_3_3"
+  value_top_s1:
+    param1: "value_shared_top_1_1"
+    param2: "value_shared_top_1_2"
+    param3: "value_shared_top_1_3"
+  value_middle_s1:
+    param1: "value_shared_middle_1_1"
+    param2: "value_shared_middle_1_2"
+    param3: "value_shared_middle_1_3"
+  value_bottom_s1:
+    param1: "value_shared_bottom_1_1"
+    param2: "value_shared_bottom_1_2"
+    param3: "value_shared_bottom_1_3"
+  value_top_s2:
+    param1: "value_shared_top_2_1"
+    param2: "value_shared_top_2_2"
+    param3: "value_shared_top_2_3"
+  value_middle_s2:
+    param1: "value_shared_middle_2_1"
+    param2: "value_shared_middle_2_2"
+    param3: "value_shared_middle_2_3"
+  value_bottom_s2:
+    param1: "value_shared_bottom_2_1"
+    param2: "value_shared_bottom_2_2"
+    param3: "value_shared_bottom_2_3"
 service_group_params:
   group_1_1: "value_group_1_1"
   group_1_2: "value_group_1_2"
@@ -472,6 +620,42 @@ service_group_params:
   shared_3_2: "value_group_shared_3_2"
   shared_3_3: "value_group_shared_3_3"
   shared_3_4: "value_group_shared_3_4"
+  group_top_1_1: "value_group_top_1_1"
+  group_top_1_2: "value_group_top_1_2"
+  group_middle_1_1: "value_group_middle_1_1"
+  group_middle_1_2: "value_group_middle_1_2"
+  group_bottom_1_1: "value_group_bottom_1_1"
+  group_bottom_1_2: "value_group_bottom_1_2"
+  shared_top_1_1: "value_group_shared_top_1_1"
+  shared_top_1_2: "value_group_shared_top_1_2"
+  shared_top_1_3: "value_group_shared_top_1_3"
+  shared_top_1_4: "value_group_shared_top_1_4"
+  shared_middle_1_1: "value_group_shared_middle_1_1"
+  shared_middle_1_2: "value_group_shared_middle_1_2"
+  shared_middle_1_3: "value_group_shared_middle_1_3"
+  shared_middle_1_4: "value_group_shared_middle_1_4"
+  shared_bottom_1_1: "value_group_shared_bottom_1_1"
+  shared_bottom_1_2: "value_group_shared_bottom_1_2"
+  shared_bottom_1_3: "value_group_shared_bottom_1_3"
+  shared_bottom_1_4: "value_group_shared_bottom_1_4"
+  group_top_2_1: "value_group_top_2_1"
+  group_top_2_2: "value_group_top_2_2"
+  group_middle_2_1: "value_group_middle_2_1"
+  group_middle_2_2: "value_group_middle_2_2"
+  group_bottom_2_1: "value_group_bottom_2_1"
+  group_bottom_2_2: "value_group_bottom_2_2"
+  shared_top_2_1: "value_group_shared_top_2_1"
+  shared_top_2_2: "value_group_shared_top_2_2"
+  shared_top_2_3: "value_group_shared_top_2_3"
+  shared_top_2_4: "value_group_shared_top_2_4"
+  shared_middle_2_1: "value_group_shared_middle_2_1"
+  shared_middle_2_2: "value_group_shared_middle_2_2"
+  shared_middle_2_3: "value_group_shared_middle_2_3"
+  shared_middle_2_4: "value_group_shared_middle_2_4"
+  shared_bottom_2_1: "value_group_shared_bottom_2_1"
+  shared_bottom_2_2: "value_group_shared_bottom_2_2"
+  shared_bottom_2_3: "value_group_shared_bottom_2_3"
+  shared_bottom_2_4: "value_group_shared_bottom_2_4"
 clouds:
   local:
     type: "local"
@@ -545,6 +729,18 @@ credentials:
   my_credential_2_2: "my_secret_2_2"
   my_credential_3_1: "my_secret_3_1"
   my_credential_3_2: "my_secret_3_2"
+  my_credential_top_1_1: "my_secret_top_1_1"
+  my_credential_top_1_2: "my_secret_top_1_2"
+  my_credential_middle_1_1: "my_secret_middle_1_1"
+  my_credential_middle_1_2: "my_secret_middle_1_2"
+  my_credential_bottom_1_1: "my_secret_bottom_1_1"
+  my_credential_bottom_1_2: "my_secret_bottom_1_2"
+  my_credential_top_2_1: "my_secret_top_2_1"
+  my_credential_top_2_2: "my_secret_top_2_2"
+  my_credential_middle_2_1: "my_secret_middle_2_1"
+  my_credential_middle_2_2: "my_secret_middle_2_2"
+  my_credential_bottom_2_1: "my_secret_bottom_2_1"
+  my_credential_bottom_2_2: "my_secret_bottom_2_2"
   digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
   s3: "{{ params.credentials.s3 | default({}) }}"
   godaddy: "{{ params.credentials.godaddy | default({}) }}"
