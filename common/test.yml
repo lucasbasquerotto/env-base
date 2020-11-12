@@ -2,7 +2,7 @@ name: "test ({{ params.name }})"
 ctxs: "{{ params.ctxs }}"
 container: ""
 main:
-  cloud_hooks:
+  local_cloud_hooks:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
@@ -22,7 +22,7 @@ main:
       custom_tasks: "test_custom_tasks"
     shared_params: ["local"]
     shared_group_params: "test_shared_group_params"
-  cloud_services:
+  local_cloud_services:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
@@ -97,7 +97,7 @@ main:
     group_params:
       custom_tasks: "main_custom_tasks"
     shared_params: ["local"]
-  repos:
+  local_repos:
     repo: "cloud"
     extra_repos:
       - repo: "env_base"
