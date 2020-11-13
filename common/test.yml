@@ -425,6 +425,7 @@ services:
       service_credential_top_1: "my_credential_top_1_1"
       service_credential_top_2: "my_credential_top_1_2"
     params:
+      flat_list: true
       services:
         - name: "test_top_1_middle_1"
           key: "test_middle_1"
@@ -446,10 +447,14 @@ services:
       service_credential_middle_1: "my_credential_middle_1_1"
       service_credential_middle_2: "my_credential_middle_1_2"
     params:
+      flat_list: false
       services:
         - name: "test_middle_1_bottom_1"
           key: "test_bottom_1"
           single: true
+        - name: "test_middle_1_list_1"
+          key: "test_list_1"
+          single: false
       param1: "value_middle_1_1"
     group_params:
       param1: "group_middle_1_1"
