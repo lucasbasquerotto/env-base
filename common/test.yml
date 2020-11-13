@@ -399,7 +399,7 @@ services:
     services:
       - name: "test_list_2_list_1"
         key: "test_list_1"
-        single: true
+        single: false
       - name: "test_list_2_service_2"
         key: "test_service_2"
         single: true
