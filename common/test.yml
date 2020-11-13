@@ -231,9 +231,6 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    destroy:
-      initial_services: true
-      final_services: true
     initial_services: "{{ params.env_params.services }}"
     params:
       hosts_content: |
@@ -295,6 +292,7 @@ services:
   digital_ocean_vpn:
     base_dir: "custom-cloud"
     type: "tasks/vpn/digital_ocean.main.vpn"
+    namespace: "ext_vpn"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -342,6 +340,7 @@ services:
   service_dns:
     base_dir: "custom-cloud"
     type: "tasks/dns/{{ params.env_params.dns_name }}.main.dns"
+    namespace: "ext_dns"
     credentials:
       dns: "{{ params.env_params.dns_name }}"
     params:
@@ -352,6 +351,7 @@ services:
   service_s3:
     base_dir: "custom-cloud"
     type: "tasks/s3/aws.main.s3"
+    namespace: "ext_s3"
     credentials:
       s3: "s3"
     params:
