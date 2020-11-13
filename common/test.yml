@@ -81,6 +81,15 @@ main:
       - name: "test_top_1"
         tmp: true
     shared_params: ["local"]
+  local_cloud_sequence_services:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    initial_services:
+      - name: "test_sequence"
+        tmp: true
+    shared_params: ["local"]
   cloud_custom_tasks:
     repo: "cloud"
     env_repos:
@@ -350,7 +359,7 @@ services:
       permission: "public-read"
   test_service_1:
     base_dir: "custom-cloud"
-    type: "test/services/01"
+    type: "test/services/general/01"
     credentials:
       service_credential_1: "my_credential_1_1"
       service_credential_2: "my_credential_1_2"
@@ -363,7 +372,7 @@ services:
     shared_group_params: "value_g1"
   test_service_2:
     base_dir: "custom-cloud"
-    type: "test/services/02"
+    type: "test/services/general/02"
     credentials:
       service_credential_1: "my_credential_2_1"
       service_credential_2: "my_credential_2_2"
@@ -376,7 +385,7 @@ services:
     shared_group_params: "value_g2"
   test_service_3:
     base_dir: "custom-cloud"
-    type: "test/services/03"
+    type: "test/services/general/03"
     credentials:
       service_credential_1: "my_credential_3_1"
       service_credential_2: "my_credential_3_2"
@@ -419,7 +428,7 @@ services:
         key: "test_service_2"
   test_top_1:
     base_dir: "custom-cloud"
-    type: "test/services/top"
+    type: "test/services/layer/top"
     namespace: "ext_test_top"
     credentials:
       service_credential_top_1: "my_credential_top_1_1"
@@ -445,7 +454,7 @@ services:
     shared_group_params: "value_top_g1"
   test_middle_1:
     base_dir: "custom-cloud"
-    type: "test/services/middle"
+    type: "test/services/layer/middle"
     namespace: "ext_test_middle"
     credentials:
       service_credential_middle_1: "my_credential_middle_1_1"
@@ -470,7 +479,7 @@ services:
     shared_group_params: "value_middle_g1"
   test_bottom_1:
     base_dir: "custom-cloud"
-    type: "test/services/bottom"
+    type: "test/services/layer/bottom"
     namespace: "ext_test_bottom"
     credentials:
       service_credential_bottom_1: "my_credential_bottom_1_1"
@@ -485,7 +494,7 @@ services:
     shared_group_params: "value_bottom_g1"
   test_top_2:
     base_dir: "custom-cloud"
-    type: "test/services/top"
+    type: "test/services/layer/top"
     namespace: "ext_test_top"
     credentials:
       service_credential_top_1: "my_credential_top_2_1"
@@ -504,7 +513,7 @@ services:
     shared_group_params: "value_top_g2"
   test_middle_2:
     base_dir: "custom-cloud"
-    type: "test/services/middle"
+    type: "test/services/layer/middle"
     namespace: "ext_test_middle"
     credentials:
       service_credential_middle_1: "my_credential_middle_2_1"
@@ -523,7 +532,7 @@ services:
     shared_group_params: "value_middle_g2"
   test_bottom_2:
     base_dir: "custom-cloud"
-    type: "test/services/bottom"
+    type: "test/services/layer/bottom"
     namespace: "ext_test_bottom"
     credentials:
       service_credential_bottom_1: "my_credential_bottom_2_1"
@@ -536,6 +545,52 @@ services:
       param2: "group_bottom_2_2"
     shared_params: ["value_bottom_s2"]
     shared_group_params: "value_bottom_g2"
+  test_sequence:
+    list: true
+    inverse_destroy: false
+    services:
+      - name: "test_before_sequence"
+        key: "test_before"
+        single: true
+      - name: "test_after_no_sequence_1"
+        key: "test_after"
+        params:
+          param_changed: "after_value_no_sequence_1"
+      - name: "test_adapter_sequence"
+        key: "test_adapter"
+        single: true
+        params:
+          input_service: "test_before_sequence"
+      - name: "test_after_no_sequence_2"
+        key: "test_after"
+        params:
+          param_changed: "after_value_no_sequence_2"
+      - name: "test_after_sequence"
+        key: "test_after"
+        single: true
+        params:
+          input_service: "test_adapter_sequence"
+      - name: "test_after_no_sequence_3"
+        key: "test_after"
+        params:
+          param_changed: "after_value_no_sequence_3"
+  test_before:
+    base_dir: "custom-cloud"
+    type: "test/services/sequence/before"
+    namespace: "ext_test_before"
+    params:
+      param_1: "value_1"
+      param_2: "value_2"
+  test_adapter:
+    base_dir: "custom-cloud"
+    type: "test/services/sequence/adapter"
+    namespace: "ext_test_adapter"
+  test_after:
+    base_dir: "custom-cloud"
+    type: "test/services/sequence/after"
+    namespace: "ext_test_after"
+    params:
+      param_unchanged: "after_value"
 service_shared_group_params:
   value_g1:
     param1: "shared_1_1"
