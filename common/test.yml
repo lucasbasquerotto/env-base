@@ -1,5 +1,6 @@
 name: "test ({{ params.name }})"
 ctxs: "{{ params.ctxs }}"
+migration: ""
 container: ""
 main:
   local_cloud_hooks:
@@ -253,7 +254,7 @@ main_shared_group_params:
   test_shared_group_params:
     prop1: "test_custom_roles"
     prop2: "test_custom_tasks"
-main_params:
+main_group_params:
   test_custom_roles:
     role1: "custom-cloud/test/roles/role1"
     role2: "custom-cloud/test/roles/role2"

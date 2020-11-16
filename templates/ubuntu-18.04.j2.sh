@@ -7,10 +7,10 @@ set -euo pipefail
 ########################
 
 # Name of the user to create and grant sudo privileges
-USERNAME="{{ host_user }}"
+USERNAME="{{ params.host_user }}"
 
 # Password of the user to create and grant sudo privileges
-PASSWORD="{{ host_pass }}"
+PASSWORD="{{ params.host_pass }}"
 
 # Additional public keys to add to the new sudo user
 # OTHER_PUBLIC_KEYS_TO_ADD=(
@@ -18,7 +18,7 @@ PASSWORD="{{ host_pass }}"
 #	"ssh-rsa AAAAB..."
 # )
 OTHER_PUBLIC_KEYS_TO_ADD=(
-{% for item in host_ssh_public_keys %}
+{% for item in params.host_ssh_public_keys %}
 	"{{ item }}"
 {% endfor %}
 )
