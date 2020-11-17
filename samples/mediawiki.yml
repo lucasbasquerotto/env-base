@@ -20,14 +20,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "mediawiki_local"
-    local:
-      pods:
-        - "mediawiki"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -74,14 +70,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "mediawiki_local"
-    local:
-      pods:
-        - "mediawiki"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -220,7 +212,7 @@ nodes:
   mediawiki_local:
     cloud: "local"
     base_dir: "/var/cloud"
-    credentials: "user"
+    credential: "user"
     pods:
       - name: "mediawiki"
         params:
@@ -372,7 +364,7 @@ pods:
         }}
       uploads_backup: "uploads_backup_sync"
       certbot: "certbot"
-pod_params:
+pod_group_params:
   mediawiki_custom_args:
     nginx:
       enable_validate_origin: true
