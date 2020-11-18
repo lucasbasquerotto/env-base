@@ -316,7 +316,7 @@ pods:
         }}
       db_backup: "db_backup_sync"
       certbot: "certbot"
-pod_params:
+pod_group_params:
   prometheus_custom_args:
     nginx:
       enable_validate_origin: true

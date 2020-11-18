@@ -428,7 +428,7 @@ pods:
         }}
       uploads_backup: "uploads_backup_sync"
       certbot: "certbot"
-pod_params:
+pod_group_params:
   wp_custom_args:
     nginx:
       enable_validate_origin: true
