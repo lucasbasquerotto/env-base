@@ -20,14 +20,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "prometheus_local"
-    local:
-      pods:
-        - "prometheus"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -73,14 +69,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "prometheus_local"
-    local:
-      pods:
-        - "prometheus"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -208,9 +200,8 @@ buckets:
     credentials: "backup_bucket"
 nodes:
   prometheus_local:
-    cloud: "local"
     base_dir: "/var/cloud"
-    credentials: "user"
+    credential: "user"
     pods:
       - name: "prometheus"
         params:
@@ -222,10 +213,6 @@ nodes:
           custom_domain: "prometheus_custom_domain_local"
           certbot: "certbot_local"
           db_backup: "db_backup_no_sync"
-    params:
-      size:
-        memory: "2gb"
-        cpu: 2
   prometheus:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"

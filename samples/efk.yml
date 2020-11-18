@@ -20,14 +20,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "efk_local"
-    local:
-      pods:
-        - "efk"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -73,14 +69,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "efk_local"
-    local:
-      pods:
-        - "efk"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -208,9 +200,8 @@ buckets:
     credentials: "backup_bucket"
 nodes:
   efk_local:
-    cloud: "local"
     base_dir: "/var/cloud"
-    credentials: "user"
+    credential: "user"
     pods:
       - name: "efk"
         params:
@@ -221,10 +212,6 @@ nodes:
           custom_args: "efk_custom_args"
           custom_domain: "efk_custom_domain_local"
           certbot: "certbot_local"
-    params:
-      size:
-        memory: "2gb"
-        cpu: 2
   efk:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
@@ -327,7 +314,7 @@ pods:
       db_setup: "db_setup"
       db_backup: "db_backup"
       certbot: "certbot"
-pod_params:
+pod_group_params:
   efk_custom_args:
     nginx:
       enable_validate_origin: true

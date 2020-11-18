@@ -20,11 +20,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "wp_local"
+        local: true
     extra_repos:
       - repo: "app"
         dir: "app-wp"
@@ -74,16 +73,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "wp_local"
-    local:
-      pods:
-        - "wp"
-      apps:
-        - "wp_local"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -268,9 +261,8 @@ buckets:
     credentials: "backup_replica_bucket"
 nodes:
   wp_local:
-    cloud: "local"
     base_dir: "/var/cloud"
-    credentials: "user"
+    credential: "user"
     pods:
       - name: "wp"
         params:
@@ -288,10 +280,6 @@ nodes:
           db_backup: "db_backup_no_sync"
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
-    params:
-      size:
-        memory: "2gb"
-        cpu: 2
   wp:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"

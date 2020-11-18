@@ -210,7 +210,6 @@ buckets:
     credentials: "backup_replica_bucket"
 nodes:
   mediawiki_local:
-    cloud: "local"
     base_dir: "/var/cloud"
     credential: "user"
     pods:
@@ -225,10 +224,6 @@ nodes:
           db_backup: "db_backup_no_sync"
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
-    params:
-      size:
-        memory: "2gb"
-        cpu: 2
   mediawiki:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"

@@ -20,14 +20,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "rocketchat_local"
-    local:
-      pods:
-        - "rocketchat"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -74,14 +70,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     nodes:
       - name: "app"
         key: "rocketchat_local"
-    local:
-      pods:
-        - "rocketchat"
+        local: true
     params:
       hosts_content: |
         [main]
@@ -209,9 +201,8 @@ buckets:
     credentials: "backup_bucket"
 nodes:
   rocketchat_local:
-    cloud: "local"
     base_dir: "/var/cloud"
-    credentials: "user"
+    credential: "user"
     pods:
       - name: "rocketchat"
         params:
@@ -224,10 +215,6 @@ nodes:
           db_backup: "db_backup_no_sync"
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
-    params:
-      size:
-        memory: "2gb"
-        cpu: 2
   rocketchat:
     cloud: "{{ params.env_params.cloud_name }}"
     base_dir: "/var/cloud"
@@ -357,7 +344,7 @@ pods:
         }}
       uploads_backup: "uploads_backup_sync"
       certbot: "certbot"
-pod_params:
+pod_group_params:
   rocketchat_custom_args:
     nginx:
       enable_validate_origin: true
