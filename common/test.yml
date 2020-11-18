@@ -780,7 +780,6 @@ dns:
     credentials: "fake"
 nodes:
   custom:
-    cloud: "custom"
     base_dir: "/var/cloud"
     credentials: "fake_user"
     params:
@@ -788,8 +787,6 @@ nodes:
       region: {}
       size: {}
   custom_local:
-    cloud: "local"
-    base_dir: "/var/cloud"
     credentials: "user"
     params:
       instance: {}

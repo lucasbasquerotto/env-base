@@ -138,79 +138,78 @@ main:
         web
         [db]
         [web]
-clouds:
-  local:
-    type: "local"
-  digital_ocean:
-    type: "digital_ocean"
-    credentials: "digital_ocean"
-    params:
-      x_digital_ocean_tags:
-        - "auto"
-        - "dmz"
-      x_digital_ocean_firewalls:
-        - name: "private"
-          tags: ["auto"]
-          inbound_rules:
-            - ports: "9080"
-              sources:
-                addresses: "{{ params.env_params.private_ips }}"
-            - ports: "9443"
-              sources:
-                addresses: "{{ params.env_params.private_ips }}"
-        - name: "auto"
-          tags: ["auto"]
-          inbound_rules:
-            - ports: "22"
-              sources:
-                tags: ["main"]
-          outbound_rules:
-            - protocol: "tcp"
-              ports: "1-65535"
-              destinations:
-                addresses: ["0.0.0.0/0", "::/0"]
-            - protocol: "udp"
-              ports: "1-65535"
-              destinations:
-                addresses: ["0.0.0.0/0", "::/0"]
-            - protocol: "icmp"
-              ports: "1-65535"
-              destinations:
-                addresses: ["0.0.0.0/0", "::/0"]
-        - name: "dmz"
-          tags: ["dmz"]
-          inbound_rules:
-            - ports: "80"
-              sources:
-                addresses: ["0.0.0.0/0", "::/0"]
-            - ports: "443"
-              sources:
-                addresses: ["0.0.0.0/0", "::/0"]
-dns:
-  cloudflare:
-    type: "cloudflare"
-    zone: "{{ params.env_params.domain }}"
-    credentials: "cloudflare"
-  godaddy:
-    type: "godaddy"
-    zone: "{{ params.env_params.domain }}"
-    credentials: "godaddy"
-buckets:
-  mediawiki_uploads:
-    name: "{{ params.env_params.uploads_bucket_name }}"
-    credentials: "uploads_bucket"
-  mediawiki_backup:
-    name: "{{ params.env_params.backup_bucket_name }}"
-    credentials: "backup_bucket"
-  mediawiki_uploads_replica:
-    name: "{{ params.env_params.uploads_replica_bucket_name }}"
-    credentials: "uploads_replica_bucket"
-  mediawiki_backup_replica:
-    name: "{{ params.env_params.backup_replica_bucket_name }}"
-    credentials: "backup_replica_bucket"
+# clouds:
+#   local:
+#     type: "local"
+#   digital_ocean:
+#     type: "digital_ocean"
+#     credentials: "digital_ocean"
+#     params:
+#       x_digital_ocean_tags:
+#         - "auto"
+#         - "dmz"
+#       x_digital_ocean_firewalls:
+#         - name: "private"
+#           tags: ["auto"]
+#           inbound_rules:
+#             - ports: "9080"
+#               sources:
+#                 addresses: "{{ params.env_params.private_ips }}"
+#             - ports: "9443"
+#               sources:
+#                 addresses: "{{ params.env_params.private_ips }}"
+#         - name: "auto"
+#           tags: ["auto"]
+#           inbound_rules:
+#             - ports: "22"
+#               sources:
+#                 tags: ["main"]
+#           outbound_rules:
+#             - protocol: "tcp"
+#               ports: "1-65535"
+#               destinations:
+#                 addresses: ["0.0.0.0/0", "::/0"]
+#             - protocol: "udp"
+#               ports: "1-65535"
+#               destinations:
+#                 addresses: ["0.0.0.0/0", "::/0"]
+#             - protocol: "icmp"
+#               ports: "1-65535"
+#               destinations:
+#                 addresses: ["0.0.0.0/0", "::/0"]
+#         - name: "dmz"
+#           tags: ["dmz"]
+#           inbound_rules:
+#             - ports: "80"
+#               sources:
+#                 addresses: ["0.0.0.0/0", "::/0"]
+#             - ports: "443"
+#               sources:
+#                 addresses: ["0.0.0.0/0", "::/0"]
+# dns:
+#   cloudflare:
+#     type: "cloudflare"
+#     zone: "{{ params.env_params.domain }}"
+#     credentials: "cloudflare"
+#   godaddy:
+#     type: "godaddy"
+#     zone: "{{ params.env_params.domain }}"
+#     credentials: "godaddy"
+# buckets:
+#   mediawiki_uploads:
+#     name: "{{ params.env_params.uploads_bucket_name }}"
+#     credentials: "uploads_bucket"
+#   mediawiki_backup:
+#     name: "{{ params.env_params.backup_bucket_name }}"
+#     credentials: "backup_bucket"
+#   mediawiki_uploads_replica:
+#     name: "{{ params.env_params.uploads_replica_bucket_name }}"
+#     credentials: "uploads_replica_bucket"
+#   mediawiki_backup_replica:
+#     name: "{{ params.env_params.backup_replica_bucket_name }}"
+#     credentials: "backup_replica_bucket"
 nodes:
   mediawiki_local:
-    base_dir: "/var/cloud"
     credential: "user"
     pods:
       - name: "mediawiki"
