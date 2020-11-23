@@ -8,8 +8,8 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
     params:
       hosts_content: |
         [main]
@@ -36,17 +36,18 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    destroy:
-      nodes: true
-      buckets: true
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
-    buckets:
-      - "mediawiki_uploads"
-      - "mediawiki_backup"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+    # destroy:
+    #   nodes: true
+    #   buckets: true
+    # buckets:
+    #   - "mediawiki_uploads"
+    #   - "mediawiki_backup"
     nodes:
       - name: "app"
         key: "mediawiki"
+        can_destroy: true
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -86,14 +87,16 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    destroy:
-      nodes: true
-      buckets: true
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
-    buckets:
-      - "mediawiki_uploads"
-      - "mediawiki_backup"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+    # destroy:
+    #   nodes: true
+    #   buckets: true
+    # clouds:
+    #   - "{{ params.env_params.cloud_name }}"
+    # buckets:
+    #   - "mediawiki_uploads"
+    #   - "mediawiki_backup"
     nodes:
       - name: "db"
         key: "mediawiki"
@@ -138,6 +141,83 @@ main:
         web
         [db]
         [web]
+services:
+  node_dns_service:
+    base_dir: "custom-cloud"
+    type: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns"
+    namespace: "ext_dns"
+    credentials:
+      dns: "{{ params.env_params.dns_provider }}"
+    params:
+      zone: "{{ params.env_params.domain }}"
+  digital_ocean_vpn:
+    base_dir: "custom-cloud"
+    type: "tasks/vpn/digital_ocean.main.vpn"
+    credentials:
+      vpn: "digital_ocean"
+    params:
+      tags:
+        - "auto"
+        - "dmz"
+      firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "dmz"
+          tags: ["dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+  digital_ocean_node:
+    base_dir: "custom-cloud"
+    type: "tasks/node/digital_ocean.main.node"
+    credentials:
+      node: "digital_ocean"
+    params:
+      instance:
+        image: "ubuntu-18-04-x64"
+        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        ipv6: "yes"
+      region:
+        name: "ams3"
+        region: "ams"
+        zone: "3"
+      size:
+        name: "s-1vcpu-1gb"
+        memory: "1gb"
+        cpu: 1
+      tags:
+        - "auto"
+        - "dmz"
 # clouds:
 #   local:
 #     type: "local"
@@ -224,9 +304,10 @@ nodes:
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
   mediawiki:
-    cloud: "{{ params.env_params.cloud_name }}"
+    service: "{{ params.env_params.node_service }}"
+    dns_service: "node_dns_service"
     base_dir: "/var/cloud"
-    credentials: "host"
+    credential: "host"
     pods:
       - name: "mediawiki"
         params:
@@ -260,27 +341,12 @@ nodes:
         - user: "root"
           src_file: "{{ params.env.repo_dir }}/cron/app.cron"
           dest_dir: "/var/spool/cron/crontabs"
-      instance:
-        image: "ubuntu-18-04-x64"
-        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
-        ipv6: "yes"
-      region:
-        name: "ams3"
-        region: "ams"
-        zone: "3"
-      size:
-        name: "s-1vcpu-1gb"
-        memory: "1gb"
-        cpu: 1
       host_test:
         log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
         setup_finished_log_last_line: "Setup Finished"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
-      x_digital_ocean_tags:
-        - "auto"
-        - "dmz"
 pods:
   mediawiki:
     repo: "pod"
