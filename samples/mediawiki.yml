@@ -24,6 +24,9 @@ main:
       - name: "app"
         key: "mediawiki_local"
         local: true
+        params:
+          test1: "abc"
+          test2: "def"
     params:
       hosts_content: |
         [main]
