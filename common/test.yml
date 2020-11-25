@@ -259,6 +259,8 @@ services:
     base_dir: "custom-cloud"
     type: "tasks/vpn/digital_ocean.main.vpn"
     namespace: "ext_vpn"
+    params_schema: "tasks/vpn/digital_ocean.params.schema.vpn.yml"
+    credentials_schema: "tasks/vpn/digital_ocean.credentials.schema.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -320,6 +322,8 @@ services:
     base_dir: "custom-cloud"
     type: "tasks/s3/aws.main.s3"
     namespace: "ext_s3"
+    params_schema: "tasks/s3/params.schema.s3.yml"
+    credentials_schema: "tasks/s3/credentials.schema.s3.yml"
     credentials:
       s3: "s3"
     params:
