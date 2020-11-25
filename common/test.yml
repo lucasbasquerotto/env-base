@@ -307,6 +307,8 @@ services:
     base_dir: "custom-cloud"
     type: "tasks/dns/{{ params.env_params.dns_name }}.main.dns"
     namespace: "ext_dns"
+    params_schema: "tasks/dns/params.schema.dns.yml"
+    credentials_schema: "tasks/dns/{{ params.env_params.dns_name }}.credentials.schema.dns.yml"
     credentials:
       dns: "{{ params.env_params.dns_name }}"
     params:
