@@ -8,8 +8,6 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "local"
     params:
       x_custom_roles:
         - "role1"
@@ -34,6 +32,7 @@ main:
         key: "test_service_1"
         single: true
         tmp: true
+        can_destroy: true
         params:
           param1: "value_overriden_1_1"
         group_params:
@@ -81,6 +80,7 @@ main:
     final_services:
       - name: "test_top_1"
         tmp: true
+        can_destroy: true
     shared_params: ["local"]
   local_cloud_sequence_services:
     repo: "cloud"
@@ -90,36 +90,6 @@ main:
     initial_services:
       - name: "test_sequence"
         tmp: true
-    shared_params: ["local"]
-  cloud_custom_tasks:
-    repo: "cloud"
-    env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
-    clouds:
-      - "custom"
-    dns:
-      - name: "custom"
-        dns_type: "NS"
-        record: "dev"
-        data_list:
-          - value: "ns1dev.test.com"
-          - value: "ns2dev.test.com"
-      - name: "custom"
-        dns_type: "A"
-        record: "dev"
-        data_list:
-          - value: "1.2.3.4"
-    nodes:
-      - "custom"
-      - "custom_local"
-    run_stages:
-      - tasks:
-          - name: "custom"
-            nodes: ["custom_local"]
-            nodes_tasks: true
-    group_params:
-      custom_tasks: "main_custom_tasks"
     shared_params: ["local"]
   local_repos:
     repo: "cloud"
@@ -261,11 +231,6 @@ main_group_params:
   test_custom_tasks:
     task1: "custom-cloud/test/tasks/task1.yml"
     task2: "custom-cloud/test/tasks/task2.yml"
-  main_custom_tasks:
-    cloud: "custom-cloud/test/tasks/cloud.yml"
-    dns: "custom-cloud/test/tasks/dns.yml"
-    node: "custom-cloud/test/tasks/node.yml"
-    run: "custom-cloud/test/tasks/run.yml"
   test_hooks:
     before_initial_services: "custom-cloud/test/hooks/before_initial_services.yml"
     after_initial_services: "custom-cloud/test/hooks/after_initial_services.yml"
@@ -760,34 +725,16 @@ service_group_params:
   shared_bottom_2_2: "value_group_shared_bottom_2_2"
   shared_bottom_2_3: "value_group_shared_bottom_2_3"
   shared_bottom_2_4: "value_group_shared_bottom_2_4"
-clouds:
-  local:
-    type: "local"
-  custom:
-    custom_task: true
-    type: "cloud"
-    node_type: "node"
-    credentials: "fake"
-    params:
-      x_test_param_1: "test_value_1"
-      x_test_param_2: "test_value_2"
-      x_test_param_3: "test_value_3"
-dns:
-  custom:
-    custom_task: true
-    type: "dns"
-    zone: "test.com"
-    credentials: "fake"
 nodes:
   custom:
     base_dir: "/var/cloud"
-    credentials: "fake_user"
+    credential: "fake_user"
     params:
       instance: {}
       region: {}
       size: {}
   custom_local:
-    credentials: "user"
+    credential: "user"
     params:
       instance: {}
       region: {}
