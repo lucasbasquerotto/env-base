@@ -330,7 +330,7 @@ nodes:
 pods:
   mediawiki:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "custom-pod/mediawiki/ctx.yml"
     fast_prepare: "true"
     env_repos:
