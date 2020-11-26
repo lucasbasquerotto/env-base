@@ -349,6 +349,24 @@ services:
     credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
     credentials:
       node: "digital_ocean"
+    params:
+      image_id: "ubuntu-18-04-x64"
+      ipv6: true
+      region_id: "ams3"
+      size_id: "s-1vcpu-1gb"
+      tags:
+        - "auto"
+        - "dmz"
+  node_dns_service:
+    base_dir: "custom-cloud"
+    type: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns"
+    namespace: "ext_dns"
+    params_schema: "tasks/dns/params.schema.dns.yml"
+    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider }}.credentials.schema.dns.yml"
+    credentials:
+      dns: "{{ params.env_params.dns_provider }}"
+    params:
+      zone: "{{ params.env_params.domain }}"
   test_service_1:
     base_dir: "custom-cloud"
     type: "test/services/general/01"
@@ -754,9 +772,16 @@ service_group_params:
 nodes:
   digital_ocean_node:
     service: "digital_ocean_node_service"
+    dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     credential: "fake_user"
     params:
+      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+      dns_service_params_list:
+        - record: "test1"
+          ttl: 100
+        - record: "test2"
+          ttl: 200
       host_test:
         log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
