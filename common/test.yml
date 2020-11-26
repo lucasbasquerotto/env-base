@@ -27,11 +27,11 @@ main:
       - repo: "custom_cloud"
         dir: "custom-cloud"
     initial_services:
-      - "test_list_1"
+      - name: "test_list_1"
+        absent: true
       - name: "test_service_1_initial"
         key: "test_service_1"
         single: true
-        absent: True
         tmp: true
         can_destroy: true
         params:
@@ -44,6 +44,7 @@ main:
       - name: "test_service_2_initial"
         key: "test_service_2"
         single: true
+        absent: true
         params:
           param1: "value_overriden_2_1"
         group_params:
@@ -217,9 +218,9 @@ main:
     nodes:
       - name: "test_{{ params.env_params.node }}"
         key: "{{ params.env_params.node }}"
-        absent: True
-        tmp: True
-        can_destroy: True
+        absent: true
+        tmp: true
+        can_destroy: true
     params:
       hosts_content: |
         [main]
@@ -413,13 +414,13 @@ services:
     shared_group_params: "value_g3"
   test_list_1:
     list: true
-    flat_list: true
     services:
-      - "test_service_1"
-      - "test_service_2"
+      - name: "test_service_1"
+        single: true
+      - name: "test_service_2"
+        single: true
   test_list_2:
     list: true
-    flat_list: false
     services:
       - name: "test_list_2_list_1"
         key: "test_list_1"
@@ -427,6 +428,7 @@ services:
       - name: "test_list_2_service_2"
         key: "test_service_2"
         single: true
+        absent: true
         params:
           param1: "value_overriden_2_1"
         group_params:
@@ -436,7 +438,6 @@ services:
         shared_group_params: "overriden_g2"
   test_list_3:
     list: true
-    flat_list: true
     services:
       - name: "test_list_3_service_2"
         single: true
@@ -449,7 +450,6 @@ services:
       service_credential_top_1: "my_credential_top_1_1"
       service_credential_top_2: "my_credential_top_1_2"
     params:
-      flat_list: true
       result_service_name: "test_top_1_middle_1"
       result_value: "test_top_1"
       services:
@@ -475,7 +475,6 @@ services:
       service_credential_middle_1: "my_credential_middle_1_1"
       service_credential_middle_2: "my_credential_middle_1_2"
     params:
-      flat_list: false
       result_service_name: "test_middle_1_bottom_1"
       services:
         - name: "test_middle_1_bottom_1"
