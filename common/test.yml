@@ -775,6 +775,11 @@ nodes:
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     credential: "fake_user"
+    pods:
+      - name: "test_pod"
+        key: "custom"
+        params:
+          pod_param_4: "value_4"
     params:
       user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
       dns_service_params_list:
@@ -790,10 +795,23 @@ nodes:
         setup_finished_timeout: 300
   custom_local:
     credential: "user"
+pods:
+  custom:
+    repo: "pod"
+    env_repos:
+      - repo: "custom_pod"
+        dir: "custom-pod"
+    ctx: "custom-pod/test/ctx.yml"
+    params_schema: "custom-pod/test/params.schema.yml"
+    credentials_schema: "custom-pod/test/credentials.schema.yml"
+    root: true
+    fast_prepare: "true"
+    credentials:
+      pod_credential_1: my_credential_1_1
+      pod_credential_2: my_credential_1_2
     params:
-      instance: {}
-      region: {}
-      size: {}
+      pod_param_1: "value_1"
+      pod_param_2: "value_2"
 tasks:
   custom:
     type: "task"

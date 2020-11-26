@@ -330,12 +330,12 @@ nodes:
 pods:
   mediawiki:
     repo: "pod"
-    root: true
-    ctx: "custom-pod/mediawiki/ctx.yml"
-    fast_prepare: "true"
     env_repos:
       - repo: "custom_pod"
         dir: "custom-pod"
+    root: true
+    ctx: "custom-pod/mediawiki/ctx.yml"
+    fast_prepare: "true"
     credentials:
       mediawiki: "mediawiki"
       minio_gateway: "minio_gateway"
