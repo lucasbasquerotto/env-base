@@ -31,6 +31,7 @@ main:
       - name: "test_service_1_initial"
         key: "test_service_1"
         single: true
+        absent: True
         tmp: true
         can_destroy: true
         params:
@@ -214,7 +215,11 @@ main:
       - repo: "custom_cloud"
         dir: "custom-cloud"
     nodes:
-      - "{{ params.env_params.node }}"
+      - name: "test_{{ params.env_params.node }}"
+        key: "{{ params.env_params.node }}"
+        absent: True
+        tmp: True
+        can_destroy: True
     params:
       hosts_content: |
         [main]
@@ -269,8 +274,8 @@ main_group_params:
 services:
   digital_ocean_vpn:
     base_dir: "custom-cloud"
-    type: "tasks/vpn/digital_ocean.main.vpn"
     namespace: "ext_vpn"
+    task: "tasks/vpn/digital_ocean.main.vpn.yml"
     params_schema: "tasks/vpn/digital_ocean.params.schema.vpn.yml"
     credentials_schema: "tasks/vpn/digital_ocean.credentials.schema.vpn.yml"
     credentials:
@@ -319,8 +324,8 @@ services:
                 addresses: ["0.0.0.0/0", "::/0"]
   service_dns:
     base_dir: "custom-cloud"
-    type: "tasks/dns/{{ params.env_params.dns_name }}.main.dns"
     namespace: "ext_dns"
+    task: "tasks/dns/{{ params.env_params.dns_name }}.main.dns.yml"
     params_schema: "tasks/dns/params.schema.dns.yml"
     credentials_schema: "tasks/dns/{{ params.env_params.dns_name }}.credentials.schema.dns.yml"
     credentials:
@@ -332,8 +337,8 @@ services:
       data_list: "{{ params.env_params.dns_records }}"
   service_s3:
     base_dir: "custom-cloud"
-    type: "tasks/s3/aws.main.s3"
     namespace: "ext_s3"
+    task: "tasks/s3/aws.main.s3.yml"
     params_schema: "tasks/s3/params.schema.s3.yml"
     credentials_schema: "tasks/s3/credentials.schema.s3.yml"
     credentials:
@@ -343,8 +348,8 @@ services:
       permission: "public-read"
   digital_ocean_node_service:
     base_dir: "custom-cloud"
-    type: "tasks/node/digital_ocean.main.node"
     namespace: "ext_node"
+    task: "tasks/node/digital_ocean.main.node.yml"
     params_schema: "tasks/node/digital_ocean.params.schema.node.yml"
     credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
     credentials:
@@ -359,8 +364,8 @@ services:
         - "dmz"
   node_dns_service:
     base_dir: "custom-cloud"
-    type: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns"
     namespace: "ext_dns"
+    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
     params_schema: "tasks/dns/params.schema.dns.yml"
     credentials_schema: "tasks/dns/{{ params.env_params.dns_provider }}.credentials.schema.dns.yml"
     credentials:
@@ -369,7 +374,7 @@ services:
       zone: "{{ params.env_params.domain }}"
   test_service_1:
     base_dir: "custom-cloud"
-    type: "test/services/general/01"
+    task: "test/services/general/01.yml"
     credentials:
       service_credential_1: "my_credential_1_1"
       service_credential_2: "my_credential_1_2"
@@ -382,7 +387,7 @@ services:
     shared_group_params: "value_g1"
   test_service_2:
     base_dir: "custom-cloud"
-    type: "test/services/general/02"
+    task: "test/services/general/02.yml"
     credentials:
       service_credential_1: "my_credential_2_1"
       service_credential_2: "my_credential_2_2"
@@ -395,7 +400,7 @@ services:
     shared_group_params: "value_g2"
   test_service_3:
     base_dir: "custom-cloud"
-    type: "test/services/general/03"
+    task: "test/services/general/03.yml"
     credentials:
       service_credential_1: "my_credential_3_1"
       service_credential_2: "my_credential_3_2"
@@ -438,7 +443,7 @@ services:
         key: "test_service_2"
   test_top_1:
     base_dir: "custom-cloud"
-    type: "test/services/layer/top"
+    task: "test/services/layer/top.yml"
     namespace: "ext_test_top"
     credentials:
       service_credential_top_1: "my_credential_top_1_1"
@@ -464,7 +469,7 @@ services:
     shared_group_params: "value_top_g1"
   test_middle_1:
     base_dir: "custom-cloud"
-    type: "test/services/layer/middle"
+    task: "test/services/layer/middle.yml"
     namespace: "ext_test_middle"
     credentials:
       service_credential_middle_1: "my_credential_middle_1_1"
@@ -489,7 +494,7 @@ services:
     shared_group_params: "value_middle_g1"
   test_bottom_1:
     base_dir: "custom-cloud"
-    type: "test/services/layer/bottom"
+    task: "test/services/layer/bottom.yml"
     namespace: "ext_test_bottom"
     credentials:
       service_credential_bottom_1: "my_credential_bottom_1_1"
@@ -504,7 +509,7 @@ services:
     shared_group_params: "value_bottom_g1"
   test_top_2:
     base_dir: "custom-cloud"
-    type: "test/services/layer/top"
+    task: "test/services/layer/top.yml"
     namespace: "ext_test_top"
     credentials:
       service_credential_top_1: "my_credential_top_2_1"
@@ -523,7 +528,7 @@ services:
     shared_group_params: "value_top_g2"
   test_middle_2:
     base_dir: "custom-cloud"
-    type: "test/services/layer/middle"
+    task: "test/services/layer/middle.yml"
     namespace: "ext_test_middle"
     credentials:
       service_credential_middle_1: "my_credential_middle_2_1"
@@ -542,7 +547,7 @@ services:
     shared_group_params: "value_middle_g2"
   test_bottom_2:
     base_dir: "custom-cloud"
-    type: "test/services/layer/bottom"
+    task: "test/services/layer/bottom.yml"
     namespace: "ext_test_bottom"
     credentials:
       service_credential_bottom_1: "my_credential_bottom_2_1"
@@ -557,7 +562,6 @@ services:
     shared_group_params: "value_bottom_g2"
   test_sequence:
     list: true
-    inverse_destroy: false
     services:
       - name: "test_before_sequence"
         key: "test_before"
@@ -586,18 +590,18 @@ services:
           param_changed: "after_value_no_sequence_3"
   test_before:
     base_dir: "custom-cloud"
-    type: "test/services/sequence/before"
+    task: "test/services/sequence/before.yml"
     namespace: "ext_test_before"
     params:
       param_1: "value_1"
       param_2: "value_2"
   test_adapter:
     base_dir: "custom-cloud"
-    type: "test/services/sequence/adapter"
+    task: "test/services/sequence/adapter.yml"
     namespace: "ext_test_adapter"
   test_after:
     base_dir: "custom-cloud"
-    type: "test/services/sequence/after"
+    task: "test/services/sequence/after.yml"
     namespace: "ext_test_after"
     params:
       param_unchanged: "after_value"
