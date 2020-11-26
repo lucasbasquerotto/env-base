@@ -210,13 +210,27 @@ main:
         [main]
         localhost ansible_connection=local
         [host]
+  node_local:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    nodes:
+      - name: "test_node_local"
+        key: "custom_local"
+        local: true
+    params:
+      hosts_content: |
+        [main]
+        localhost ansible_connection=local
+        [host]
   node:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
     nodes:
-      - name: "test_{{ params.env_params.node }}"
+      - name: "app"
         key: "{{ params.env_params.node }}"
         absent: true
         tmp: true
@@ -226,6 +240,9 @@ main:
         [main]
         localhost ansible_connection=local
         [host]
+        [host:children]
+        app
+        [app]
 main_shared_params:
   local:
     hosts_content: |
@@ -798,6 +815,14 @@ nodes:
         setup_finished_timeout: 300
   custom_local:
     credential: "user"
+    # pods:
+    #   - name: "test_pod_local"
+    #     key: "custom"
+    params:
+      cron:
+        - user: "root"
+          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest_dir: "/var/spool/cron/crontabs"
 pods:
   custom:
     repo: "pod"
