@@ -815,14 +815,14 @@ nodes:
         setup_finished_timeout: 300
   custom_local:
     credential: "user"
-    # pods:
-    #   - name: "test_pod_local"
-    #     key: "custom"
-    params:
-      cron:
-        - user: "root"
-          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-          dest_dir: "/var/spool/cron/crontabs"
+    pods:
+      - name: "test_pod_local"
+        key: "custom"
+    # params:
+    #   cron:
+    #     - user: "root"
+    #       src_file: "{{ params.env.repo_dir }}/cron/app.cron"
+    #       dest_dir: "/var/spool/cron/crontabs"
 pods:
   custom:
     repo: "pod"
