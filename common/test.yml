@@ -834,6 +834,7 @@ pods:
     credentials_schema: "custom-pod/test/credentials.schema.yml"
     root: true
     fast_prepare: 'false'
+    skip_unchanged: true
     credentials:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
