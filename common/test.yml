@@ -833,11 +833,12 @@ pods:
     params_schema: "custom-pod/test/params.schema.yml"
     credentials_schema: "custom-pod/test/credentials.schema.yml"
     root: true
-    fast_prepare: "true"
+    fast_prepare: 'false'
     credentials:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
     params:
+      custom_dir: "custom-pod"
       pod_param_1: "value_1"
       pod_param_2: "value_2"
 tasks:
