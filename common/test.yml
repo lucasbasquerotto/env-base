@@ -219,6 +219,7 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
+        local_host_test: true
     params:
       hosts_content: |
         [main]
