@@ -219,7 +219,6 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
-        local_host_test: true
     params:
       hosts_content: |
         [main]
@@ -810,8 +809,8 @@ nodes:
           ttl: 200
       host_test:
         log_file: "/var/log/setup.log"
-        setup_finished_log_regex: "Setup Finished"
-        setup_finished_log_last_line: "Setup Finished"
+        setup_finished_log_regex: "$Setup Finished*"
+        setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
   custom_local:
@@ -819,7 +818,13 @@ nodes:
     pods:
       - name: "test_pod_local"
         key: "custom"
-    # params:
+    params:
+      host_test:
+        log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "Setup Finished"
+        setup_success_log_last_line: "Setup Finished"
+        initial_connection_timeout: 3
+        setup_finished_timeout: 5
     #   cron:
     #     - user: "root"
     #       src_file: "{{ params.env.repo_dir }}/cron/app.cron"
