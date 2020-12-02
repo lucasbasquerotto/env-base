@@ -219,6 +219,10 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
+        pods:
+          test_pod_local:
+            params:
+              pod_param_1: "ctx overriden value"
     params:
       hosts_content: |
         [main]
@@ -818,6 +822,8 @@ nodes:
     pods:
       - name: "test_pod_local"
         key: "custom"
+        params:
+          pod_param_2: "node overriden value"
     params:
       host_test:
         log_file: "/var/log/setup.log"
@@ -840,7 +846,7 @@ pods:
     credentials_schema: "custom-pod/test/credentials.schema.yml"
     root: true
     fast_prepare: true
-    skip_unchanged: true
+    skip_unchanged: false
     credentials:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
@@ -848,6 +854,7 @@ pods:
       custom_dir: "custom-pod"
       pod_param_1: "value_1"
       pod_param_2: "value_2"
+      pod_param_3: "value_3"
 tasks:
   custom:
     type: "task"
