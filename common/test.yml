@@ -223,6 +223,14 @@ main:
           test_pod_local:
             params:
               pod_param_1: "ctx overriden value"
+    run_stages:
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            nodes_tasks: true
+          - name: "test"
+            all_nodes: true
+            nodes_tasks: true
     params:
       hosts_content: |
         [main]
@@ -861,6 +869,13 @@ pods:
       pod_param_2: "value_2"
       pod_param_3: "value_3"
 tasks:
+  docker_compose_install:
+    type: "task"
+    root: true
+    file: "docker.yml"
+    compose_params:
+      version: "1.27.2"
+      remote: true
   custom:
     type: "task"
     custom_task: true
