@@ -1,4 +1,4 @@
-name: "test ({{ params.name }})"
+name: "test__{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
