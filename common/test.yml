@@ -873,7 +873,7 @@ tasks:
     type: "task"
     root: true
     file: "custom-cloud/run-tasks/docker.yml"
-    params_schema: ""
+    params_schema: "custom-cloud/run-tasks/docker.params.schema.yml"
     params:
       compose_params:
         version: "1.27.2"
