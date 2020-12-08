@@ -227,10 +227,10 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
+            node_task: true
           - name: "test"
             all_nodes: true
-            nodes_tasks: true
+            node_task: true
     params:
       hosts_content: |
         [main]
@@ -872,18 +872,21 @@ tasks:
   docker_compose_install:
     type: "task"
     root: true
-    file: "docker.yml"
-    compose_params:
-      version: "1.27.2"
-      remote: true
-  custom:
+    file: "custom-cloud/run-tasks/docker.yml"
+    params_schema: ""
+    params:
+      compose_params:
+        version: "1.27.2"
+        remote: true
+  test:
     type: "task"
-    custom_task: true
     root: true
-    file: "run"
-    custom_params:
-      param1: "value1"
-      param2: "value2"
+    file: "custom-cloud/run-tasks/docker.yml"
+    params_schema: ""
+    params:
+      compose_params:
+        version: "1.27.3"
+        remote: true
 repos:
   env_base:
     src: "https://github.com/lucasbasquerotto/env-base.git"
