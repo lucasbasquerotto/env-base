@@ -225,13 +225,19 @@ main:
               pod_param_1: "ctx overriden value"
     run_stages:
       - tasks:
-          - name: "docker_compose_install"
+          - name: "test_task_cloud"
             all_nodes: true
             node_task: true
           - name: "test"
+            nodes:
+              - name: "test_node_local"
+                pods: [] # ["test_pod_local"]
+            pod_task: true
+          - name: "test_skip"
             all_nodes: true
             node_task: true
-          - name: "test_skip"
+      - tasks:
+          - name: "test_task_env"
             all_nodes: true
             node_task: true
     params:
@@ -872,20 +878,60 @@ pods:
       pod_param_2: "value_2"
       pod_param_3: "value_3"
 tasks:
-  docker_compose_install:
+  test_task_cloud:
     type: "task"
     root: true
-    file: "custom-cloud/run-tasks/docker.yml"
-    params_schema: "custom-cloud/run-tasks/docker.params.schema.yml"
-    params:
-      compose:
-        version: "" # "1.27.2"
+    file: "custom-cloud/test/run-tasks/task.yml"
+    params_schema: "custom-cloud/test/run-tasks/task.schema.yml"
+    credentials_schema: "custom-cloud/test/run-tasks/task.schema.yml"
+    credentials:
+      prop1: "test_task_prop1_cloud"
+      prop2: "test_task_prop2"
+    shared_params: ["test_task", "test_task_cloud"]
+    group_params:
+      prop3: "test_task_prop3"
+  test_task_env:
+    type: "task"
+    origin: "env"
+    root: true
+    file: "{{ params.env.repo_dir }}/test/run-tasks/task.yml"
+    params_schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
+    credentials_schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
+    credentials:
+      prop1: "test_task_prop1_env"
+      prop2: "test_task_prop2"
+    shared_params: ["test_task", "test_task_env"]
+    group_params:
+      prop3: "test_task_prop3"
   test:
-    type: "task"
-    root: true
-    file: "custom-cloud/run-tasks/docker.yml"
+    type: "shell"
+    cmd: "bash custom-pod/test/run.sh"
   test_skip:
     type: "skip"
+task_shared_params:
+  test_task:
+    prop1: "value1"
+    prop2:
+      inner_prop1: "inner_value1"
+      inner_prop2:
+        inner_prop1: "inner2_2_value1"
+      inner_prop3:
+        inner_prop1: "inner2_3_value1"
+  test_task_cloud:
+    prop1: "value1_cloud"
+  test_task_env:
+    prop1: "value1_env"
+task_group_params:
+  test_task_prop3:
+    inner_prop1: "inner3_value1"
+    inner_prop2:
+      inner_prop1: "inner3_2_value1"
+      inner_prop2:
+        inner_prop1: "inner3_2_2_value1"
+        inner_prop3:
+          inner_prop1: "inner3_2_2_3_value1"
+    inner_prop3:
+      inner_prop1: "inner3_3_value1"
 repos:
   env_base:
     src: "https://github.com/lucasbasquerotto/env-base.git"
@@ -931,3 +977,15 @@ credentials:
   s3: "{{ params.credentials.s3 | default({}) }}"
   godaddy: "{{ params.credentials.godaddy | default({}) }}"
   cloudflare: "{{ params.credentials.cloudflare | default({}) }}"
+  test_task_prop1_cloud: "value1_credential_cloud"
+  test_task_prop1_env: "value1_credential_env"
+  test_task_prop2:
+    inner_prop1: "inner2_value1"
+    inner_prop2:
+      inner_prop1: "inner2_2_value1"
+      inner_prop2:
+        inner_prop1: "inner2_2_2_value1"
+        inner_prop3:
+          inner_prop1: "inner2_2_2_3_value1"
+    inner_prop3:
+      inner_prop1: "inner2_3_value1"

@@ -444,10 +444,11 @@ tasks:
   docker_compose_install:
     type: "task"
     root: true
-    file: "docker.yml"
-    compose_params:
-      version: "1.27.2"
-      remote: true
+    file: "custom-cloud/run-tasks/docker.yml"
+    params_schema: "custom-cloud/run-tasks/docker.params.schema.yml"
+    params:
+      compose:
+        version: "1.27.2"
   main_build:
     type: "shell"
     root: true
