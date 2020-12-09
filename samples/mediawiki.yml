@@ -38,12 +38,6 @@ main:
         dir: "custom-cloud"
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-    # destroy:
-    #   nodes: true
-    #   buckets: true
-    # buckets:
-    #   - "mediawiki_uploads"
-    #   - "mediawiki_backup"
     nodes:
       - name: "app"
         key: "mediawiki"
@@ -52,13 +46,10 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
-          - name: "main_build"
-            all_nodes: true
-            pods_tasks: true
+            node_task: true
           - name: "main_upgrade"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
     params:
       hosts_content: |
         [main]
@@ -121,17 +112,17 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
+            node_task: true
           - name: "main_build"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
           - name: "main_upgrade"
             nodes: ["db"]
-            pods_tasks: true
+            pod_task: true
       - tasks:
           - name: "main_upgrade"
             nodes: ["web"]
-            pods_tasks: true
+            pod_task: true
     params:
       hosts_content: |
         [main]
@@ -142,9 +133,41 @@ main:
         [db]
         [web]
 services:
+  s3_buckets:
+    list: true
+    services:
+      - name: "s3_backup"
+        key: "s3_service_base"
+        params:
+          bucket: "{{ params.env_params.backup_bucket_name }}"
+          permission: "private"
+      - name: "s3_uploads"
+        key: "s3_service_base"
+        params:
+          bucket: "{{ params.env_params.uploads_bucket_name }}"
+          permission: "public-read"
+      # - name: "s3_backup_replica"
+      #   key: "s3_service_base"
+      #   params:
+      #     bucket: "{{ params.env_params.backup_replica_bucket_name }}"
+      #     permission: "private"
+      # - name: "s3_uploads_replica"
+      #   key: "s3_service_base"
+      #   params:
+      #     bucket: "{{ params.env_params.uploads_replica_bucket_name }}"
+      #     permission: "private"
+  s3_service_base:
+    base_dir: "custom-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/aws.main.s3.yml"
+    params_schema: "tasks/s3/params.schema.s3.yml"
+    credentials_schema: "tasks/s3/credentials.schema.s3.yml"
+    credentials:
+      s3: "s3"
+    params:
   node_dns_service:
     base_dir: "custom-cloud"
-    type: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns"
+    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
     namespace: "ext_dns"
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
@@ -152,7 +175,7 @@ services:
       zone: "{{ params.env_params.domain }}"
   digital_ocean_vpn:
     base_dir: "custom-cloud"
-    type: "tasks/vpn/digital_ocean.main.vpn"
+    task: "tasks/vpn/digital_ocean.main.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -199,95 +222,20 @@ services:
                 addresses: ["0.0.0.0/0", "::/0"]
   digital_ocean_node:
     base_dir: "custom-cloud"
-    type: "tasks/node/digital_ocean.main.node"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean.main.node.yml"
+    params_schema: "tasks/node/digital_ocean.params.schema.node.yml"
+    credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
     credentials:
       node: "digital_ocean"
     params:
-      instance:
-        image: "ubuntu-18-04-x64"
-        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
-        ipv6: "yes"
-      region:
-        name: "ams3"
-        region: "ams"
-        zone: "3"
-      size:
-        name: "s-1vcpu-1gb"
-        memory: "1gb"
-        cpu: 1
+      image_id: "ubuntu-18-04-x64"
+      ipv6: true
+      region_id: "ams3"
+      size_id: "s-1vcpu-1gb"
       tags:
         - "auto"
         - "dmz"
-# clouds:
-#   local:
-#     type: "local"
-#   digital_ocean:
-#     type: "digital_ocean"
-#     credentials: "digital_ocean"
-#     params:
-#       x_digital_ocean_tags:
-#         - "auto"
-#         - "dmz"
-#       x_digital_ocean_firewalls:
-#         - name: "private"
-#           tags: ["auto"]
-#           inbound_rules:
-#             - ports: "9080"
-#               sources:
-#                 addresses: "{{ params.env_params.private_ips }}"
-#             - ports: "9443"
-#               sources:
-#                 addresses: "{{ params.env_params.private_ips }}"
-#         - name: "auto"
-#           tags: ["auto"]
-#           inbound_rules:
-#             - ports: "22"
-#               sources:
-#                 tags: ["main"]
-#           outbound_rules:
-#             - protocol: "tcp"
-#               ports: "1-65535"
-#               destinations:
-#                 addresses: ["0.0.0.0/0", "::/0"]
-#             - protocol: "udp"
-#               ports: "1-65535"
-#               destinations:
-#                 addresses: ["0.0.0.0/0", "::/0"]
-#             - protocol: "icmp"
-#               ports: "1-65535"
-#               destinations:
-#                 addresses: ["0.0.0.0/0", "::/0"]
-#         - name: "dmz"
-#           tags: ["dmz"]
-#           inbound_rules:
-#             - ports: "80"
-#               sources:
-#                 addresses: ["0.0.0.0/0", "::/0"]
-#             - ports: "443"
-#               sources:
-#                 addresses: ["0.0.0.0/0", "::/0"]
-# dns:
-#   cloudflare:
-#     type: "cloudflare"
-#     zone: "{{ params.env_params.domain }}"
-#     credentials: "cloudflare"
-#   godaddy:
-#     type: "godaddy"
-#     zone: "{{ params.env_params.domain }}"
-#     credentials: "godaddy"
-# buckets:
-#   mediawiki_uploads:
-#     name: "{{ params.env_params.uploads_bucket_name }}"
-#     credentials: "uploads_bucket"
-#   mediawiki_backup:
-#     name: "{{ params.env_params.backup_bucket_name }}"
-#     credentials: "backup_bucket"
-#   mediawiki_uploads_replica:
-#     name: "{{ params.env_params.uploads_replica_bucket_name }}"
-#     credentials: "uploads_replica_bucket"
-#   mediawiki_backup_replica:
-#     name: "{{ params.env_params.backup_replica_bucket_name }}"
-#     credentials: "backup_replica_bucket"
 nodes:
   mediawiki_local:
     credential: "user"
@@ -316,6 +264,7 @@ nodes:
           custom_args: "mediawiki_custom_args"
           custom_domain: "mediawiki_custom_domain"
     params:
+      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       cron:
         - user: "root"
@@ -323,8 +272,8 @@ nodes:
           dest_dir: "/var/spool/cron/crontabs"
       host_test:
         log_file: "/var/log/setup.log"
-        setup_finished_log_regex: "Setup Finished"
-        setup_success_log_last_line: "Setup Finished"
+        setup_finished_log_regex: "$Setup Finished*"
+        setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
 pods:

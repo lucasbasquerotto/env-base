@@ -50,13 +50,10 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
-          - name: "main_build"
-            all_nodes: true
-            pods_tasks: true
+            node_task: true
           - name: "main_upgrade"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
     params:
       hosts_content: |
         [main]
@@ -117,17 +114,17 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
+            node_task: true
           - name: "main_build"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
           - name: "main_upgrade"
             nodes: ["db"]
-            pods_tasks: true
+            pod_task: true
       - tasks:
           - name: "main_upgrade"
             nodes: ["web"]
-            pods_tasks: true
+            pod_task: true
     params:
       hosts_content: |
         [main]
