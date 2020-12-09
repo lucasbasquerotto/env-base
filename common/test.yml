@@ -228,18 +228,40 @@ main:
           - name: "test_task_cloud"
             all_nodes: true
             node_task: true
+            params:
+              prop4: "overriden_cloud_1_4"
+            shared_params: ["test_task_overriden_1"]
           - name: "test"
             nodes:
               - name: "test_node_local"
-                pods: [] # ["test_pod_local"]
+                pods: ["test_pod_local"]
             pod_task: true
           - name: "test_skip"
             all_nodes: true
             node_task: true
       - tasks:
           - name: "test_task_env"
-            all_nodes: true
+            nodes: ["test_node_local"]
             node_task: true
+            params:
+              prop4: "overriden_env_1_4"
+            shared_params: ["test_task_overriden_1"]
+          - name: "test_task_pod_1"
+            key: "test_task_pod"
+            all_nodes: true
+            pod_task: true
+            params:
+              prop4: "overriden_pod_1_4"
+            shared_params: ["test_task_overriden_1"]
+          - name: "test_task_pod_2"
+            key: "test_task_pod"
+            nodes:
+              - name: "test_node_local"
+                pods: ["test_pod_local_2"]
+            pod_task: true
+            params:
+              prop4: "overriden_pod_2_4"
+            shared_params: ["test_task_overriden_2"]
     params:
       hosts_content: |
         [main]
@@ -841,6 +863,10 @@ nodes:
         key: "custom"
         params:
           pod_param_2: "node overriden value"
+      - name: "test_pod_local_2"
+        key: "custom"
+        params:
+          pod_param_2: "node overriden value 2"
     params:
       host_test:
         log_file: "/var/log/setup.log"
@@ -848,10 +874,10 @@ nodes:
         setup_success_log_last_line: "Setup Finished"
         initial_connection_timeout: 3
         setup_finished_timeout: 5
-    #   cron:
-    #     - user: "root"
-    #       src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-    #       dest_dir: "/var/spool/cron/crontabs"
+      cron:
+        - user: "root"
+          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest_dir: "/var/spool/cron/crontabs"
 pods:
   custom:
     repo: "pod"
@@ -887,6 +913,8 @@ tasks:
     credentials:
       prop1: "test_task_prop1_cloud"
       prop2: "test_task_prop2"
+      prop4: "test_task_prop4"
+      prop5: "test_task_prop5"
     shared_params: ["test_task", "test_task_cloud"]
     group_params:
       prop3: "test_task_prop3"
@@ -900,7 +928,24 @@ tasks:
     credentials:
       prop1: "test_task_prop1_env"
       prop2: "test_task_prop2"
+      prop4: "test_task_prop4"
+      prop5: "test_task_prop5"
     shared_params: ["test_task", "test_task_env"]
+    group_params:
+      prop3: "test_task_prop3"
+  test_task_pod:
+    type: "task"
+    origin: "pod"
+    root: true
+    file: "custom-pod/test/run-tasks/task.yml"
+    params_schema: "custom-pod/test/run-tasks/task.schema.yml"
+    credentials_schema: "custom-pod/test/run-tasks/task.schema.yml"
+    credentials:
+      prop1: "test_task_prop1_pod"
+      prop2: "test_task_prop2"
+      prop4: "test_task_prop4"
+      prop5: "test_task_prop5"
+    shared_params: ["test_task", "test_task_pod"]
     group_params:
       prop3: "test_task_prop3"
   test:
@@ -921,6 +966,14 @@ task_shared_params:
     prop1: "value1_cloud"
   test_task_env:
     prop1: "value1_env"
+  test_task_pod:
+    prop1: "value1_pod"
+  test_task_overriden_1:
+    prop4: "overriden_shared_1_4"
+    prop5: "overriden_shared_1_5"
+  test_task_overriden_2:
+    prop4: "overriden_shared_2_4"
+    prop5: "overriden_shared_2_5"
 task_group_params:
   test_task_prop3:
     inner_prop1: "inner3_value1"
@@ -979,6 +1032,7 @@ credentials:
   cloudflare: "{{ params.credentials.cloudflare | default({}) }}"
   test_task_prop1_cloud: "value1_credential_cloud"
   test_task_prop1_env: "value1_credential_env"
+  test_task_prop1_pod: "value1_credential_pod"
   test_task_prop2:
     inner_prop1: "inner2_value1"
     inner_prop2:
@@ -989,3 +1043,5 @@ credentials:
           inner_prop1: "inner2_2_2_3_value1"
     inner_prop3:
       inner_prop1: "inner2_3_value1"
+  test_task_prop4: "value4_credential"
+  test_task_prop5: "value5_credential"
