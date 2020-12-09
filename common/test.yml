@@ -223,6 +223,9 @@ main:
           test_pod_local:
             params:
               pod_param_1: "ctx overriden value"
+          test_pod_local_2:
+            params:
+              pod_param_1: "ctx overriden value"
     run_stages:
       - tasks:
           - name: "test_task_cloud"
@@ -866,7 +869,7 @@ nodes:
       - name: "test_pod_local_2"
         key: "custom"
         params:
-          pod_param_2: "node overriden value 2"
+          pod_param_2: "node overriden value"
     params:
       host_test:
         log_file: "/var/log/setup.log"
