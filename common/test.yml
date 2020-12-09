@@ -231,6 +231,9 @@ main:
           - name: "test"
             all_nodes: true
             node_task: true
+          - name: "test_skip"
+            all_nodes: true
+            node_task: true
     params:
       hosts_content: |
         [main]
@@ -875,18 +878,14 @@ tasks:
     file: "custom-cloud/run-tasks/docker.yml"
     params_schema: "custom-cloud/run-tasks/docker.params.schema.yml"
     params:
-      compose_params:
-        version: "1.27.2"
-        remote: true
+      compose:
+        version: "" # "1.27.2"
   test:
     type: "task"
     root: true
     file: "custom-cloud/run-tasks/docker.yml"
-    params_schema: ""
-    params:
-      compose_params:
-        version: "1.27.3"
-        remote: true
+  test_skip:
+    type: "skip"
 repos:
   env_base:
     src: "https://github.com/lucasbasquerotto/env-base.git"
