@@ -897,6 +897,7 @@ pods:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
     params:
+      env_files_dir: "{{ params.env.repo_dir }}/test/files"
       test_schema:
         - 123
         - { p1: [{ p1: [456, { p1: 111 }] }, 012, { p1: 123 }] }

@@ -1,0 +1,4 @@
+name: "test template"
+src: "{{ params.src }}"
+dest: "{{ params.dest }}"
+{{ { 'params': params.params } | to_nice_yaml }}
