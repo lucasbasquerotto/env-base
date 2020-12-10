@@ -8,8 +8,8 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
     params:
       hosts_content: |
         [main]
@@ -36,13 +36,9 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    destroy:
-      nodes: true
-      buckets: true
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
-    buckets:
-      - "prometheus_backup"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - "s3_buckets"
     nodes:
       - name: "app"
         key: "prometheus"
@@ -50,13 +46,10 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
-          - name: "main_build"
-            all_nodes: true
-            pods_tasks: true
+            node_task: true
           - name: "main_upgrade"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
     params:
       hosts_content: |
         [main]
@@ -85,13 +78,9 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    destroy:
-      nodes: true
-      buckets: true
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
-    buckets:
-      - "prometheus_backup"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - "s3_buckets"
     nodes:
       - name: "db"
         key: "prometheus"
@@ -117,17 +106,17 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            nodes_tasks: true
+            node_task: true
           - name: "main_build"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
           - name: "main_upgrade"
             nodes: ["db"]
-            pods_tasks: true
+            pod_task: true
       - tasks:
           - name: "main_upgrade"
             nodes: ["web"]
-            pods_tasks: true
+            pod_task: true
     params:
       hosts_content: |
         [main]
@@ -137,17 +126,42 @@ main:
         web
         [db]
         [web]
-clouds:
-  local:
-    type: "local"
-  digital_ocean:
-    type: "digital_ocean"
-    credentials: "digital_ocean"
+services:
+  s3_buckets:
+    list: true
+    services:
+      - name: "s3_backup"
+        key: "s3_service_base"
+        params:
+          bucket: "{{ params.env_params.backup_bucket_name }}"
+          permission: "private"
+  s3_service_base:
+    base_dir: "custom-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/aws.main.s3.yml"
+    params_schema: "tasks/s3/params.schema.s3.yml"
+    credentials_schema: "tasks/s3/credentials.schema.s3.yml"
+    credentials:
+      s3: "s3"
     params:
-      x_digital_ocean_tags:
+  node_dns_service:
+    base_dir: "custom-cloud"
+    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
+    namespace: "ext_dns"
+    credentials:
+      dns: "{{ params.env_params.dns_provider }}"
+    params:
+      zone: "{{ params.env_params.domain }}"
+  digital_ocean_vpn:
+    base_dir: "custom-cloud"
+    task: "tasks/vpn/digital_ocean.main.vpn.yml"
+    credentials:
+      vpn: "digital_ocean"
+    params:
+      tags:
         - "auto"
         - "dmz"
-      x_digital_ocean_firewalls:
+      firewalls:
         - name: "private"
           tags: ["auto"]
           inbound_rules:
@@ -185,22 +199,24 @@ clouds:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
-dns:
-  cloudflare:
-    type: "cloudflare"
-    zone: "{{ params.env_params.domain }}"
-    credentials: "cloudflare"
-  godaddy:
-    type: "godaddy"
-    zone: "{{ params.env_params.domain }}"
-    credentials: "godaddy"
-buckets:
-  prometheus_backup:
-    name: "{{ params.env_params.backup_bucket_name }}"
-    credentials: "backup_bucket"
+  digital_ocean_node:
+    base_dir: "custom-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean.main.node.yml"
+    params_schema: "tasks/node/digital_ocean.params.schema.node.yml"
+    credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
+    credentials:
+      node: "digital_ocean"
+    params:
+      image_id: "ubuntu-18-04-x64"
+      ipv6: true
+      region_id: "ams3"
+      size_id: "s-2vcpu-2gb"
+      tags:
+        - "auto"
+        - "dmz"
 nodes:
   prometheus_local:
-    base_dir: "/var/cloud"
     credential: "user"
     pods:
       - name: "prometheus"
@@ -214,9 +230,10 @@ nodes:
           certbot: "certbot_local"
           db_backup: "db_backup_no_sync"
   prometheus:
-    cloud: "{{ params.env_params.cloud_name }}"
+    service: "{{ params.env_params.node_service }}"
+    dns_service: "node_dns_service"
     base_dir: "/var/cloud"
-    credentials: "host"
+    credential: "host"
     pods:
       - name: "prometheus"
         params:
@@ -225,43 +242,18 @@ nodes:
           custom_args: "prometheus_custom_args"
           custom_domain: "prometheus_custom_domain"
     params:
-      dns:
-        - record: "{{ params.env_params.grafana_dns_record }}"
-          name: "{{ params.env_params.grafana_dns_name }}"
-        - record: "{{ params.env_params.theia_dns_record }}"
-          name: "{{ params.env_params.theia_dns_name }}"
-          when: "{{ params.env_params.use_theia }}"
-        - record: "{{ params.env_params.minio_gateway_dns_record }}"
-          name: "{{ params.env_params.minio_gateway_dns_name }}"
-          when: "{{ params.env_params.use_minio_gateway }}"
-        - record: "{{ params.env_params.filestash_dns_record }}"
-          name: "{{ params.env_params.filestash_dns_name }}"
-          when: "{{ params.env_params.use_filestash }}"
+      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       cron:
         - user: "root"
           src_file: "{{ params.env.repo_dir }}/cron/app.cron"
           dest_dir: "/var/spool/cron/crontabs"
-      instance:
-        image: "ubuntu-18-04-x64"
-        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
-        ipv6: "yes"
-      region:
-        name: "ams3"
-        region: "ams"
-        zone: "3"
-      size:
-        name: "s-2vcpu-2gb"
-        memory: "2gb"
-        cpu: 2
       host_test:
         log_file: "/var/log/setup.log"
-        setup_finished_log_regex: "Setup Finished"
-        setup_success_log_last_line: "Setup Finished"
+        setup_finished_log_regex: "$Setup Finished*"
+        setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
-      x_digital_ocean_tags:
-        - "auto"
-        - "dmz"
 pods:
   prometheus:
     repo: "pod"

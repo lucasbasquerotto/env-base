@@ -38,6 +38,7 @@ main:
         dir: "custom-cloud"
     initial_services:
       - "{{ params.env_params.vpn_service }}"
+      - "s3_buckets"
     nodes:
       - name: "app"
         key: "mediawiki"
@@ -80,14 +81,7 @@ main:
         dir: "custom-cloud"
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-    # destroy:
-    #   nodes: true
-    #   buckets: true
-    # clouds:
-    #   - "{{ params.env_params.cloud_name }}"
-    # buckets:
-    #   - "mediawiki_uploads"
-    #   - "mediawiki_backup"
+      - "s3_buckets"
     nodes:
       - name: "db"
         key: "mediawiki"
