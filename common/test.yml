@@ -923,7 +923,7 @@ tasks:
       prop3: "test_task_prop3"
   test_task_env:
     type: "task"
-    origin: "env"
+    target_origin: "env"
     root: true
     file: "{{ params.env.repo_dir }}/test/run-tasks/task.yml"
     params_schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
@@ -938,7 +938,7 @@ tasks:
       prop3: "test_task_prop3"
   test_task_pod:
     type: "task"
-    origin: "pod"
+    target_origin: "pod"
     root: true
     file: "custom-pod/test/run-tasks/task.yml"
     params_schema: "custom-pod/test/run-tasks/task.schema.yml"
