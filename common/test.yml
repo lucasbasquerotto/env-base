@@ -223,9 +223,9 @@ main:
           test_pod_local:
             params:
               pod_param_1: "ctx overriden value"
-          # test_pod_local_2:
-          #   params:
-          #     pod_param_1: "ctx overriden value"
+          test_pod_local_2:
+            params:
+              pod_param_1: "ctx overriden value"
     run_stages:
       - tasks:
           - name: "test_task_cloud"
@@ -256,15 +256,15 @@ main:
             params:
               prop4: "overriden_pod_1_4"
             shared_params: ["test_task_overriden_1"]
-          # - name: "test_task_pod_2"
-          #   key: "test_task_pod"
-          #   nodes:
-          #     - name: "test_node_local"
-          #       pods: ["test_pod_local_2"]
-          #   pod_task: true
-          #   params:
-          #     prop4: "overriden_pod_2_4"
-          #   shared_params: ["test_task_overriden_2"]
+          - name: "test_task_pod_2"
+            key: "test_task_pod"
+            nodes:
+              - name: "test_node_local"
+                pods: ["test_pod_local_2"]
+            pod_task: true
+            params:
+              prop4: "overriden_pod_2_4"
+            shared_params: ["test_task_overriden_2"]
     params:
       hosts_content: |
         [main]
@@ -866,10 +866,10 @@ nodes:
         key: "custom"
         params:
           pod_param_2: "node overriden value"
-      # - name: "test_pod_local_2"
-      #   key: "custom"
-      #   params:
-      #     pod_param_2: "node overriden value"
+      - name: "test_pod_local_2"
+        key: "custom"
+        params:
+          pod_param_2: "node overriden value"
     params:
       host_test:
         log_file: "/var/log/setup.log"
