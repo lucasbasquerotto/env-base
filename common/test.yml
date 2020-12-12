@@ -226,6 +226,9 @@ main:
           test_pod_local_2:
             params:
               pod_param_1: "ctx overriden value"
+      - name: "custom_node_service_local"
+        amount: 3
+        max_amount: 5
     run_stages:
       - tasks:
           - name: "test_task_cloud"
@@ -270,6 +273,9 @@ main:
         [main]
         localhost ansible_connection=local
         [host]
+        [host:children]
+        custom_node_service_local
+        [custom_node_service_local]
   node:
     repo: "cloud"
     env_repos:
@@ -436,6 +442,16 @@ services:
       dns: "{{ params.env_params.dns_provider }}"
     params:
       zone: "{{ params.env_params.domain }}"
+  service_node_local:
+    base_dir: "custom-cloud"
+    namespace: "ext_node"
+    task: "test/services/node/test.main.node.yml"
+    params_schema: "test/services/node/test.params.schema.node.yml"
+    credentials_schema: "test/services/node/test.credentials.schema.node.yml"
+    credentials:
+      node: "node_service_local_credential"
+    params:
+      prop1: "test value 1"
   test_service_1:
     base_dir: "custom-cloud"
     task: "test/services/general/01.yml"
@@ -881,6 +897,17 @@ nodes:
         - user: "root"
           src_file: "{{ params.env.repo_dir }}/cron/app.cron"
           dest_dir: "/var/spool/cron/crontabs"
+  custom_node_service_local:
+    service: "service_node_local"
+    base_dir: "/var/cloud"
+    credential: "user"
+    params:
+      host_test:
+        log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "Setup Finished"
+        setup_success_log_last_line: "Setup Finished"
+        initial_connection_timeout: 3
+        setup_finished_timeout: 5
 pods:
   custom:
     repo: "pod"
@@ -1034,6 +1061,7 @@ credentials:
   s3: "{{ params.credentials.s3 | default({}) }}"
   godaddy: "{{ params.credentials.godaddy | default({}) }}"
   cloudflare: "{{ params.credentials.cloudflare | default({}) }}"
+  node_service_local_credential: { test_token: "1234556" }
   test_task_prop1_cloud: "value1_credential_cloud"
   test_task_prop1_env: "value1_credential_env"
   test_task_prop1_pod: "value1_credential_pod"
