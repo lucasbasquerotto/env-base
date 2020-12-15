@@ -216,60 +216,58 @@ main:
       - repo: "custom_cloud"
         dir: "custom-cloud"
     nodes:
-      # - name: "test_node_local"
-      #   key: "custom_local"
-      #   local: true
-      #   pods:
-      #     test_pod_local:
-      #       params:
-      #         pod_param_1: "ctx overriden value"
-      #     test_pod_local_2:
-      #       params:
-      #         pod_param_1: "ctx overriden value"
+      - name: "test_node_local"
+        key: "custom_local"
+        local: true
+        pods:
+          test_pod_local:
+            params:
+              pod_param_1: "ctx overriden value"
+          test_pod_local_2:
+            params:
+              pod_param_1: "ctx overriden value"
       - name: "custom_node_service_local"
-        amount: 1
-        max_amount: 1
-        # amount: 3
-        # max_amount: 5
-    # run_stages:
-    #   - tasks:
-    #       - name: "test_task_cloud"
-    #         all_nodes: true
-    #         node_task: true
-    #         params:
-    #           prop4: "overriden_cloud_1_4"
-    #         shared_params: ["test_task_overriden_1"]
-    #       - name: "test"
-    #         nodes:
-    #           - name: "test_node_local"
-    #             pods: ["test_pod_local"]
-    #         pod_task: true
-    #       - name: "test_skip"
-    #         all_nodes: true
-    #         node_task: true
-    #   - tasks:
-    #       - name: "test_task_env"
-    #         nodes: ["test_node_local"]
-    #         node_task: true
-    #         params:
-    #           prop4: "overriden_env_1_4"
-    #         shared_params: ["test_task_overriden_1"]
-    #       - name: "test_task_pod_1"
-    #         key: "test_task_pod"
-    #         all_nodes: true
-    #         pod_task: true
-    #         params:
-    #           prop4: "overriden_pod_1_4"
-    #         shared_params: ["test_task_overriden_1"]
-    #       - name: "test_task_pod_2"
-    #         key: "test_task_pod"
-    #         nodes:
-    #           - name: "test_node_local"
-    #             pods: ["test_pod_local_2"]
-    #         pod_task: true
-    #         params:
-    #           prop4: "overriden_pod_2_4"
-    #         shared_params: ["test_task_overriden_2"]
+        amount: 3
+        max_amount: 5
+    run_stages:
+      - tasks:
+          - name: "test_task_cloud"
+            all_nodes: true
+            node_task: true
+            params:
+              prop4: "overriden_cloud_1_4"
+            shared_params: ["test_task_overriden_1"]
+          - name: "test"
+            nodes:
+              - name: "test_node_local"
+                pods: ["test_pod_local"]
+            pod_task: true
+          - name: "test_skip"
+            all_nodes: true
+            node_task: true
+      - tasks:
+          - name: "test_task_env"
+            nodes: ["test_node_local"]
+            node_task: true
+            params:
+              prop4: "overriden_env_1_4"
+            shared_params: ["test_task_overriden_1"]
+          - name: "test_task_pod_1"
+            key: "test_task_pod"
+            all_nodes: true
+            pod_task: true
+            params:
+              prop4: "overriden_pod_1_4"
+            shared_params: ["test_task_overriden_1"]
+          - name: "test_task_pod_2"
+            key: "test_task_pod"
+            nodes:
+              - name: "test_node_local"
+                pods: ["test_pod_local_2"]
+            pod_task: true
+            params:
+              prop4: "overriden_pod_2_4"
+            shared_params: ["test_task_overriden_2"]
     params:
       hosts_content: |
         [main]
