@@ -216,58 +216,60 @@ main:
       - repo: "custom_cloud"
         dir: "custom-cloud"
     nodes:
-      - name: "test_node_local"
-        key: "custom_local"
-        local: true
-        pods:
-          test_pod_local:
-            params:
-              pod_param_1: "ctx overriden value"
-          test_pod_local_2:
-            params:
-              pod_param_1: "ctx overriden value"
+      # - name: "test_node_local"
+      #   key: "custom_local"
+      #   local: true
+      #   pods:
+      #     test_pod_local:
+      #       params:
+      #         pod_param_1: "ctx overriden value"
+      #     test_pod_local_2:
+      #       params:
+      #         pod_param_1: "ctx overriden value"
       - name: "custom_node_service_local"
-        amount: 3
-        max_amount: 5
-    run_stages:
-      - tasks:
-          - name: "test_task_cloud"
-            all_nodes: true
-            node_task: true
-            params:
-              prop4: "overriden_cloud_1_4"
-            shared_params: ["test_task_overriden_1"]
-          - name: "test"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local"]
-            pod_task: true
-          - name: "test_skip"
-            all_nodes: true
-            node_task: true
-      - tasks:
-          - name: "test_task_env"
-            nodes: ["test_node_local"]
-            node_task: true
-            params:
-              prop4: "overriden_env_1_4"
-            shared_params: ["test_task_overriden_1"]
-          - name: "test_task_pod_1"
-            key: "test_task_pod"
-            all_nodes: true
-            pod_task: true
-            params:
-              prop4: "overriden_pod_1_4"
-            shared_params: ["test_task_overriden_1"]
-          - name: "test_task_pod_2"
-            key: "test_task_pod"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local_2"]
-            pod_task: true
-            params:
-              prop4: "overriden_pod_2_4"
-            shared_params: ["test_task_overriden_2"]
+        amount: 1
+        max_amount: 1
+        # amount: 3
+        # max_amount: 5
+    # run_stages:
+    #   - tasks:
+    #       - name: "test_task_cloud"
+    #         all_nodes: true
+    #         node_task: true
+    #         params:
+    #           prop4: "overriden_cloud_1_4"
+    #         shared_params: ["test_task_overriden_1"]
+    #       - name: "test"
+    #         nodes:
+    #           - name: "test_node_local"
+    #             pods: ["test_pod_local"]
+    #         pod_task: true
+    #       - name: "test_skip"
+    #         all_nodes: true
+    #         node_task: true
+    #   - tasks:
+    #       - name: "test_task_env"
+    #         nodes: ["test_node_local"]
+    #         node_task: true
+    #         params:
+    #           prop4: "overriden_env_1_4"
+    #         shared_params: ["test_task_overriden_1"]
+    #       - name: "test_task_pod_1"
+    #         key: "test_task_pod"
+    #         all_nodes: true
+    #         pod_task: true
+    #         params:
+    #           prop4: "overriden_pod_1_4"
+    #         shared_params: ["test_task_overriden_1"]
+    #       - name: "test_task_pod_2"
+    #         key: "test_task_pod"
+    #         nodes:
+    #           - name: "test_node_local"
+    #             pods: ["test_pod_local_2"]
+    #         pod_task: true
+    #         params:
+    #           prop4: "overriden_pod_2_4"
+    #         shared_params: ["test_task_overriden_2"]
     params:
       hosts_content: |
         [main]
@@ -452,6 +454,74 @@ services:
       node: "node_service_local_credential"
     params:
       prop1: "test value 1"
+      user_datas:
+        - |
+          User Data 1 1
+          User Data 1 2
+          User Data 1 3
+        - type: "str"
+          params:
+            value: |
+              User Data 2 1
+              User Data 2 2
+              User Data 2 3
+        - type: "str"
+          shared_params: ["user_data_str"]
+        - type: "env"
+          name: "user_data_str_1"
+        - type: "env"
+          name: "user_data_str_2_custom_name"
+          key: "user_data_str_2"
+        - type: "env"
+          name: "user_data_str_3"
+        - type: "file"
+          file: "custom-cloud/test/services/node/files/user-data.sh"
+        - type: "env"
+          name: "user_data_file_1"
+          key: "user_data_file"
+        - type: "template"
+          file: "custom-cloud/test/services/node/files/user-data.tpl.sh"
+          params:
+            prop1: "value_1"
+          group_params:
+            prop1: "user_data_1"
+            prop2: "user_data_2"
+          shared_params: ["user_data_1", "user_data_2"]
+          shared_group_params: "user_data"
+        - type: "env"
+          name: "user_data_tpl_1"
+          key: "user_data_tpl"
+          params:
+            prop1: "value_overridden_1"
+          group_params:
+            prop1: "user_data_overridden_1"
+            prop2: "user_data_overridden_2"
+          shared_params: ["user_data_overridden_1", "user_data_overridden_2"]
+          shared_group_params: "user_data_overridden"
+        - type: "env"
+          name: "user_data_tpl_2"
+          key: "user_data_tpl"
+          params:
+            prop3: "value_overridden_3"
+          group_params:
+            prop1: "user_data_overridden_1"
+        - type: "env"
+          name: "user_data_tpl_env_1"
+          key: "user_data_tpl_env"
+          params:
+            prop1: "value_overridden_env_1"
+          group_params:
+            prop1: "user_data_overridden_1"
+            prop2: "user_data_overridden_2"
+          shared_params: ["user_data_overridden_1", "user_data_overridden_2"]
+          shared_group_params: "user_data_overridden"
+        - type: "env"
+          name: "user_data_tpl_env_2"
+          key: "user_data_tpl_env"
+          params:
+            prop3: "value_overridden_env_3"
+          group_params:
+            prop1: "user_data_overridden_1"
   test_service_1:
     base_dir: "custom-cloud"
     task: "test/services/general/01.yml"
@@ -1016,6 +1086,104 @@ task_group_params:
           inner_prop1: "inner3_2_2_3_value1"
     inner_prop3:
       inner_prop1: "inner3_3_value1"
+contents:
+  user_data_str_1: |
+    User Data Env 1 1
+    User Data Env 1 2
+    User Data Env 1 3
+  user_data_str_2:
+    type: "str"
+    params:
+      value: |
+        User Data Env 2 1
+        User Data Env 2 2
+        User Data Env 2 3
+  user_data_str_3:
+    type: "str"
+    shared_params: ["user_data_env_str"]
+  user_data_file:
+    type: "file"
+    file: "custom-cloud/test/services/node/files/user-data.sh"
+  user_data_file_env:
+    type: "file"
+    origin: "env"
+    file: "{{ params.env.repo_dir }}/test/files/user-data.sh"
+  user_data_tpl:
+    type: "template"
+    file: "custom-cloud/test/services/node/files/user-data.tpl.sh"
+    params:
+      prop1: "value_env_1"
+    group_params:
+      prop1: "user_data_1"
+      prop2: "user_data_2"
+    shared_params: ["user_data_1", "user_data_2"]
+    shared_group_params: "user_data"
+  user_data_tpl_env:
+    type: "template"
+    origin: "env"
+    file: "{{ params.env.repo_dir }}/test/files/user-data.tpl.sh"
+    params:
+      prop1: "value_double_env_1"
+    group_params:
+      prop1: "user_data_1"
+      prop2: "user_data_2"
+    shared_params: ["user_data_1", "user_data_2"]
+    shared_group_params: "user_data"
+content_shared_group_params:
+  user_data:
+    prop1: "user_data_shared_1"
+    prop2: "user_data_shared_2"
+    prop3: "user_data_shared_3"
+    prop4: "user_data_shared_4"
+    prop5: "user_data_shared_5"
+  user_data_overridden:
+    prop1: "user_data_shared_overriden_1"
+    prop2: "user_data_shared_overriden_2"
+    prop3: "user_data_shared_overriden_3"
+    prop4: "user_data_shared_overriden_4"
+    prop5: "user_data_shared_overriden_5"
+content_shared_params:
+  user_data_str:
+    value: |
+      User Data Shared 1
+      User Data Shared 2
+      User Data Shared 3
+  user_data_env_str:
+    value: |
+      User Data Env Shared 1
+      User Data Env Shared 2
+      User Data Env Shared 3
+  user_data_1:
+    prop1: "value_shared_1_1"
+    prop2: "value_shared_1_2"
+    prop3: "value_shared_1_3"
+    prop4: "value_shared_1_4"
+  user_data_2:
+    prop2: "value_shared_2_2"
+    prop4: "value_shared_2_4"
+  user_data_overridden_1:
+    prop1: "value_shared_overridden_1_1"
+    prop2: "value_shared_overridden_1_2"
+    prop3: "value_shared_overridden_1_3"
+    prop4: "value_shared_overridden_1_4"
+  user_data_overridden_2:
+    prop2: "value_shared_overridden_2_2"
+    prop4: "value_shared_overridden_2_4"
+content_group_params:
+  user_data_1: "value_group_1"
+  user_data_2: "value_group_2"
+  user_data_shared_1: "value_shared_group_1"
+  user_data_shared_2: "value_shared_group_2"
+  user_data_shared_3: "value_shared_group_3"
+  user_data_shared_4: "value_shared_group_4"
+  user_data_shared_5: "value_shared_group_5"
+  user_data_overridden_1: "value_group_overridden_1"
+  user_data_overridden_2: "value_group_overridden_2"
+  user_data_shared_overriden_1: "value_shared_group_overriden_1"
+  user_data_shared_overriden_2: "value_shared_group_overriden_2"
+  user_data_shared_overriden_3: "value_shared_group_overriden_3"
+  user_data_shared_overriden_4: "value_shared_group_overriden_4"
+  user_data_shared_overriden_5: "value_shared_group_overriden_5"
 repos:
   env_base:
     src: "https://github.com/lucasbasquerotto/env-base.git"
