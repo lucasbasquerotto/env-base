@@ -2,30 +2,45 @@ name: "test__{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
+meta:
+  lax: false
+  template_no_empty_lines: true
 main:
   local_cloud_hooks:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    params:
-      x_custom_roles:
-        - "role1"
-        - "role2"
-      x_custom_tasks:
-        - "task1"
-        - "task2"
-    group_params:
-      hooks: "test_hooks"
-      custom_roles: "test_custom_roles"
-      custom_tasks: "test_custom_tasks"
-    shared_params: ["local"]
-    shared_group_params: "test_shared_group_params"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    hooks:
+      before_initial_services: "custom-cloud/test/hooks/before_initial_services.yml"
+      after_initial_services: "custom-cloud/test/hooks/after_initial_services.yml"
+      before_nodes: "custom-cloud/test/hooks/before_nodes.yml"
+      after_nodes: "custom-cloud/test/hooks/after_nodes.yml"
+      before_wait_nodes: "custom-cloud/test/hooks/before_wait_nodes.yml"
+      after_wait_nodes: "custom-cloud/test/hooks/after_wait_nodes.yml"
+      before_prepare: "custom-cloud/test/hooks/before_prepare.yml"
+      after_prepare: "custom-cloud/test/hooks/after_prepare.yml"
+      before_cron: "custom-cloud/test/hooks/before_cron.yml"
+      after_cron: "custom-cloud/test/hooks/after_cron.yml"
+      before_final_services: "custom-cloud/test/hooks/before_final_services.yml"
+      after_final_services: "custom-cloud/test/hooks/after_final_services.yml"
+      before_delete_tmp: "custom-cloud/test/hooks/before_delete_tmp.yml"
+      after_delete_tmp: "custom-cloud/test/hooks/after_delete_tmp.yml"
+      before_delete_main: "custom-cloud/test/hooks/before_delete_main.yml"
+      after_delete_main: "custom-cloud/test/hooks/after_delete_main.yml"
   local_cloud_services:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     initial_services:
       - name: "test_list_1"
         absent: true
@@ -68,12 +83,15 @@ main:
       - name: "test_list_2_final"
         key: "test_list_2"
         tmp: true
-    shared_params: ["local"]
   local_cloud_layer_services:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     initial_services:
       - "test_top_1"
       - name: "test_top_2"
@@ -83,18 +101,24 @@ main:
       - name: "test_top_1"
         tmp: true
         can_destroy: true
-    shared_params: ["local"]
   local_cloud_sequence_services:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     initial_services:
       - name: "test_sequence"
         tmp: true
-    shared_params: ["local"]
   local_repos:
     repo: "cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     extra_repos:
       - repo: "env_base"
         dir: "env-base"
@@ -198,23 +222,28 @@ main:
             dest: "tmp/test/ef1.yml"
           - src: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
             dest: "tmp/test/ef2.yml"
-    shared_params: ["local"]
   services:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     initial_services: "{{ params.env_params.services }}"
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
   node_local:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+      [host:children]
+      custom_node_service_local
+      [custom_node_service_local]
     nodes:
       - name: "test_node_local"
         key: "custom_local"
@@ -268,79 +297,24 @@ main:
             params:
               prop4: "overriden_pod_2_4"
             shared_params: ["test_task_overriden_2"]
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
-        [host:children]
-        custom_node_service_local
-        [custom_node_service_local]
   node:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+      [host:children]
+      app
+      [app]
     nodes:
       - name: "app"
         key: "{{ params.env_params.node }}"
         absent: true
         tmp: true
         can_destroy: true
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
-        [host:children]
-        app
-        [app]
-main_shared_params:
-  local:
-    hosts_content: |
-      [main]
-      localhost ansible_connection=local
-      [host:children]
-      custom
-      custom_local
-      [custom]
-      [custom_local]
-    meta:
-      template_no_empty_lines: true
-main_shared_group_params:
-  test_shared_group_params:
-    prop1: "test_custom_roles"
-    prop2: "test_custom_tasks"
-main_group_params:
-  test_custom_roles:
-    role1: "custom-cloud/test/roles/role1"
-    role2: "custom-cloud/test/roles/role2"
-  test_custom_tasks:
-    task1: "custom-cloud/test/tasks/task1.yml"
-    task2: "custom-cloud/test/tasks/task2.yml"
-  test_hooks:
-    before_initial_services: "custom-cloud/test/hooks/before_initial_services.yml"
-    after_initial_services: "custom-cloud/test/hooks/after_initial_services.yml"
-    before_cloud_main: "custom-cloud/test/hooks/before_cloud_main.yml"
-    after_cloud_main: "custom-cloud/test/hooks/after_cloud_main.yml"
-    before_dns: "custom-cloud/test/hooks/before_dns.yml"
-    after_dns: "custom-cloud/test/hooks/after_dns.yml"
-    before_buckets: "custom-cloud/test/hooks/before_buckets.yml"
-    after_buckets: "custom-cloud/test/hooks/after_buckets.yml"
-    before_nodes: "custom-cloud/test/hooks/before_nodes.yml"
-    after_nodes: "custom-cloud/test/hooks/after_nodes.yml"
-    before_wait_nodes: "custom-cloud/test/hooks/before_wait_nodes.yml"
-    after_wait_nodes: "custom-cloud/test/hooks/after_wait_nodes.yml"
-    before_prepare: "custom-cloud/test/hooks/before_prepare.yml"
-    after_prepare: "custom-cloud/test/hooks/after_prepare.yml"
-    before_cron: "custom-cloud/test/hooks/before_cron.yml"
-    after_cron: "custom-cloud/test/hooks/after_cron.yml"
-    before_final_services: "custom-cloud/test/hooks/before_final_services.yml"
-    after_final_services: "custom-cloud/test/hooks/after_final_services.yml"
-    before_delete_tmp: "custom-cloud/test/hooks/before_delete_tmp.yml"
-    after_delete_tmp: "custom-cloud/test/hooks/after_delete_tmp.yml"
-    before_delete_main: "custom-cloud/test/hooks/before_delete_main.yml"
-    after_delete_main: "custom-cloud/test/hooks/after_delete_main.yml"
 services:
   digital_ocean_vpn:
     base_dir: "custom-cloud"
