@@ -3,7 +3,7 @@ ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
 meta:
-  lax: false
+  lax: true
   template_no_empty_lines: true
 main:
   local_cloud_hooks:
