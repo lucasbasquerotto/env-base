@@ -2,24 +2,29 @@ name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
+meta:
+  template_no_empty_lines: true
 main:
   cloud:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
   local:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     nodes:
       - name: "app"
         key: "wp_local"
@@ -27,18 +32,17 @@ main:
     extra_repos:
       - repo: "app"
         dir: "app-wp"
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
-      meta:
-        template_no_empty_lines: true
   remote:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+      app
+      [app]
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - "s3_buckets"
@@ -53,34 +57,19 @@ main:
           - name: "main_upgrade"
             all_nodes: true
             pod_task: true
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host:children]
-        app
-        [app]
-  remote_local_test:
-    repo: "cloud"
-    env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
-    nodes:
-      - name: "app"
-        key: "wp_local"
-        local: true
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
-      meta:
-        template_no_empty_lines: true
   nodes:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+      db
+      web
+      [db]
+      [web]
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - "s3_buckets"
@@ -119,15 +108,6 @@ main:
           - name: "main_upgrade"
             nodes: ["web"]
             pod_task: true
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host:children]
-        db
-        web
-        [db]
-        [web]
 services:
   s3_buckets:
     list: true
@@ -222,6 +202,11 @@ services:
       tags:
         - "auto"
         - "dmz"
+      user_data:
+        type: "template"
+        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        credentials:
+          node: "host"
 nodes:
   wp_local:
     credential: "user"
@@ -255,7 +240,6 @@ nodes:
           custom_args: "wp_custom_args"
           custom_domain: "wp_custom_domain"
     params:
-      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       cron:
         - user: "root"

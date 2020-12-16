@@ -4,6 +4,10 @@ container: ""
 main:
   repos:
     repo: "cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
     extra_repos:
       - repo: "env_base"
         dir: "env-base"
@@ -19,11 +23,6 @@ main:
         dir: "container-images"
       - repo: "backups"
         dir: "backups"
-    params:
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
 repos:
   env_base:
     src: "https://github.com/lucasbasquerotto/env-base.git"

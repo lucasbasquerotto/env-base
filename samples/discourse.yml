@@ -2,42 +2,83 @@ name: "{{ params.name }}"
 ctxs: ["app"]
 main:
   app:
-    destroy:
-      nodes: true
-      buckets: true
-    clouds:
-      - "{{ params.env_params.cloud_name }}"
-    buckets:
-      - "discourse_backup"
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+      app
+      [app]
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.s3_buckets_service | default('s3_no_bucket', true) }}"
     nodes:
-      - "discourse"
+      - name: "app"
+        key: "discourse"
     run_stages:
       - tasks:
           - name: "discourse_setup"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
           - name: "discourse_rebuild"
             all_nodes: true
-            pods_tasks: true
+            pod_task: true
+services:
+  s3_no_bucket:
+    list: true
+    services: []
+  s3_buckets:
+    list: true
+    services:
+      - name: "s3_backup"
+        key: "s3_service_base"
+        params:
+          bucket: "{{ params.env_params.backup_bucket_name }}"
+          permission: "private"
+      - name: "s3_uploads"
+        key: "s3_service_base"
+        params:
+          bucket: "{{ params.env_params.uploads_bucket_name }}"
+          permission: "public-read"
+  s3_service_base:
+    base_dir: "custom-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/aws.main.s3.yml"
+    params_schema: "tasks/s3/params.schema.s3.yml"
+    credentials_schema: "tasks/s3/credentials.schema.s3.yml"
+    credentials:
+      s3: "s3"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host:children]
-        discourse
-        [discourse]
-clouds:
-  digital_ocean:
-    type: "digital_ocean"
-    credentials: "digital_ocean"
+  node_dns_service:
+    base_dir: "custom-cloud"
+    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
+    namespace: "ext_dns"
+    credentials:
+      dns: "{{ params.env_params.dns_provider }}"
     params:
-      x_digital_ocean_tags:
+      zone: "{{ params.env_params.domain }}"
+  digital_ocean_vpn:
+    base_dir: "custom-cloud"
+    task: "tasks/vpn/digital_ocean.main.vpn.yml"
+    credentials:
+      vpn: "digital_ocean"
+    params:
+      tags:
         - "auto"
         - "dmz"
-      x_digital_ocean_firewalls:
+      firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
         - name: "auto"
           tags: ["auto"]
           inbound_rules:
@@ -66,51 +107,43 @@ clouds:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
-dns:
-  cloudflare:
-    type: "cloudflare"
-    zone: "{{ params.env_params.domain }}"
-    credentials: "cloudflare"
-  godaddy:
-    type: "godaddy"
-    zone: "{{ params.env_params.domain }}"
-    credentials: "godaddy"
-buckets:
-  discourse_backup:
-    name: "{{ params.env_params.discourse_backup_bucket_name }}"
-    endpoint: "{{ params.env_params.discourse_backup_bucket_endpoint }}"
-    credentials: "discourse_backup_bucket"
-nodes:
-  discourse:
-    cloud: "{{ params.env_params.cloud_name }}"
-    base_dir: "/var"
-    credentials: "host"
-    pods: ["discourse"]
+  digital_ocean_node:
+    base_dir: "custom-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean.main.node.yml"
+    params_schema: "tasks/node/digital_ocean.params.schema.node.yml"
+    credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
+    credentials:
+      node: "digital_ocean"
     params:
-      dns:
-        - record: "forum"
-          name: "{{ params.env_params.dns_name }}"
-      instance:
-        image: "ubuntu-18-04-x64"
-        user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
-        ipv6: "yes"
-      region:
-        name: "ams3"
-        region: "ams"
-        zone: "3"
-      size:
-        name: "s-1vcpu-1gb"
-        memory: "1gb"
-        cpu: 1
-      host_test:
-        log_file: "/var/log/setup.log"
-        setup_finished_log_regex: "Setup Finished"
-        setup_finished_log_last_line: "Setup Finished"
-        initial_connection_timeout: 90
-        setup_finished_timeout: 300
-      x_digital_ocean_tags:
+      image_id: "ubuntu-18-04-x64"
+      ipv6: true
+      region_id: "ams3"
+      size_id: "s-1vcpu-1gb"
+      tags:
         - "auto"
         - "dmz"
+      user_data:
+        type: "template"
+        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        credentials:
+          node: "host"
+nodes:
+  discourse:
+    service: "{{ params.env_params.node_service }}"
+    dns_service: "node_dns_service"
+    base_dir: "/var"
+    tmp_dir: "/tmp/discourse/node"
+    credential: "host"
+    pods: ["discourse"]
+    params:
+      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+      host_test:
+        log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "$Setup Finished*"
+        setup_success_log_last_line: "Setup Finished - Success"
+        initial_connection_timeout: 90
+        setup_finished_timeout: 300
 pods:
   discourse:
     repo: "discourse_docker"
@@ -121,13 +154,11 @@ pods:
     env_files:
       - src: "{{ params.env.repo_dir }}/samples/discourse/setup.sh"
         dest: "shared/setup.sh"
-        root: true
         mode: "0755"
     env_templates:
       - src: "samples/discourse/app.yml"
         dest: "containers/app.yml"
-        root: true
-        params: "{{ params.env_params.app_params }}"
+        params: "{{ params.credentials.app_params }}"
     credentials:
       discourse_backup_bucket: "discourse_backup_bucket"
 tasks:
@@ -142,6 +173,9 @@ tasks:
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    version: "master"
+  custom_cloud:
+    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
     version: "master"
   discourse_docker:
     src: "https://github.com/discourse/discourse_docker.git"
