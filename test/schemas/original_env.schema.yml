@@ -1,0 +1,156 @@
+root: "env"
+schemas:
+  env:
+    type: "dict"
+    props:
+      name:
+        non_empty: true
+        type: "str"
+      ctxs:
+        non_empty: true
+        type: "list"
+        elem_type: "str"
+      ctl_env_schema:
+        type: "str"
+      env:
+        non_empty: true
+        schema: "env_base"
+      env_params:
+        non_empty: true
+        schema: "env_params"
+      credentials:
+        non_empty: true
+        schema: "credentials"
+  env_base:
+    type: "dict"
+    props:
+      repo:
+        schema: "repo"
+        non_empty: true
+      repo_dir:
+        type: "str"
+        non_empty: true
+      file:
+        type: "str"
+        non_empty: true
+  repo:
+    type: "dict"
+    props:
+      src:
+        type: "str"
+        non_empty: true
+      version:
+        type: "str"
+      ssh_file:
+        type: "str"
+      ssh_file_encrypted:
+        type: "bool"
+  env_params:
+    type: "dict"
+    props:
+      domain:
+        type: "str"
+        required: true
+      private_ips:
+        type: "list"
+        required: true
+        elem_type: "str"
+      dns_provider:
+        type: "str"
+        required: true
+      s3_bucket:
+        type: "str"
+        required: true
+      node:
+        type: "str"
+        required: true
+      dns_records:
+        type: "list"
+        required: true
+        elem_schema: "dns_record"
+        elem_non_empty: true
+      services:
+        type: "list"
+        required: true
+        elem_schema: "service"
+        elem_non_empty: true
+  dns_record:
+    type: "dict"
+    props:
+      value:
+        type: "str"
+        non_empty: true
+      ttl:
+        type: "int"
+  service:
+    type: "simple_dict"
+    alternative_type: "str"
+    props:
+      name:
+        type: "str"
+        non_empty: true
+      key:
+        type: "str"
+      tmp:
+        type: "bool"
+      can_destroy:
+        type: "bool"
+  credentials:
+    type: "dict"
+    props:
+      digital_ocean:
+        schema: "credential_digital_ocean"
+      s3:
+        schema: "credential_s3"
+      godaddy:
+        schema: "credential_godaddy"
+      cloudflare:
+        schema: "credential_cloudflare"
+  credential_digital_ocean:
+    type: "dict"
+    props:
+      api_token:
+        type: "str"
+        non_empty: true
+  credential_s3:
+    type: "dict"
+    props:
+      host:
+        type: "str"
+        non_empty: true
+      ssl:
+        type: "bool"
+        non_empty: true
+      endpoint:
+        type: "str"
+        non_empty: true
+      access_key:
+        type: "str"
+        non_empty: true
+      secret_key:
+        type: "str"
+        non_empty: true
+  credential_godaddy:
+    type: "dict"
+    props:
+      api_server:
+        type: "str"
+        non_empty: true
+      api_version:
+        type: "str"
+        non_empty: true
+      api_key:
+        type: "str"
+        non_empty: true
+      api_secret:
+        type: "str"
+        non_empty: true
+  credential_cloudflare:
+    type: "dict"
+    props:
+      email:
+        type: "str"
+        non_empty: true
+      token:
+        type: "str"
+        non_empty: true

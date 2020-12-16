@@ -2,6 +2,7 @@ name: "test__{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
+original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.schema.yml"
 meta:
   lax: true
   template_no_empty_lines: true
@@ -369,11 +370,11 @@ services:
   service_dns:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_name }}.main.dns.yml"
+    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
     params_schema: "tasks/dns/params.schema.dns.yml"
-    credentials_schema: "tasks/dns/{{ params.env_params.dns_name }}.credentials.schema.dns.yml"
+    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider }}.credentials.schema.dns.yml"
     credentials:
-      dns: "{{ params.env_params.dns_name }}"
+      dns: "{{ params.env_params.dns_provider }}"
     params:
       zone: "{{ params.env_params.domain }}"
       dns_type: "A"
