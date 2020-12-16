@@ -1,0 +1,30 @@
+root: "env"
+schemas:
+  env:
+    type: "dict"
+    lax: true
+    props:
+      env_params:
+        non_empty: true
+        schema: "env_params"
+  env_params:
+    type: "dict"
+    lax: true
+    props:
+      domain:
+        type: "str"
+        non_empty: true
+      private_ips:
+        type: "list"
+        non_empty: true
+        elem_type: "str"
+      dns_provider:
+        type: "str"
+        non_empty: true
+      node:
+        type: "str"
+        non_empty: true
+      dns_records:
+        type: "list"
+        non_empty: true
+        elem_type: "dict"

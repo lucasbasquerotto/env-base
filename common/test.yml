@@ -1,5 +1,5 @@
-name: "test__{{ params.name }}"
-ctxs: "{{ params.ctxs }}"
+name: "test__{{ params.name | default('') }}"
+ctxs: "{{ params.ctxs | default([]) }}"
 migration: ""
 container: ""
 original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.schema.yml"
@@ -223,16 +223,6 @@ main:
             dest: "tmp/test/ef1.yml"
           - src: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
             dest: "tmp/test/ef2.yml"
-  services:
-    repo: "cloud"
-    env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host]
-    initial_services: "{{ params.env_params.services }}"
   node_local:
     repo: "cloud"
     env_repos:
@@ -312,10 +302,22 @@ main:
       [app]
     nodes:
       - name: "app"
-        key: "{{ params.env_params.node }}"
+        key: "{{ params.env_params.node | default('') }}"
         absent: true
         tmp: true
         can_destroy: true
+    original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
+  services:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    initial_services: "{{ params.env_params.services | default([]) }}"
+    original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.services.schema.yml"
 services:
   digital_ocean_vpn:
     base_dir: "custom-cloud"
@@ -335,10 +337,10 @@ services:
           inbound_rules:
             - ports: "9080"
               sources:
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
             - ports: "9443"
               sources:
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
         - name: "auto"
           tags: ["auto"]
           inbound_rules:
@@ -370,16 +372,16 @@ services:
   service_dns:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
+    task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
     params_schema: "tasks/dns/params.schema.dns.yml"
-    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider }}.credentials.schema.dns.yml"
+    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.credentials.schema.dns.yml"
     credentials:
-      dns: "{{ params.env_params.dns_provider }}"
+      dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.domain }}"
+      zone: "{{ params.env_params.domain | default('') }}"
       dns_type: "A"
       record: "dev"
-      data_list: "{{ params.env_params.dns_records }}"
+      data_list: "{{ params.env_params.dns_records | default([]) }}"
   service_s3:
     base_dir: "custom-cloud"
     namespace: "ext_s3"
@@ -389,7 +391,7 @@ services:
     credentials:
       s3: "s3"
     params:
-      bucket: "{{ params.env_params.s3_bucket }}"
+      bucket: "{{ params.env_params.s3_bucket | default('') }}"
       permission: "public-read"
   digital_ocean_node_service:
     base_dir: "custom-cloud"
@@ -407,16 +409,21 @@ services:
       tags:
         - "auto"
         - "dmz"
+      user_data:
+        type: "template"
+        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        credentials:
+          node: "host"
   node_dns_service:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
+    task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
     params_schema: "tasks/dns/params.schema.dns.yml"
-    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider }}.credentials.schema.dns.yml"
+    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.credentials.schema.dns.yml"
     credentials:
-      dns: "{{ params.env_params.dns_provider }}"
+      dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.domain }}"
+      zone: "{{ params.env_params.domain | default('') }}"
   service_node_local:
     base_dir: "custom-cloud"
     namespace: "ext_node"
@@ -906,7 +913,6 @@ nodes:
         params:
           pod_param_4: "value_4"
     params:
-      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
       dns_service_params_list:
         - record: "test1"
           ttl: 100

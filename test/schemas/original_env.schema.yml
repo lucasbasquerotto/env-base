@@ -50,28 +50,21 @@ schemas:
     props:
       domain:
         type: "str"
-        required: true
       private_ips:
         type: "list"
-        required: true
         elem_type: "str"
       dns_provider:
         type: "str"
-        required: true
       s3_bucket:
         type: "str"
-        required: true
       node:
         type: "str"
-        required: true
       dns_records:
         type: "list"
-        required: true
         elem_schema: "dns_record"
         elem_non_empty: true
       services:
         type: "list"
-        required: true
         elem_schema: "service"
         elem_non_empty: true
   dns_record:
