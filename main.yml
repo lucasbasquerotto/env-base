@@ -175,7 +175,7 @@ tasks:
     cmd: "sleep {{ params.env_params.wait | default('60') }}"
 repos:
   cloud:
-    src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    src: "https://github.com/lucasbasquerotto/cloud.git"
     version: "master"
   main:
     src: "https://github.com/lucasbasquerotto/ansible-manager"

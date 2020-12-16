@@ -422,7 +422,7 @@ tasks:
     cmd: "./run upgrade"
 repos:
   cloud:
-    src: "https://github.com/lucasbasquerotto/ansible-docker.git"
+    src: "https://github.com/lucasbasquerotto/cloud.git"
     version: "master"
   custom_cloud:
     src: "https://github.com/lucasbasquerotto/custom-cloud.git"
