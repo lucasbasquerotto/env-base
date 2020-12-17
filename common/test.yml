@@ -269,9 +269,27 @@ main:
         local: true
         pods:
           test_pod_local:
+            transfer:
+              - src: |
+                  Test transfer content pod1 ctx
+                  Type: str
+                dest: "env-transfer/content.str_ctx1.txt"
+              - src: |
+                  Test transfer content pod1 overriden ctx (overriden ctx)
+                  Type: str
+                dest: "env-transfer/content.overriden_ctx1.txt"
             params:
               pod_param_1: "ctx overriden value"
           test_pod_local_2:
+            transfer:
+              - src: |
+                  Test transfer content pod2 ctx
+                  Type: str
+                dest: "env-transfer/content.str_ctx2.txt"
+              - src: |
+                  Test transfer content pod2 overriden ctx (overriden ctx)
+                  Type: str
+                dest: "env-transfer/content.overriden_ctx2.txt"
             params:
               pod_param_1: "ctx overriden value"
       - name: "custom_node_service_local"
@@ -957,10 +975,36 @@ nodes:
     pods:
       - name: "test_pod_local"
         key: "custom"
+        transfer:
+          - src: |
+              Test transfer content pod1
+              Type: str
+            dest: "env-transfer/content.str1.txt"
+          - src: |
+              Test transfer content pod1 overriden (overriden)
+              Type: str
+            dest: "env-transfer/content.overriden1.txt"
+          - src: |
+              Test transfer content pod1 overriden (overriden ctx)
+              Type: str
+            dest: "env-transfer/content.overriden_ctx1.txt"
         params:
           pod_param_2: "node overriden value"
       - name: "test_pod_local_2"
         key: "custom"
+        transfer:
+          - src: |
+              Test transfer content pod2
+              Type: str
+            dest: "env-transfer/content.str2.txt"
+          - src: |
+              Test transfer content pod2 overriden (overriden)
+              Type: str
+            dest: "env-transfer/content.overriden2.txt"
+          - src: |
+              Test transfer content pod2 overriden (overriden ctx)
+              Type: str
+            dest: "env-transfer/content.overriden_ctx2.txt"
         params:
           pod_param_2: "node overriden value"
     params:
@@ -997,6 +1041,48 @@ pods:
     root: true
     fast_prepare: true
     skip_unchanged: false
+    transfer:
+      - src: |
+          Test transfer content
+          Type: str
+        dest: "env-transfer/content.str.txt"
+      - src:
+          file: "custom-pod/test/run.sh"
+        dest: "env-transfer/content.file.sh"
+      - src:
+          type: "template"
+          file: "custom-pod/test/template.sh"
+          params:
+            value: "transfer content value"
+        dest: "env-transfer/content.template.sh"
+      - src:
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+        dest: "env-transfer/content.env_file.yml"
+      - src:
+          type: "template"
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+          params:
+            value1: "transfer content template value 1"
+            value2: "transfer content template value 2"
+        dest: "env-transfer/content.env_template.yml"
+      - src: |
+          Test transfer content pod1 (overriden)
+          Type: str
+        dest: "env-transfer/content.overriden1.txt"
+      - src: |
+          Test transfer content pod1 (overriden ctx)
+          Type: str
+        dest: "env-transfer/content.overriden_ctx1.txt"
+      - src: |
+          Test transfer content pod2 (overriden)
+          Type: str
+        dest: "env-transfer/content.overriden2.txt"
+      - src: |
+          Test transfer content pod2 (overriden ctx)
+          Type: str
+        dest: "env-transfer/content.overriden_ctx2.txt"
     credentials:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
