@@ -1,4 +1,4 @@
-# template repo 1
+# env template repo 1
 prop1:
   prop1_inner1: "{{ params.value1 }}"
   prop1_inner2: "{{ params.value2 }}"
