@@ -294,6 +294,15 @@ main:
                 dest: "env-transfer/content.overriden_ctx2.txt"
             params:
               pod_param_1: "ctx overriden value"
+        transfer:
+          - src: |
+              Test transfer node info content
+              Type: str
+            dest: "env-transfer/content.node.str.txt"
+          - src: |
+              Test transfer node content overriden (overriden)
+              Type: str
+            dest: "env-transfer/content.node.overriden.txt"
       - name: "custom_node_service_local"
         amount: 3
         max_amount: 5
@@ -1009,6 +1018,36 @@ nodes:
             dest: "env-transfer/content.overriden_ctx2.txt"
         params:
           pod_param_2: "node overriden value"
+    transfer:
+      - src: |
+          Test transfer node content
+          Type: str
+        dest: "env-transfer/content.node.str.txt"
+      - src:
+          file: "custom-pod/test/run.sh"
+        dest: "env-transfer/content.node.file.sh"
+      - src:
+          type: "template"
+          file: "custom-pod/test/template.sh"
+          params:
+            value: "transfer node content value"
+        dest: "env-transfer/content.node.template.sh"
+      - src:
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+        dest: "env-transfer/content.node.env_file.yml"
+      - src:
+          type: "template"
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+          params:
+            value1: "transfer node content template value 1"
+            value2: "transfer node content template value 2"
+        dest: "env-transfer/content.node.env_template.yml"
+      - src: |
+          Test transfer node content (overriden)
+          Type: str
+        dest: "env-transfer/content.node.overriden.txt"
     params:
       host_test:
         log_file: "/var/log/setup.log"
