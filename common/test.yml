@@ -23,6 +23,8 @@ main:
       after_nodes: "custom-cloud/test/hooks/after_nodes.yml"
       before_wait_nodes: "custom-cloud/test/hooks/before_wait_nodes.yml"
       after_wait_nodes: "custom-cloud/test/hooks/after_wait_nodes.yml"
+      before_prepare_nodes: "custom-cloud/test/hooks/before_prepare_nodes.yml"
+      after_prepare_nodes: "custom-cloud/test/hooks/after_prepare_nodes.yml"
       before_prepare: "custom-cloud/test/hooks/before_prepare.yml"
       after_prepare: "custom-cloud/test/hooks/after_prepare.yml"
       before_cron: "custom-cloud/test/hooks/before_cron.yml"
