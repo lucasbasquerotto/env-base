@@ -91,6 +91,8 @@ schemas:
   credentials:
     type: "dict"
     props:
+      host:
+        schema: "credential_host"
       digital_ocean:
         schema: "credential_digital_ocean"
       s3:
@@ -99,6 +101,23 @@ schemas:
         schema: "credential_godaddy"
       cloudflare:
         schema: "credential_cloudflare"
+  credential_host:
+    type: "dict"
+    props:
+      host_user:
+        type: "str"
+        non_empty: true
+      host_pass:
+        type: "str"
+        non_empty: true
+      host_ssh_public_keys_path:
+        type: "str"
+        non_empty: true
+      ssh_file:
+        type: "str"
+        non_empty: true
+      ssh_file_encrypted:
+        type: "bool"
   credential_digital_ocean:
     type: "dict"
     props:
