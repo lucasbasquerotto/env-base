@@ -298,7 +298,7 @@ main:
           - src: |
               Test transfer node info content
               Type: str
-            dest: "env-transfer/content.node.str.txt"
+            dest: "env-transfer/content.node.info_str.txt"
           - src: |
               Test transfer node content overriden (overriden)
               Type: str
@@ -1024,13 +1024,14 @@ nodes:
           Type: str
         dest: "env-transfer/content.node.str.txt"
       - src:
-          file: "custom-pod/test/run.sh"
+          file: "custom-cloud/test/extra-repos/cloud_file1.yml"
         dest: "env-transfer/content.node.file.sh"
       - src:
           type: "template"
-          file: "custom-pod/test/template.sh"
+          file: "custom-cloud/test/extra-repos/cloud_template1.yml"
           params:
-            value: "transfer node content value"
+            value1: "transfer node content value1"
+            value2: "transfer node content value2"
         dest: "env-transfer/content.node.template.sh"
       - src:
           origin: "env"
@@ -1041,8 +1042,8 @@ nodes:
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
           params:
-            value1: "transfer node content template value 1"
-            value2: "transfer node content template value 2"
+            value1: "transfer node env content template value 1"
+            value2: "transfer node env content template value 2"
         dest: "env-transfer/content.node.env_template.yml"
       - src: |
           Test transfer node content (overriden)
