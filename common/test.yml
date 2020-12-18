@@ -12,6 +12,11 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
+    cfg: |
+      [defaults]
+      interpreter_python=/usr/bin/python3
+      stdout_callback = default
+      collections_paths = collections
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -468,9 +473,14 @@ services:
         - "dmz"
       user_data:
         type: "template"
-        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        origin: "cloud"
+        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
         credentials:
           node: "host"
+        contents:
+          host_ssh_public_keys_path:
+            origin: "env"
+            file: "{{ credentials.host.host_ssh_public_keys_path | default('') }}"
   node_dns_service:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
