@@ -1049,6 +1049,19 @@ nodes:
           Test transfer node content (overriden)
           Type: str
         dest: "env-transfer/content.node.overriden.txt"
+      - src:
+          type: "template"
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
+          params_schema: "{{ params.env.repo_dir }}/test/files/template.params.schema.yml"
+          credentials_schema: "{{ params.env.repo_dir }}/test/files/template.credentials.schema.yml"
+          credentials:
+            cred1: "node_cred_content_1"
+            cred2: "node_cred_content_2"
+          params:
+            value1: "transfer node env main content template value 1"
+            value2: "transfer node env main content template value 2"
+        dest: "env-transfer/content.node.env_template.content.yml"
     params:
       host_test:
         log_file: "/var/log/setup.log"
@@ -1380,3 +1393,8 @@ credentials:
       inner_prop1: "inner2_3_value1"
   test_task_prop4: "value4_credential"
   test_task_prop5: "value5_credential"
+  node_cred_content_1:
+    secret1: "1234556"
+    secret2: 2
+  node_cred_content_2:
+    secret1: "1234556"

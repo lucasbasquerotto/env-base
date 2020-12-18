@@ -1,0 +1,7 @@
+# env content template file
+content_params:
+  param1: "{{ params.param1 }}"
+  param2: "{{ params.param2 }}"
+content_credentials:
+  credential1: "{{ credentials.cred1 }}"
+  credential2: "{{ credentials.cred2 }}"

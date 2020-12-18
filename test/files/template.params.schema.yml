@@ -1,0 +1,11 @@
+root: "test"
+schemas:
+  test:
+    type: "dict"
+    props:
+      value1:
+        required: true
+        type: "str"
+      value2:
+        required: true
+        type: "str"
