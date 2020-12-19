@@ -1,6 +1,24 @@
-root: "test"
+root: "template_schema"
 schemas:
-  test:
+  template_schema:
+    type: "dict"
+    props:
+      params:
+        schema: "params"
+        non_empty: true
+      credentials:
+        schema: "credentials"
+        non_empty: true
+  params:
+    type: "dict"
+    props:
+      value1:
+        required: true
+        type: "str"
+      value2:
+        required: true
+        type: "str"
+  credentials:
     type: "dict"
     props:
       cred1:

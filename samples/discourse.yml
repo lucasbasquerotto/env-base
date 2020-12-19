@@ -47,8 +47,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_s3"
     task: "tasks/s3/aws.main.s3.yml"
-    params_schema: "tasks/s3/params.schema.s3.yml"
-    credentials_schema: "tasks/s3/credentials.schema.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
     credentials:
       s3: "s3"
     params:
@@ -111,8 +110,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_node"
     task: "tasks/node/digital_ocean.main.node.yml"
-    params_schema: "tasks/node/digital_ocean.params.schema.node.yml"
-    credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
+    schema: "tasks/node/digital_ocean.schema.node.yml"
     credentials:
       node: "digital_ocean"
     params:

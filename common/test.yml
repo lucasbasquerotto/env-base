@@ -385,8 +385,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_vpn"
     task: "tasks/vpn/digital_ocean.main.vpn.yml"
-    params_schema: "tasks/vpn/digital_ocean.params.schema.vpn.yml"
-    credentials_schema: "tasks/vpn/digital_ocean.credentials.schema.vpn.yml"
+    schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -435,8 +434,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
     task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
-    params_schema: "tasks/dns/params.schema.dns.yml"
-    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.credentials.schema.dns.yml"
+    schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.schema.dns.yml"
     credentials:
       dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
@@ -448,8 +446,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_s3"
     task: "tasks/s3/aws.main.s3.yml"
-    params_schema: "tasks/s3/params.schema.s3.yml"
-    credentials_schema: "tasks/s3/credentials.schema.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
     credentials:
       s3: "s3"
     params:
@@ -459,8 +456,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_node"
     task: "tasks/node/digital_ocean.main.node.yml"
-    params_schema: "tasks/node/digital_ocean.params.schema.node.yml"
-    credentials_schema: "tasks/node/digital_ocean.credentials.schema.node.yml"
+    schema: "tasks/node/digital_ocean.schema.node.yml"
     credentials:
       node: "digital_ocean"
     params:
@@ -485,8 +481,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
     task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
-    params_schema: "tasks/dns/params.schema.dns.yml"
-    credentials_schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.credentials.schema.dns.yml"
+    schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.schema.dns.yml"
     credentials:
       dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
@@ -495,8 +490,7 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_node"
     task: "test/services/node/test.main.node.yml"
-    params_schema: "test/services/node/test.params.schema.node.yml"
-    credentials_schema: "test/services/node/test.credentials.schema.node.yml"
+    schema: "test/services/node/test.schema.node.yml"
     credentials:
       node: "node_service_local_credential"
     params:
@@ -1063,8 +1057,7 @@ nodes:
           type: "template"
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
-          params_schema: "{{ params.env.repo_dir }}/test/files/template.params.schema.yml"
-          credentials_schema: "{{ params.env.repo_dir }}/test/files/template.credentials.schema.yml"
+          schema: "{{ params.env.repo_dir }}/test/files/template.schema.yml"
           credentials:
             cred1: "node_cred_content_1"
             cred2: "node_cred_content_2"
@@ -1101,8 +1094,7 @@ pods:
       - repo: "custom_pod"
         dir: "custom-pod"
     ctx: "custom-pod/test/ctx.yml"
-    params_schema: "custom-pod/test/params.schema.yml"
-    credentials_schema: "custom-pod/test/credentials.schema.yml"
+    schema: "custom-pod/test/schema.yml"
     root: true
     fast_prepare: true
     skip_unchanged: false
@@ -1167,8 +1159,7 @@ tasks:
     type: "task"
     root: true
     file: "custom-cloud/test/run-tasks/task.yml"
-    params_schema: "custom-cloud/test/run-tasks/task.schema.yml"
-    credentials_schema: "custom-cloud/test/run-tasks/task.schema.yml"
+    schema: "custom-cloud/test/run-tasks/task.schema.yml"
     credentials:
       prop1: "test_task_prop1_cloud"
       prop2: "test_task_prop2"
@@ -1182,8 +1173,7 @@ tasks:
     target_origin: "env"
     root: true
     file: "{{ params.env.repo_dir }}/test/run-tasks/task.yml"
-    params_schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
-    credentials_schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
+    schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
     credentials:
       prop1: "test_task_prop1_env"
       prop2: "test_task_prop2"
@@ -1197,8 +1187,7 @@ tasks:
     target_origin: "pod"
     root: true
     file: "custom-pod/test/run-tasks/task.yml"
-    params_schema: "custom-pod/test/run-tasks/task.schema.yml"
-    credentials_schema: "custom-pod/test/run-tasks/task.schema.yml"
+    schema: "custom-pod/test/run-tasks/task.schema.yml"
     credentials:
       prop1: "test_task_prop1_pod"
       prop2: "test_task_prop2"
