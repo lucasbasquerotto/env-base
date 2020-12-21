@@ -1143,6 +1143,16 @@ pods:
     credentials:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
+    contents:
+      content_pod_1: |
+        Content pod 01
+        Line 02
+      content_pod_2:
+        type: "str"
+        params:
+          value: |
+            Content pod 02
+            Line 02
     params:
       env_files_dir: "{{ params.env.repo_dir }}/test/files"
       test_schema:
@@ -1179,6 +1189,16 @@ tasks:
       prop2: "test_task_prop2"
       prop4: "test_task_prop4"
       prop5: "test_task_prop5"
+    contents:
+      content_1: |
+        Content env run task 01
+        Line 02
+      content_2:
+        type: "str"
+        params:
+          value: |
+            Content env run task 02
+            Line 02
     shared_params: ["test_task", "test_task_env"]
     group_params:
       prop3: "test_task_prop3"
@@ -1193,6 +1213,16 @@ tasks:
       prop2: "test_task_prop2"
       prop4: "test_task_prop4"
       prop5: "test_task_prop5"
+    contents:
+      content_task_1: |
+        Content pod run task 01
+        Line 02
+      content_task_2:
+        type: "str"
+        params:
+          value: |
+            Content pod run task 02
+            Line 02
     shared_params: ["test_task", "test_task_pod"]
     group_params:
       prop3: "test_task_prop3"
