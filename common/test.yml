@@ -1071,7 +1071,7 @@ nodes:
           type: "template"
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
-          schema: "{{ params.env.repo_dir }}/test/files/template.schema.yml"
+          schema: "{{ params.env.repo_dir }}/test/files/template.content.schema.yml"
           credentials:
             cred1: "node_cred_content_1"
             cred2: "node_cred_content_2"

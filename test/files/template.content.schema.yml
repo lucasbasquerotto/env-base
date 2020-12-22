@@ -1,0 +1,46 @@
+root: "template_schema"
+schemas:
+  template_schema:
+    type: "dict"
+    props:
+      params:
+        schema: "params"
+        non_empty: true
+      credentials:
+        schema: "credentials"
+        non_empty: true
+  params:
+    type: "dict"
+    props:
+      value1:
+        required: true
+        type: "str"
+      value2:
+        required: true
+        type: "str"
+  credentials:
+    type: "dict"
+    props:
+      cred1:
+        required: true
+        schema: "cred1"
+      cred2:
+        required: true
+        schema: "cred2"
+  cred1:
+    type: "dict"
+    props:
+      secret1:
+        required: true
+        type: "str"
+      secret2:
+        required: true
+        type: "int"
+  cred2:
+    type: "dict"
+    props:
+      secret1:
+        required: true
+        type: "str"
+      secret2:
+        type: "str"
