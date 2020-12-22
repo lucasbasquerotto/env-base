@@ -1154,6 +1154,19 @@ pods:
           Test transfer content pod2 (overriden ctx)
           Type: str
         dest: "env-transfer/content.overriden_ctx2.txt"
+      - src:
+          type: "template"
+          origin: "cloud"
+          file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
+          schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+          credentials:
+            node: "host"
+          contents:
+            host_ssh_public_keys:
+              origin: "env"
+              file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
+        dest: "env-transfer/user_data.sh"
+        mode: 777
     credentials:
       pod_credential_1: my_credential_1_1
       pod_credential_2: my_credential_1_2
@@ -1167,6 +1180,17 @@ pods:
           value: |
             Content pod 02
             Line 02
+      user_data:
+        type: "template"
+        origin: "cloud"
+        file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
+        schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+        credentials:
+          node: "host"
+        contents:
+          host_ssh_public_keys:
+            origin: "env"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
     params:
       env_files_dir: "{{ params.env.repo_dir }}/test/files"
       test_schema:

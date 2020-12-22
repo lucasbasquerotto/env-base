@@ -1,12 +1,6 @@
-root: "env_template_schema"
+root: "env_template_params"
 schemas:
-  env_template_schema:
-    type: "dict"
-    props:
-      params:
-        schema: "params"
-        non_empty: true
-  params:
+  env_template_params:
     type: "dict"
     props:
       src:
@@ -14,6 +8,8 @@ schemas:
         type: "str"
       dest:
         required: true
+        type: "str"
+      schema:
         type: "str"
       params:
         required: true
