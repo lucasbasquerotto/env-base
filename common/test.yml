@@ -476,9 +476,9 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys_path:
+          host_ssh_public_keys:
             origin: "env"
-            file: "{{ credentials.host.host_ssh_public_keys_path | default('') }}"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
   node_dns_service:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
@@ -504,9 +504,9 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys_path:
+          host_ssh_public_keys:
             origin: "env"
-            file: "{{ credentials.host.host_ssh_public_keys_path | default('') }}"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
     params:
       prop1: "test value 1"
       user_datas:
@@ -1398,6 +1398,7 @@ credentials:
     host_pass: "123456"
   user:
     host_user: "root"
+  host: "{{ params.credentials.host | default({}) }}"
   my_credential_1_1: "my_secret_1_1"
   my_credential_1_2: "my_secret_1_2"
   my_credential_2_1: "my_secret_2_1"
