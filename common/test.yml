@@ -499,8 +499,8 @@ services:
       user_data:
         type: "template"
         origin: "cloud"
-        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
+        schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
         credentials:
           node: "host"
         contents:
