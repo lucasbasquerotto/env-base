@@ -46,7 +46,6 @@ env_params:
   s3_cli: "awscli"
   certbot_email: "lucasbasquerotto@gmail.com"
   auth_file: "{{ params.env_dir }}/.htpasswd"
-  auth_file_encrypted: false
   fluentd_output_plugin: "elasticsearch"
   backup_bucket_name: "lucasbasquerotto-prometheus-backup"
   backup_replica_bucket_name: "lucasbasquerotto-prometheus-replica-backup"

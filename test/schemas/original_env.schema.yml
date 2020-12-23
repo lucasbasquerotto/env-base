@@ -43,8 +43,6 @@ schemas:
         type: "str"
       ssh_file:
         type: "str"
-      ssh_file_encrypted:
-        type: "bool"
   env_params:
     type: "dict"
     props:
@@ -116,8 +114,6 @@ schemas:
       ssh_file:
         type: "str"
         non_empty: true
-      ssh_file_encrypted:
-        type: "bool"
   credential_digital_ocean:
     type: "dict"
     props:

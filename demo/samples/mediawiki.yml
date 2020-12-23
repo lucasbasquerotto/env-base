@@ -59,7 +59,6 @@ env_params:
   s3_cli: "awscli"
   certbot_email: "lucasbasquerotto@gmail.com"
   auth_file: "{{ params.env_dir }}/.htpasswd"
-  auth_file_encrypted: false
   backup_bucket_name: "lucasbasquerotto-mediawiki-backup"
   uploads_bucket_name: "lucasbasquerotto-mediawiki-uploads"
   backup_replica_bucket_name: "lucasbasquerotto-mediawiki-replica-backup"

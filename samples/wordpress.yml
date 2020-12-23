@@ -289,7 +289,6 @@ pods:
       use_certbot: "{{ params.env_params.use_certbot }}"
       block_ips: "{{ params.env_params.block_ips }}"
       auth_file: "{{ params.env_params.auth_file }}"
-      auth_file_encrypted: "{{ params.env_params.auth_file_encrypted | default(false) }}"
       s3_cli: "{{ params.env_params.s3_cli }}"
       backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
