@@ -1000,7 +1000,6 @@ nodes:
         initial_connection_timeout: 90
         setup_finished_timeout: 300
   custom_local:
-    credential: "user"
     pods:
       - name: "test_pod_local"
         key: "custom"
