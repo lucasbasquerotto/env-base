@@ -208,11 +208,18 @@ services:
       tags:
         - "auto"
         - "dmz"
+    contents:
       user_data:
         type: "template"
-        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        origin: "cloud"
+        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
         credentials:
           node: "host"
+        contents:
+          host_ssh_public_keys:
+            origin: "env"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
 nodes:
   mediawiki_local:
     credential: "user"
