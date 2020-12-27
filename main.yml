@@ -1,121 +1,153 @@
 name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 main:
+  local:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    nodes:
+    - name: "ctl"
+      key: "local"
+      local: true
   remote:
-    destroy:
-      nodes: true
-    clouds:
-    - "{{ params.env_params.cloud_name }}"
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+      ctl
+      [ctl]
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
     nodes:
     - name: "ctl"
       key: "remote"
-    run_stages:
-    - tasks:
-      - name: "docker_compose_install"
-        all_nodes: true
-        nodes_tasks: true
-      - name: "main_build"
-        all_nodes: true
-        pods_tasks: true
-    params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host:children]
-        ctl
-        [ctl]
   external:
-    destroy:
-      nodes: true
-    clouds:
-    - "{{ params.env_params.cloud_name }}"
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts:
+      type: "template"
+      file: "{{ params.env.repo_dir }}/files/external.hosts"
+      credentials:
+        ctl: "host"
+      params:
+        node_types:
+        - name: "ctl"
+          hosts:
+          - name: "ctl-external-host"
+            ip: "{{ params.env_params.external_ipv4 | default('') }}"
+            ipv4: "{{ params.env_params.external_ipv4 | default('') }}"
+            ipv6: "{{ params.env_params.external_ipv6 | default('') }}"
+            private_ip: "{{ params.env_params.external_private_ip | default('') }}"
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
     nodes:
     - name: "ctl"
       key: "remote"
       external: true
-      pod_params:
-        main:
-          test: true
-    dependencies:
-    - host: "main-domain-test"
-      node: "ctl"
-    - host: "main-domain-test-new"
-      node: "ctl"
-    run_stages:
-    - tasks:
-      - name: "docker_compose_install"
-        all_nodes: true
-        nodes_tasks: true
-      - name: "main_build"
-        all_nodes: true
-        pods_tasks: true
+services:
+  digital_ocean_vpn:
+    base_dir: "custom-cloud"
+    task: "tasks/vpn/digital_ocean.main.vpn.yml"
+    credentials:
+      vpn: "digital_ocean"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
-      hosts_file: "files/main/external.hosts"
-  local:
-    clouds:
-    - "local"
-    nodes:
-    - name: "ctl"
-      key: "local"
-    local:
-      pods:
-      - "main"
+      tags:
+        - "auto"
+        - "dmz"
+      firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.env_params.private_ips }}"
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "dmz"
+          tags: ["dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+  digital_ocean_node:
+    base_dir: "custom-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean.schema.node.yml"
+    credentials:
+      node: "digital_ocean"
     params:
-      entrypoint: "main.yml"
-      entrypoint_template_src: "main.tpl.yml"
-      repo: "cloud"
-      hosts_content: |
-        [main]
-        localhost ansible_connection=local
-        [host]
-clouds:
-  digital_ocean:
-    type: "digital_ocean"
-    credentials: "digital_ocean"
-    params:
-      x_digital_ocean_tags:
-      - "main"
-      x_digital_ocean_firewalls:
-      - name: "main"
-        tags: ["main"]
-        inbound_rules:
-        - ports: "22"
-          sources:
-            addresses: ["0.0.0.0/0", "::/0"]
-        outbound_rules:
-        - protocol: "tcp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - protocol: "udp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-        - protocol: "icmp"
-          ports: "1-65535"
-          destinations:
-            addresses: ["0.0.0.0/0", "::/0"]
-  local:
-    type: "local"
+      image_id: "ubuntu-18-04-x64"
+      ipv6: true
+      region_id: "ams3"
+      size_id: "s-1vcpu-1gb"
+      tags:
+        - "auto"
+        - "dmz"
+    contents:
+      user_data:
+        type: "template"
+        origin: "cloud"
+        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        credentials:
+          node: "host"
+        contents:
+          host_ssh_public_keys:
+            origin: "env"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
 nodes:
+  local: {}
   remote:
-    cloud: "{{ params.env_params.cloud_name }}"
+    service: "{{ params.env_params.node_service }}"
     base_dir: "/var/cloud"
-    credentials: "node"
+    credential: "host"
     pods: ["main"]
-    shared_params: ["do_ubuntu_remote"]
-  local:
-    cloud: "local"
-    base_dir: "/var/cloud"
-    credentials: "node"
-    pods: ["main"]
-    shared_params: ["local"]
+    params:
+      cron:
+        - user: "root"
+          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest_dir: "/var/spool/cron/crontabs"
+      host_test:
+        log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "$Setup Finished*"
+        setup_success_log_last_line: "Setup Finished - Success"
+        initial_connection_timeout: 90
+        setup_finished_timeout: 300
 node_shared_params:
   local:
     size:

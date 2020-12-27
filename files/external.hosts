@@ -1,0 +1,8 @@
+[main]
+localhost ansible_connection=local
+
+[host:children]
+ctl
+
+[ctl]
+main-app-nyc3-0001 ansible_host=159.203.79.145 ansible_user=main ansible_become_pass=abc123 ansible_ssh_private_key_file=/root/w/r/main/tmp/cloud/node/digital_ocean/app.key instance_type=external instance_key=external instance_index=1 ansible_host_public_ipv4=159.203.79.145 ansible_host_public_ipv6=2604:a880:800:a1::168:1 ansible_host_private_ip=10.132.42.131
