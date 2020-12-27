@@ -200,11 +200,18 @@ services:
       tags:
         - "auto"
         - "dmz"
+    contents:
       user_data:
         type: "template"
-        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        origin: "cloud"
+        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
         credentials:
           node: "host"
+        contents:
+          host_ssh_public_keys:
+            origin: "env"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
 nodes:
   wp_local:
     credential: "user"
@@ -263,10 +270,10 @@ pods:
       mysql: "mysql"
       minio_gateway: "minio_gateway"
       nextcloud: "nextcloud"
-      backup_bucket: "backup_bucket"
-      uploads_bucket: "uploads_bucket"
-      backup_replica_bucket: "backup_replica_bucket"
-      uploads_replica_bucket: "uploads_replica_bucket"
+      backup_bucket: "s3"
+      uploads_bucket: "s3"
+      backup_replica_bucket: "s3_replica"
+      uploads_replica_bucket: "s3_replica"
     params:
       type: "app"
       orchestration: "docker_compose"

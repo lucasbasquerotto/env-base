@@ -193,11 +193,18 @@ services:
       tags:
         - "auto"
         - "dmz"
+    contents:
       user_data:
         type: "template"
-        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        origin: "cloud"
+        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
         credentials:
           node: "host"
+        contents:
+          host_ssh_public_keys:
+            origin: "env"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
 nodes:
   efk_local:
     credential: "user"
@@ -224,7 +231,6 @@ nodes:
           custom_args: "efk_custom_args"
           custom_domain: "efk_custom_domain"
     params:
-      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       cron:
         - user: "root"
@@ -249,8 +255,8 @@ pods:
       efk: "efk"
       minio_gateway: "minio_gateway"
       nextcloud: "nextcloud"
-      backup_bucket: "backup_bucket"
-      backup_replica_bucket: "backup_replica_bucket"
+      backup_bucket: "s3"
+      backup_replica_bucket: "s3_replica"
     params:
       type: "app"
       orchestration: "docker_compose"

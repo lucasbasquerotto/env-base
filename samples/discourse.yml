@@ -121,11 +121,18 @@ services:
       tags:
         - "auto"
         - "dmz"
+    contents:
       user_data:
         type: "template"
-        file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
+        origin: "cloud"
+        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
         credentials:
           node: "host"
+        contents:
+          host_ssh_public_keys:
+            origin: "env"
+            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
 nodes:
   discourse:
     service: "{{ params.env_params.node_service }}"
@@ -149,16 +156,21 @@ pods:
     fast_prepare: "true"
     flat: true
     base_dir: "discourse"
-    env_files:
-      - src: "{{ params.env.repo_dir }}/samples/discourse/setup.sh"
+    transfer:
+      - src:
+          origin: "env"
+          file: "custom-cloud/run-tasks/discourse.setup.sh"
         dest: "shared/setup.sh"
         mode: "0755"
-    env_templates:
-      - src: "samples/discourse/app.yml"
+      - src:
+          type: "template"
+          origin: "env"
+          file: "samples/discourse/app.yml"
+          credentials:
+            discourse: "discourse"
         dest: "containers/app.yml"
-        params: "{{ params.credentials.app_params }}"
     credentials:
-      discourse_backup_bucket: "discourse_backup_bucket"
+      discourse_backup_bucket: "s3"
 tasks:
   discourse_setup:
     type: "shell"
