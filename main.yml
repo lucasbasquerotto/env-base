@@ -121,8 +121,10 @@ nodes:
     params:
       cron:
         - user: "root"
-          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-          dest_dir: "/var/spool/cron/crontabs"
+          src:
+            origin: "env"
+            file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest: "/var/spool/cron/crontabs/root"
       host_test:
         log_file: "/var/log/setup.log"
         setup_finished_log_regex: "$Setup Finished*"

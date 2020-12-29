@@ -274,82 +274,82 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
-        pods:
-          test_pod_local:
-            transfer:
-              - src: |
-                  Test transfer content pod1 ctx
-                  Type: str
-                dest: "env-transfer/content.str_ctx1.txt"
-              - src: |
-                  Test transfer content pod1 overriden ctx (overriden ctx)
-                  Type: str
-                dest: "env-transfer/content.overriden_ctx1.txt"
-            params:
-              pod_param_1: "ctx overriden value"
-          test_pod_local_2:
-            transfer:
-              - src: |
-                  Test transfer content pod2 ctx
-                  Type: str
-                dest: "env-transfer/content.str_ctx2.txt"
-              - src: |
-                  Test transfer content pod2 overriden ctx (overriden ctx)
-                  Type: str
-                dest: "env-transfer/content.overriden_ctx2.txt"
-            params:
-              pod_param_1: "ctx overriden value"
-        transfer:
-          - src: |
-              Test transfer node info content
-              Type: str
-            dest: "env-transfer/content.node.info_str.txt"
-          - src: |
-              Test transfer node content overriden (overriden)
-              Type: str
-            dest: "env-transfer/content.node.overriden.txt"
-      - name: "custom_node_service_local"
-        amount: 3
-        max_amount: 5
-    run_stages:
-      - tasks:
-          - name: "test_task_cloud"
-            all_nodes: true
-            node_task: true
-            params:
-              prop4: "overriden_cloud_1_4"
-            shared_params: ["test_task_overriden_1"]
-          - name: "test"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local"]
-            pod_task: true
-          - name: "test_skip"
-            all_nodes: true
-            node_task: true
-      - tasks:
-          - name: "test_task_env"
-            nodes: ["test_node_local"]
-            node_task: true
-            params:
-              prop4: "overriden_env_1_4"
-            shared_params: ["test_task_overriden_1"]
-          - name: "test_task_pod_1"
-            key: "test_task_pod"
-            all_nodes: true
-            pod_task: true
-            params:
-              prop4: "overriden_pod_1_4"
-            shared_params: ["test_task_overriden_1"]
-          - name: "test_task_pod_2"
-            key: "test_task_pod"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local_2"]
-            pod_task: true
-            params:
-              prop4: "overriden_pod_2_4"
-            shared_params: ["test_task_overriden_2"]
+        # pods:
+        #   test_pod_local:
+        #     transfer:
+        #       - src: |
+        #           Test transfer content pod1 ctx
+        #           Type: str
+        #         dest: "env-transfer/content.str_ctx1.txt"
+        #       - src: |
+        #           Test transfer content pod1 overriden ctx (overriden ctx)
+        #           Type: str
+        #         dest: "env-transfer/content.overriden_ctx1.txt"
+        #     params:
+        #       pod_param_1: "ctx overriden value"
+        #   test_pod_local_2:
+        #     transfer:
+        #       - src: |
+        #           Test transfer content pod2 ctx
+        #           Type: str
+        #         dest: "env-transfer/content.str_ctx2.txt"
+        #       - src: |
+        #           Test transfer content pod2 overriden ctx (overriden ctx)
+        #           Type: str
+        #         dest: "env-transfer/content.overriden_ctx2.txt"
+        #     params:
+        #       pod_param_1: "ctx overriden value"
+        # transfer:
+        #   - src: |
+        #       Test transfer node info content
+        #       Type: str
+        #     dest: "env-transfer/content.node.info_str.txt"
+        #   - src: |
+        #       Test transfer node content overriden (overriden)
+        #       Type: str
+        #     dest: "env-transfer/content.node.overriden.txt"
+      # - name: "custom_node_service_local"
+      #   amount: 3
+      #   max_amount: 5
+    # run_stages:
+    #   - tasks:
+    #       - name: "test_task_cloud"
+    #         all_nodes: true
+    #         node_task: true
+    #         params:
+    #           prop4: "overriden_cloud_1_4"
+    #         shared_params: ["test_task_overriden_1"]
+    #       - name: "test"
+    #         nodes:
+    #           - name: "test_node_local"
+    #             pods: ["test_pod_local"]
+    #         pod_task: true
+    #       - name: "test_skip"
+    #         all_nodes: true
+    #         node_task: true
+    #   - tasks:
+    #       - name: "test_task_env"
+    #         nodes: ["test_node_local"]
+    #         node_task: true
+    #         params:
+    #           prop4: "overriden_env_1_4"
+    #         shared_params: ["test_task_overriden_1"]
+    #       - name: "test_task_pod_1"
+    #         key: "test_task_pod"
+    #         all_nodes: true
+    #         pod_task: true
+    #         params:
+    #           prop4: "overriden_pod_1_4"
+    #         shared_params: ["test_task_overriden_1"]
+    #       - name: "test_task_pod_2"
+    #         key: "test_task_pod"
+    #         nodes:
+    #           - name: "test_node_local"
+    #             pods: ["test_pod_local_2"]
+    #         pod_task: true
+    #         params:
+    #           prop4: "overriden_pod_2_4"
+    #         shared_params: ["test_task_overriden_2"]
   node:
     repo: "cloud"
     env_repos:
@@ -1000,84 +1000,84 @@ nodes:
         initial_connection_timeout: 90
         setup_finished_timeout: 300
   custom_local:
-    pods:
-      - name: "test_pod_local"
-        key: "custom"
-        transfer:
-          - src: |
-              Test transfer content pod1
-              Type: str
-            dest: "env-transfer/content.str1.txt"
-          - src: |
-              Test transfer content pod1 overriden (overriden)
-              Type: str
-            dest: "env-transfer/content.overriden1.txt"
-          - src: |
-              Test transfer content pod1 overriden (overriden ctx)
-              Type: str
-            dest: "env-transfer/content.overriden_ctx1.txt"
-        params:
-          pod_param_2: "node overriden value"
-      - name: "test_pod_local_2"
-        key: "custom"
-        transfer:
-          - src: |
-              Test transfer content pod2
-              Type: str
-            dest: "env-transfer/content.str2.txt"
-          - src: |
-              Test transfer content pod2 overriden (overriden)
-              Type: str
-            dest: "env-transfer/content.overriden2.txt"
-          - src: |
-              Test transfer content pod2 overriden (overriden ctx)
-              Type: str
-            dest: "env-transfer/content.overriden_ctx2.txt"
-        params:
-          pod_param_2: "node overriden value"
-    transfer:
-      - src: |
-          Test transfer node content
-          Type: str
-        dest: "env-transfer/content.node.str.txt"
-      - src:
-          file: "custom-cloud/test/extra-repos/cloud_file1.yml"
-        dest: "env-transfer/content.node.file.sh"
-      - src:
-          type: "template"
-          file: "custom-cloud/test/extra-repos/cloud_template1.yml"
-          params:
-            value1: "transfer node content value1"
-            value2: "transfer node content value2"
-        dest: "env-transfer/content.node.template.sh"
-      - src:
-          origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
-        dest: "env-transfer/content.node.env_file.yml"
-      - src:
-          type: "template"
-          origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
-          params:
-            value1: "transfer node env content template value 1"
-            value2: "transfer node env content template value 2"
-        dest: "env-transfer/content.node.env_template.yml"
-      - src: |
-          Test transfer node content (overriden)
-          Type: str
-        dest: "env-transfer/content.node.overriden.txt"
-      - src:
-          type: "template"
-          origin: "env"
-          file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
-          schema: "{{ params.env.repo_dir }}/test/files/template.content.schema.yml"
-          credentials:
-            cred1: "node_cred_content_1"
-            cred2: "node_cred_content_2"
-          params:
-            value1: "transfer node env main content template value 1"
-            value2: "transfer node env main content template value 2"
-        dest: "env-transfer/content.node.env_template.content.yml"
+    # pods:
+    #   - name: "test_pod_local"
+    #     key: "custom"
+    #     transfer:
+    #       - src: |
+    #           Test transfer content pod1
+    #           Type: str
+    #         dest: "env-transfer/content.str1.txt"
+    #       - src: |
+    #           Test transfer content pod1 overriden (overriden)
+    #           Type: str
+    #         dest: "env-transfer/content.overriden1.txt"
+    #       - src: |
+    #           Test transfer content pod1 overriden (overriden ctx)
+    #           Type: str
+    #         dest: "env-transfer/content.overriden_ctx1.txt"
+    #     params:
+    #       pod_param_2: "node overriden value"
+    #   - name: "test_pod_local_2"
+    #     key: "custom"
+    #     transfer:
+    #       - src: |
+    #           Test transfer content pod2
+    #           Type: str
+    #         dest: "env-transfer/content.str2.txt"
+    #       - src: |
+    #           Test transfer content pod2 overriden (overriden)
+    #           Type: str
+    #         dest: "env-transfer/content.overriden2.txt"
+    #       - src: |
+    #           Test transfer content pod2 overriden (overriden ctx)
+    #           Type: str
+    #         dest: "env-transfer/content.overriden_ctx2.txt"
+    #     params:
+    #       pod_param_2: "node overriden value"
+    # transfer:
+    #   - src: |
+    #       Test transfer node content
+    #       Type: str
+    #     dest: "env-transfer/content.node.str.txt"
+    #   - src:
+    #       file: "custom-cloud/test/extra-repos/cloud_file1.yml"
+    #     dest: "env-transfer/content.node.file.sh"
+    #   - src:
+    #       type: "template"
+    #       file: "custom-cloud/test/extra-repos/cloud_template1.yml"
+    #       params:
+    #         value1: "transfer node content value1"
+    #         value2: "transfer node content value2"
+    #     dest: "env-transfer/content.node.template.sh"
+    #   - src:
+    #       origin: "env"
+    #       file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+    #     dest: "env-transfer/content.node.env_file.yml"
+    #   - src:
+    #       type: "template"
+    #       origin: "env"
+    #       file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+    #       params:
+    #         value1: "transfer node env content template value 1"
+    #         value2: "transfer node env content template value 2"
+    #     dest: "env-transfer/content.node.env_template.yml"
+    #   - src: |
+    #       Test transfer node content (overriden)
+    #       Type: str
+    #     dest: "env-transfer/content.node.overriden.txt"
+    #   - src:
+    #       type: "template"
+    #       origin: "env"
+    #       file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
+    #       schema: "{{ params.env.repo_dir }}/test/files/template.content.schema.yml"
+    #       credentials:
+    #         cred1: "node_cred_content_1"
+    #         cred2: "node_cred_content_2"
+    #       params:
+    #         value1: "transfer node env main content template value 1"
+    #         value2: "transfer node env main content template value 2"
+    #     dest: "env-transfer/content.node.env_template.content.yml"
     params:
       host_test:
         log_file: "/var/log/setup.log"
@@ -1087,8 +1087,10 @@ nodes:
         setup_finished_timeout: 5
       cron:
         - user: "root"
-          src_file: "{{ params.env.repo_dir }}/cron/app.cron"
-          dest_dir: "/var/spool/cron/crontabs"
+          src:
+            origin: "env"
+            file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest: "/var/spool/cron/crontabs/root"
   custom_node_service_local:
     service: "service_node_local"
     base_dir: "/var/cloud"
