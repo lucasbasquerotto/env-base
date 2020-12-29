@@ -26,7 +26,7 @@ main:
       ctl
       [ctl]
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.vpn_service | default('') }}"
     nodes:
     - name: "ctl"
       key: "remote"
@@ -50,7 +50,7 @@ main:
             ipv6: "{{ params.env_params.external_ipv6 | default('') }}"
             private_ip: "{{ params.env_params.external_private_ip | default('') }}"
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.vpn_service | default('') }}"
     nodes:
     - name: "ctl"
       key: "remote"
@@ -63,24 +63,14 @@ services:
       vpn: "digital_ocean"
     params:
       tags:
-        - "auto"
-        - "dmz"
+        - "main"
       firewalls:
-        - name: "private"
-          tags: ["auto"]
-          inbound_rules:
-            - ports: "9080"
-              sources:
-                addresses: "{{ params.env_params.private_ips }}"
-            - ports: "9443"
-              sources:
-                addresses: "{{ params.env_params.private_ips }}"
-        - name: "auto"
-          tags: ["auto"]
+        - name: "main"
+          tags: ["main"]
           inbound_rules:
             - ports: "22"
               sources:
-                tags: ["main"]
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -93,15 +83,6 @@ services:
             - protocol: "icmp"
               ports: "1-65535"
               destinations:
-                addresses: ["0.0.0.0/0", "::/0"]
-        - name: "dmz"
-          tags: ["dmz"]
-          inbound_rules:
-            - ports: "80"
-              sources:
-                addresses: ["0.0.0.0/0", "::/0"]
-            - ports: "443"
-              sources:
                 addresses: ["0.0.0.0/0", "::/0"]
   digital_ocean_node:
     base_dir: "custom-cloud"
@@ -116,8 +97,7 @@ services:
       region_id: "ams3"
       size_id: "s-1vcpu-1gb"
       tags:
-        - "auto"
-        - "dmz"
+        - "main"
     contents:
       user_data:
         type: "template"
@@ -131,9 +111,10 @@ services:
             origin: "env"
             file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
 nodes:
-  local: {}
+  local:
+    pods: ["main"]
   remote:
-    service: "{{ params.env_params.node_service }}"
+    service: "{{ params.env_params.node_service | default('') }}"
     base_dir: "/var/cloud"
     credential: "host"
     pods: ["main"]
@@ -148,76 +129,28 @@ nodes:
         setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
-node_shared_params:
-  local:
-    size:
-      memory: "1gb"
-      cpu: 1
-    cron:
-    - user: "root"
-      src_file: "{{ params.env.repo_dir }}/cron/main.cron"
-      dest_dir: "/var/spool/cron/crontabs"
-  do_ubuntu_remote:
-    instance:
-      image: "ubuntu-18-04-x64"
-      user_data_file: "{{ params.env.repo_dir }}/templates/ubuntu-18.04.j2.sh"
-      ipv6: "yes"
-    region:
-      name: "ams3"
-      region: "ams"
-      zone: "3"
-    size:
-      name: "s-1vcpu-1gb"
-      memory: "1gb"
-      cpu: 1
-    host_test:
-      log_file: "/var/log/setup.log"
-      setup_last_line: "Setup Finished"
-      initial_connection_timeout: 90
-      setup_finished_timeout: 300
-    x_digital_ocean_tags: ["main"]
 pods:
   main:
     repo: "main"
-    root: "yes"
-    ctx: "ctx.yml"
-    fast_prepare: "true"
     env_repos:
-    - repo: "main_env"
+    - repo: "env_main"
       dir: "env-main"
-    credentials:
-      vault: "vault"
-tasks:
-  skip:
-    type: "skip"
-  docker_compose_install:
-    type: "task"
-    root: "true"
-    file: "docker.yml"
-    compose_params:
-      version: "1.27.2"
-      remote: true
-  main_build:
-    type: "task"
-    root: "true"
-    file: "docker-compose.build.yml"
-  main_wait:
-    type: "shell"
-    root: "true"
-    cmd: "sleep {{ params.env_params.wait | default('60') }}"
+    root: true
+    fast_prepare: "true"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
     version: "master"
   main:
-    src: "https://github.com/lucasbasquerotto/ansible-manager"
+    src: "https://github.com/lucasbasquerotto/ctl.git"
     version: "master"
-  main_env:
+  env_main:
     src: "ssh://git@bitbucket.org/lucasbasquerotto/ansible-main-env-demo.git"
     version: "master"
-    private: true
-    key_file_encrypted: "ssh/env_main.encrypted.key"
+    ssh_file: "ssh/env_main.encrypted.key"
+  custom_cloud:
+    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+    version: "master"
 credentials:
-  node: "{{ params.credentials.node | default({}) }}"
-  vault: "{{ params.credentials.vault | default({}) }}"
+  host: "{{ params.credentials.host | default({}) }}"
   digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
