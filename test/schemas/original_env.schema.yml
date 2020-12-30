@@ -55,8 +55,9 @@ schemas:
         type: "str"
       s3_bucket:
         type: "str"
-      node:
-        type: "str"
+      nodes:
+        type: "list"
+        elem_schema: "node"
       dns_records:
         type: "list"
         elem_schema: "dns_record"
@@ -65,6 +66,21 @@ schemas:
         type: "list"
         elem_schema: "service"
         elem_non_empty: true
+  node:
+    type: "simple_dict"
+    alternative_type: "str"
+    props:
+      name:
+        type: "str"
+        non_empty: true
+      key:
+        type: "str"
+      absent:
+        type: "bool"
+      tmp:
+        type: "bool"
+      can_destroy:
+        type: "bool"
   dns_record:
     type: "dict"
     props:

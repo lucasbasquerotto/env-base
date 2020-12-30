@@ -21,9 +21,11 @@ schemas:
       dns_provider:
         type: "str"
         non_empty: true
-      node:
-        type: "str"
+      nodes:
+        type: "list"
         non_empty: true
+        elem_type: "simple_dict"
+        elem_alternative_type: "str"
       dns_records:
         type: "list"
         non_empty: true

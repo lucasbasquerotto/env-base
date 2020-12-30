@@ -355,19 +355,11 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host]
-      [host:children]
-      app
-      [app]
-    nodes:
-      - name: "app"
-        key: "{{ params.env_params.node | default('') }}"
-        absent: true
-        tmp: true
-        can_destroy: true
+    hosts:
+      type: "template"
+      file: "files/hosts.tpl.ini"
+      schema: "files/hosts.schema.yml"
+    nodes: "{{ params.env_params.nodes | default([]) }}"
     original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
   services:
     repo: "cloud"
@@ -996,8 +988,8 @@ nodes:
       host_test:
         log_file: "/var/log/setup.log"
         setup_finished_log_regex: "$Setup Finished*"
-        setup_success_log_last_line: "Setup Finished - Success"
-        initial_connection_timeout: 90
+        setup_success_log_last_line: "Setup Finished - Successx"
+        initial_connection_timeout: 300
         setup_finished_timeout: 300
   custom_local:
     pods:
