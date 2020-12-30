@@ -1,5 +1,7 @@
 name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
+meta:
+  template_no_empty_lines: true
 main:
   local:
     repo: "cloud"
@@ -11,9 +13,9 @@ main:
       localhost ansible_connection=local
       [host]
     nodes:
-    - name: "ctl"
-      key: "local"
-      local: true
+      - name: "ctl"
+        key: "local"
+        local: true
   remote:
     repo: "cloud"
     env_repos:
@@ -28,8 +30,8 @@ main:
     initial_services:
       - "{{ params.env_params.vpn_service | default('') }}"
     nodes:
-    - name: "ctl"
-      key: "remote"
+      - name: "ctl"
+        key: "remote"
   external:
     repo: "cloud"
     env_repos:
@@ -37,24 +39,25 @@ main:
         dir: "custom-cloud"
     hosts:
       type: "template"
-      file: "{{ params.env.repo_dir }}/files/external.hosts"
-      credentials:
-        ctl: "host"
+      file: "files/hosts.tpl.ini"
+      schema: "files/hosts.schema.yml"
       params:
-        node_types:
-        - name: "ctl"
-          hosts:
-          - name: "ctl-external-host"
-            ip: "{{ params.env_params.external_ipv4 | default('') }}"
-            ipv4: "{{ params.env_params.external_ipv4 | default('') }}"
-            ipv6: "{{ params.env_params.external_ipv6 | default('') }}"
-            private_ip: "{{ params.env_params.external_private_ip | default('') }}"
+        hosts:
+          ctl:
+            - name: "ctl-external-host"
+              ip: "{{ params.env_params.external_ip | default('') }}"
+              ipv4: "{{ params.env_params.external_ipv4 | default('') }}"
+              ipv6: "{{ params.env_params.external_ipv6 | default('') }}"
+              private_ip: "{{ params.env_params.external_private_ip | default('') }}"
     initial_services:
       - "{{ params.env_params.vpn_service | default('') }}"
     nodes:
-    - name: "ctl"
-      key: "remote"
-      external: true
+      - name: "ctl"
+        key: "remote"
+        external: true
+      - name: "ctl2"
+        key: "remote"
+        external: true
 services:
   digital_ocean_vpn:
     base_dir: "custom-cloud"
@@ -135,8 +138,8 @@ pods:
   main:
     repo: "main"
     env_repos:
-    - repo: "env_main"
-      dir: "env-main"
+      - repo: "env_main"
+        dir: "env-main"
     root: true
     fast_prepare: "true"
 repos:
