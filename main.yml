@@ -55,9 +55,6 @@ main:
       - name: "ctl"
         key: "remote"
         external: true
-      - name: "ctl2"
-        key: "remote"
-        external: true
 services:
   digital_ocean_vpn:
     base_dir: "custom-cloud"
