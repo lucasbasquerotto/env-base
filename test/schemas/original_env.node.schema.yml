@@ -21,6 +21,9 @@ schemas:
       dns_provider:
         type: "str"
         non_empty: true
+      vpn_service:
+        type: "str"
+        non_empty: true
       nodes:
         type: "list"
         non_empty: true

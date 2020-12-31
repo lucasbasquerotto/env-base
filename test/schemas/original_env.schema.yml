@@ -55,6 +55,8 @@ schemas:
         type: "str"
       s3_bucket:
         type: "str"
+      vpn_service:
+        type: "str"
       nodes:
         type: "list"
         elem_schema: "node"

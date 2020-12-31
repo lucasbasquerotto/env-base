@@ -359,6 +359,8 @@ main:
       type: "template"
       file: "files/hosts.tpl.ini"
       schema: "files/hosts.schema.yml"
+    initial_services:
+      - "{{ params.env_params.vpn_service | default({}) }}"
     nodes: "{{ params.env_params.nodes | default([]) }}"
     original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
   services:
@@ -400,6 +402,7 @@ services:
             - ports: "22"
               sources:
                 tags: ["main"]
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -973,7 +976,7 @@ nodes:
     service: "digital_ocean_node_service"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
-    credential: "fake_user"
+    credential: "host"
     pods:
       - name: "test_pod"
         key: "custom"
@@ -989,7 +992,7 @@ nodes:
         log_file: "/var/log/setup.log"
         setup_finished_log_regex: "$Setup Finished*"
         setup_success_log_last_line: "Setup Finished - Successx"
-        initial_connection_timeout: 300
+        initial_connection_timeout: 90
         setup_finished_timeout: 300
   custom_local:
     pods:
