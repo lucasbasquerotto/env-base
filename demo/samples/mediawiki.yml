@@ -5,7 +5,7 @@ env:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "samples/mediawiki.yml"
+  file: "examples/mediawiki.yml"
 env_params:
   cloud_name: "digital_ocean"
   domain: "lucasbasquerotto.com"

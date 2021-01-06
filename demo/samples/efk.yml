@@ -5,7 +5,7 @@ env:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "samples/efk.yml"
+  file: "examples/efk.yml"
 env_params:
   private_ips: []
   cloud_name: "digital_ocean"

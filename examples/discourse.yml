@@ -165,7 +165,7 @@ pods:
       - src:
           type: "template"
           origin: "env"
-          file: "samples/discourse/app.yml"
+          file: "examples/discourse/app.yml"
           credentials:
             discourse: "discourse"
         dest: "containers/app.yml"
