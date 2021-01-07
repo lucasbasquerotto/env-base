@@ -989,9 +989,9 @@ nodes:
         - record: "test2"
           ttl: 200
       host_test:
-        log_file: "/var/log/setup.log"
-        setup_finished_log_regex: "$Setup Finished*"
-        setup_success_log_last_line: "Setup Finished - Successx"
+        setup_log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "^Setup Finished.*$"
+        setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
   custom_local:
@@ -1075,7 +1075,7 @@ nodes:
         dest: "env-transfer/content.node.env_template.content.yml"
     params:
       host_test:
-        log_file: "/var/log/setup.log"
+        setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
         setup_success_log_last_line: "Setup Finished"
         initial_connection_timeout: 3
@@ -1092,7 +1092,7 @@ nodes:
     credential: "user"
     params:
       host_test:
-        log_file: "/var/log/setup.log"
+        setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
         setup_success_log_last_line: "Setup Finished"
         initial_connection_timeout: 3
