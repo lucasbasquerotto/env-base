@@ -141,12 +141,6 @@ schemas:
   credential_s3:
     type: "dict"
     props:
-      host:
-        type: "str"
-        non_empty: true
-      ssl:
-        type: "bool"
-        non_empty: true
       endpoint:
         type: "str"
         non_empty: true
