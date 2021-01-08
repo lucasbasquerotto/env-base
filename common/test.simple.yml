@@ -1,0 +1,15 @@
+name: "{{ project_name }}"
+ctxs: ["ctx"]
+ctl_env_schema: "test/schemas/ctl_env.simple.schema.yml"
+main:
+  ctx:
+    repo: "cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    ctl_env_schema: "test/schemas/ctl_env.simple.ctx.schema.yml"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"

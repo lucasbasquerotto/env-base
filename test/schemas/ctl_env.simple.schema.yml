@@ -1,0 +1,9 @@
+root: "env"
+schemas:
+  env:
+    type: "dict"
+    props:
+      name:
+        type: "str"
+      ctx:
+        type: "str"
