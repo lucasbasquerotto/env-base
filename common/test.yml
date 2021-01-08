@@ -1107,7 +1107,6 @@ pods:
     schema: "custom-pod/test/schema.yml"
     root: true
     fast_prepare: true
-    skip_unchanged: false
     transfer:
       - src: |
           Test transfer content
