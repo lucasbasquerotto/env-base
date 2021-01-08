@@ -1,8 +1,8 @@
-name: "{{ params.name }}"
-ctxs: "{{ params.ctxs }}"
+name: "{{ params.name | default('repos') }}"
+ctxs: ["repos_ctx"]
 container: ""
 main:
-  repos:
+  repos_ctx:
     repo: "cloud"
     hosts: |
       [main]
