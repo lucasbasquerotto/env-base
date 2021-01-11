@@ -977,6 +977,7 @@ nodes:
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     credential: "host"
+    root: true
     pods:
       - name: "test_pod"
         key: "custom"
