@@ -159,7 +159,7 @@ pods:
     transfer:
       - src:
           origin: "env"
-          file: "custom-cloud/run-tasks/discourse.setup.sh"
+          file: "custom-cloud/run-tasks/discourse-setup.sh"
         dest: "shared/setup.sh"
         mode: "0755"
       - src:
