@@ -436,7 +436,7 @@ services:
       zone: "{{ params.env_params.domain | default('') }}"
       dns_type: "A"
       record: "dev"
-      dns_values: "{{ params.env_params.dns_records | default([]) }}"
+      value: "{{ params.env_params.dns_records | default([]) }}"
   service_s3:
     base_dir: "custom-cloud"
     namespace: "ext_s3"
