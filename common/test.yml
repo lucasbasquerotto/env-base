@@ -57,37 +57,53 @@ main:
         single: true
         tmp: true
         can_destroy: true
+        credentials:
+          service_credential_overridden: "my_credential_overridden"
+          service_credential_initial: "my_credential_initial"
+        contents:
+          my_content_initial: |
+            My Content Initial
+            Line 02
+          my_content_overridden: |
+            My Content Overridden
+            Line 02
         params:
-          param1: "value_overriden_1_1"
+          param1: "value_overridden_1_1"
         group_params:
-          param1: "overriden_group_1_1"
-          param2: "overriden_group_1_2"
-        shared_params: ["overriden_s1"]
-        shared_group_params: "overriden_g1"
+          param1: "overridden_group_1_1"
+          param2: "overridden_group_1_2"
+        shared_params: ["overridden_s1"]
+        shared_group_params: "overridden_g1"
       - name: "test_service_2_initial"
         key: "test_service_2"
         single: true
         absent: true
         params:
-          param1: "value_overriden_2_1"
+          param1: "value_overridden_2_1"
         group_params:
-          param1: "overriden_group_2_1"
-          param2: "overriden_group_2_2"
-        shared_params: ["overriden_s2"]
-        shared_group_params: "overriden_g2"
+          param1: "overridden_group_2_1"
+          param2: "overridden_group_2_2"
+        shared_params: ["overridden_s2"]
+        shared_group_params: "overridden_g2"
     final_services:
       - "test_service_3"
       - name: "test_service_1_final"
         key: "test_service_1"
         single: true
         tmp: true
+        credentials:
+          service_credential_final: "my_credential_final"
+        contents:
+          my_content_final: |
+            My Content Final
+            Line 02
         params:
-          param1: "value_overriden_1_1"
+          param1: "value_overridden_1_1"
         group_params:
-          param1: "overriden_group_1_1"
-          param2: "overriden_group_1_2"
-        shared_params: ["overriden_s1"]
-        shared_group_params: "overriden_g1"
+          param1: "overridden_group_1_1"
+          param2: "overridden_group_1_2"
+        shared_params: ["overridden_s1"]
+        shared_group_params: "overridden_g1"
       - name: "test_list_2_final"
         key: "test_list_2"
         tmp: true
@@ -282,11 +298,17 @@ main:
                   Type: str
                 dest: "env-transfer/content.str_ctx1.txt"
               - src: |
-                  Test transfer content pod1 overriden ctx (overriden ctx)
+                  Test transfer content pod1 overridden ctx (overridden ctx)
                   Type: str
-                dest: "env-transfer/content.overriden_ctx1.txt"
+                dest: "env-transfer/content.overridden_ctx1.txt"
             params:
-              pod_param_1: "ctx overriden value"
+              pod_param_1: "ctx overridden value"
+            credentials:
+              pod_credential_overridden_ctx: "my_credential_pod_overridden_ctx_1"
+            contents:
+              content_pod_overridden_ctx: |
+                Content pod overridden ctx 01
+                Line 02
           test_pod_local_2:
             transfer:
               - src: |
@@ -294,20 +316,26 @@ main:
                   Type: str
                 dest: "env-transfer/content.str_ctx2.txt"
               - src: |
-                  Test transfer content pod2 overriden ctx (overriden ctx)
+                  Test transfer content pod2 overridden ctx (overridden ctx)
                   Type: str
-                dest: "env-transfer/content.overriden_ctx2.txt"
+                dest: "env-transfer/content.overridden_ctx2.txt"
             params:
-              pod_param_1: "ctx overriden value"
+              pod_param_1: "ctx overridden value"
+            credentials:
+              pod_credential_overridden_ctx: "my_credential_pod_overridden_ctx_2"
+            contents:
+              content_pod_overridden_ctx: |
+                Content pod overridden ctx 02
+                Line 02
         transfer:
           - src: |
               Test transfer node info content
               Type: str
             dest: "env-transfer/content.node.info_str.txt"
           - src: |
-              Test transfer node content overriden (overriden)
+              Test transfer node content overridden (overridden)
               Type: str
-            dest: "env-transfer/content.node.overriden.txt"
+            dest: "env-transfer/content.node.overridden.txt"
       - name: "custom_node_service_local"
         amount: 3
         max_amount: 5
@@ -316,9 +344,19 @@ main:
           - name: "test_task_cloud"
             all_nodes: true
             node_task: true
+            credentials:
+              overridden: "test_task_overridden"
+              run_stage: "test_task_run_stage"
             params:
-              prop4: "overriden_cloud_1_4"
-            shared_params: ["test_task_overriden_1"]
+              prop4: "overridden_cloud_1_4"
+            shared_params: ["test_task_overridden_1"]
+            contents:
+              content_task_run_stage: |
+                Content Tasks Cloud Run Stage
+                Line 02
+              content_task_overridden: |
+                Content Tasks Cloud Overridden
+                Line 02
           - name: "test"
             nodes:
               - name: "test_node_local"
@@ -332,15 +370,15 @@ main:
             nodes: ["test_node_local"]
             node_task: true
             params:
-              prop4: "overriden_env_1_4"
-            shared_params: ["test_task_overriden_1"]
+              prop4: "overridden_env_1_4"
+            shared_params: ["test_task_overridden_1"]
           - name: "test_task_pod_1"
             key: "test_task_pod"
             all_nodes: true
             pod_task: true
             params:
-              prop4: "overriden_pod_1_4"
-            shared_params: ["test_task_overriden_1"]
+              prop4: "overridden_pod_1_4"
+            shared_params: ["test_task_overridden_1"]
           - name: "test_task_pod_2"
             key: "test_task_pod"
             nodes:
@@ -348,8 +386,8 @@ main:
                 pods: ["test_pod_local_2"]
             pod_task: true
             params:
-              prop4: "overriden_pod_2_4"
-            shared_params: ["test_task_overriden_2"]
+              prop4: "overridden_pod_2_4"
+            shared_params: ["test_task_overridden_2"]
   node:
     repo: "cloud"
     env_repos:
@@ -578,6 +616,7 @@ services:
     credentials:
       service_credential_1: "my_credential_1_1"
       service_credential_2: "my_credential_1_2"
+      service_credential_overridden: "my_credential_1_1"
     params:
       param1: "value_1_1"
     group_params:
@@ -585,6 +624,16 @@ services:
       param2: "group_1_2"
     shared_params: ["value_s1"]
     shared_group_params: "value_g1"
+    contents:
+      my_content_1: |
+        My Content 01
+        Line 02
+      my_content_2: |
+        My Content 02
+        Line 02
+      my_content_overridden: |
+        My Content (Overridden)
+        Line 02
   test_service_2:
     base_dir: "custom-cloud"
     task: "test/services/general/02.yml"
@@ -616,8 +665,11 @@ services:
     services:
       - name: "test_service_1"
         single: true
-      - name: "test_service_2"
+      - name: "test_service_2_overridden"
+        key: "test_service_2"
         single: true
+        credentials:
+          service_credential_overridden: "my_credential_overridden"
   test_list_2:
     list: true
     services:
@@ -629,12 +681,12 @@ services:
         single: true
         absent: true
         params:
-          param1: "value_overriden_2_1"
+          param1: "value_overridden_2_1"
         group_params:
-          param1: "overriden_group_2_1"
-          param2: "overriden_group_2_2"
-        shared_params: ["overriden_s2"]
-        shared_group_params: "overriden_g2"
+          param1: "overridden_group_2_1"
+          param2: "overridden_group_2_2"
+        shared_params: ["overridden_s2"]
+        shared_group_params: "overridden_g2"
   test_list_3:
     list: true
     services:
@@ -809,21 +861,21 @@ service_shared_group_params:
     param2: "shared_1_2"
     param3: "shared_1_3"
     param4: "shared_1_4"
-  overriden_g1:
-    param1: "overriden_shared_1_1"
-    param2: "overriden_shared_1_2"
-    param3: "overriden_shared_1_3"
-    param4: "overriden_shared_1_4"
+  overridden_g1:
+    param1: "overridden_shared_1_1"
+    param2: "overridden_shared_1_2"
+    param3: "overridden_shared_1_3"
+    param4: "overridden_shared_1_4"
   value_g2:
     param1: "shared_2_1"
     param2: "shared_2_2"
     param3: "shared_2_3"
     param4: "shared_2_4"
-  overriden_g2:
-    param1: "overriden_shared_2_1"
-    param2: "overriden_shared_2_2"
-    param3: "overriden_shared_2_3"
-    param4: "overriden_shared_2_4"
+  overridden_g2:
+    param1: "overridden_shared_2_1"
+    param2: "overridden_shared_2_2"
+    param3: "overridden_shared_2_3"
+    param4: "overridden_shared_2_4"
   value_g3:
     param1: "shared_3_1"
     param2: "shared_3_2"
@@ -864,18 +916,18 @@ service_shared_params:
     param1: "value_shared_1_1"
     param2: "value_shared_1_2"
     param3: "value_shared_1_3"
-  overriden_s1:
-    param1: "value_overriden_shared_1_1"
-    param2: "value_overriden_shared_1_2"
-    param3: "value_overriden_shared_1_3"
+  overridden_s1:
+    param1: "value_overridden_shared_1_1"
+    param2: "value_overridden_shared_1_2"
+    param3: "value_overridden_shared_1_3"
   value_s2:
     param1: "value_shared_2_1"
     param2: "value_shared_2_2"
     param3: "value_shared_2_3"
-  overriden_s2:
-    param1: "value_overriden_shared_2_1"
-    param2: "value_overriden_shared_2_2"
-    param3: "value_overriden_shared_2_3"
+  overridden_s2:
+    param1: "value_overridden_shared_2_1"
+    param2: "value_overridden_shared_2_2"
+    param3: "value_overridden_shared_2_3"
   value_s3:
     param1: "value_shared_3_1"
     param2: "value_shared_3_2"
@@ -907,28 +959,28 @@ service_shared_params:
 service_group_params:
   group_1_1: "value_group_1_1"
   group_1_2: "value_group_1_2"
-  overriden_group_1_1: "value_overriden_group_1_1"
-  overriden_group_1_2: "value_overriden_group_1_2"
+  overridden_group_1_1: "value_overridden_group_1_1"
+  overridden_group_1_2: "value_overridden_group_1_2"
   shared_1_1: "value_group_shared_1_1"
   shared_1_2: "value_group_shared_1_2"
   shared_1_3: "value_group_shared_1_3"
   shared_1_4: "value_group_shared_1_4"
-  overriden_shared_1_1: "value_overriden_group_shared_1_1"
-  overriden_shared_1_2: "value_overriden_group_shared_1_2"
-  overriden_shared_1_3: "value_overriden_group_shared_1_3"
-  overriden_shared_1_4: "value_overriden_group_shared_1_4"
+  overridden_shared_1_1: "value_overridden_group_shared_1_1"
+  overridden_shared_1_2: "value_overridden_group_shared_1_2"
+  overridden_shared_1_3: "value_overridden_group_shared_1_3"
+  overridden_shared_1_4: "value_overridden_group_shared_1_4"
   group_2_1: "value_group_2_1"
   group_2_2: "value_group_2_2"
-  overriden_group_2_1: "value_overriden_group_2_1"
-  overriden_group_2_2: "value_overriden_group_2_2"
+  overridden_group_2_1: "value_overridden_group_2_1"
+  overridden_group_2_2: "value_overridden_group_2_2"
   shared_2_1: "value_group_shared_2_1"
   shared_2_2: "value_group_shared_2_2"
   shared_2_3: "value_group_shared_2_3"
   shared_2_4: "value_group_shared_2_4"
-  overriden_shared_2_1: "value_overriden_group_shared_2_1"
-  overriden_shared_2_2: "value_overriden_group_shared_2_2"
-  overriden_shared_2_3: "value_overriden_group_shared_2_3"
-  overriden_shared_2_4: "value_overriden_group_shared_2_4"
+  overridden_shared_2_1: "value_overridden_group_shared_2_1"
+  overridden_shared_2_2: "value_overridden_group_shared_2_2"
+  overridden_shared_2_3: "value_overridden_group_shared_2_3"
+  overridden_shared_2_4: "value_overridden_group_shared_2_4"
   group_3_1: "value_group_3_1"
   group_3_2: "value_group_3_2"
   shared_3_1: "value_group_shared_3_1"
@@ -1005,15 +1057,29 @@ nodes:
               Type: str
             dest: "env-transfer/content.str1.txt"
           - src: |
-              Test transfer content pod1 overriden (overriden)
+              Test transfer content pod1 overridden (overridden)
               Type: str
-            dest: "env-transfer/content.overriden1.txt"
+            dest: "env-transfer/content.overridden1.txt"
           - src: |
-              Test transfer content pod1 overriden (overriden ctx)
+              Test transfer content pod1 overridden (overridden ctx)
               Type: str
-            dest: "env-transfer/content.overriden_ctx1.txt"
+            dest: "env-transfer/content.overridden_ctx1.txt"
         params:
-          pod_param_2: "node overriden value"
+          pod_param_2: "node overridden value"
+        credentials:
+          pod_credential_node: "my_credential_pod_node_1"
+          pod_credential_overridden: "my_credential_pod_overridden_1"
+          pod_credential_overridden_ctx: "my_credential_pod_node_1"
+        contents:
+          content_pod_node: |
+            Content pod node 01
+            Line 02
+          content_pod_overridden: |
+            Content pod overridden 01 (node pod)
+            Line 02
+          content_pod_overridden_ctx: |
+            Content pod overridden 01 (node pod - ctx)
+            Line 02
       - name: "test_pod_local_2"
         key: "custom"
         transfer:
@@ -1022,15 +1088,29 @@ nodes:
               Type: str
             dest: "env-transfer/content.str2.txt"
           - src: |
-              Test transfer content pod2 overriden (overriden)
+              Test transfer content pod2 overridden (overridden)
               Type: str
-            dest: "env-transfer/content.overriden2.txt"
+            dest: "env-transfer/content.overridden2.txt"
           - src: |
-              Test transfer content pod2 overriden (overriden ctx)
+              Test transfer content pod2 overridden (overridden ctx)
               Type: str
-            dest: "env-transfer/content.overriden_ctx2.txt"
+            dest: "env-transfer/content.overridden_ctx2.txt"
         params:
-          pod_param_2: "node overriden value"
+          pod_param_2: "node overridden value"
+        credentials:
+          pod_credential_node: "my_credential_pod_node_2"
+          pod_credential_overridden: "my_credential_pod_overridden_2"
+          pod_credential_overridden_ctx: "my_credential_pod_node_2"
+        contents:
+          content_pod_node: |
+            Content pod node 02
+            Line 02
+          content_pod_overridden: |
+            Content pod overridden 02 (node pod)
+            Line 02
+          content_pod_overridden_ctx: |
+            Content pod overridden 02 (node pod - ctx)
+            Line 02
     transfer:
       - src: |
           Test transfer node content
@@ -1059,9 +1139,9 @@ nodes:
             value2: "transfer node env content template value 2"
         dest: "env-transfer/content.node.env_template.yml"
       - src: |
-          Test transfer node content (overriden)
+          Test transfer node content (overridden)
           Type: str
-        dest: "env-transfer/content.node.overriden.txt"
+        dest: "env-transfer/content.node.overridden.txt"
       - src:
           type: "template"
           origin: "env"
@@ -1135,21 +1215,21 @@ pods:
             value2: "transfer content template value 2"
         dest: "env-transfer/content.env_template.yml"
       - src: |
-          Test transfer content pod1 (overriden)
+          Test transfer content pod1 (overridden)
           Type: str
-        dest: "env-transfer/content.overriden1.txt"
+        dest: "env-transfer/content.overridden1.txt"
       - src: |
-          Test transfer content pod1 (overriden ctx)
+          Test transfer content pod1 (overridden ctx)
           Type: str
-        dest: "env-transfer/content.overriden_ctx1.txt"
+        dest: "env-transfer/content.overridden_ctx1.txt"
       - src: |
-          Test transfer content pod2 (overriden)
+          Test transfer content pod2 (overridden)
           Type: str
-        dest: "env-transfer/content.overriden2.txt"
+        dest: "env-transfer/content.overridden2.txt"
       - src: |
-          Test transfer content pod2 (overriden ctx)
+          Test transfer content pod2 (overridden ctx)
           Type: str
-        dest: "env-transfer/content.overriden_ctx2.txt"
+        dest: "env-transfer/content.overridden_ctx2.txt"
       - src:
           type: "template"
           origin: "cloud"
@@ -1164,8 +1244,10 @@ pods:
         dest: "env-transfer/user_data.sh"
         mode: 777
     credentials:
-      pod_credential_1: my_credential_1_1
-      pod_credential_2: my_credential_1_2
+      pod_credential_1: "my_credential_1_1"
+      pod_credential_2: "my_credential_1_2"
+      pod_credential_overridden: "my_credential_1_1"
+      pod_credential_overridden_ctx: "my_credential_1_2"
     contents:
       content_pod_1: |
         Content pod 01
@@ -1176,6 +1258,12 @@ pods:
           value: |
             Content pod 02
             Line 02
+      content_pod_overridden: |
+        Content pod (pod - overridden)
+        Line 02
+      content_pod_overridden_ctx: |
+        Content pod (pod - overridden ctx)
+        Line 02
       user_data:
         type: "template"
         origin: "cloud"
@@ -1209,9 +1297,17 @@ tasks:
       prop2: "test_task_prop2"
       prop4: "test_task_prop4"
       prop5: "test_task_prop5"
+      overridden: "test_task_prop1_cloud"
     shared_params: ["test_task", "test_task_cloud"]
     group_params:
       prop3: "test_task_prop3"
+    contents:
+      content_task: |
+        Content Tasks Cloud
+        Line 02
+      content_task_overridden: |
+        Content Tasks Cloud (Overridden)
+        Line 02
   test_task_env:
     type: "task"
     target_origin: "env"
@@ -1280,12 +1376,12 @@ task_shared_params:
     prop1: "value1_env"
   test_task_pod:
     prop1: "value1_pod"
-  test_task_overriden_1:
-    prop4: "overriden_shared_1_4"
-    prop5: "overriden_shared_1_5"
-  test_task_overriden_2:
-    prop4: "overriden_shared_2_4"
-    prop5: "overriden_shared_2_5"
+  test_task_overridden_1:
+    prop4: "overridden_shared_1_4"
+    prop5: "overridden_shared_1_5"
+  test_task_overridden_2:
+    prop4: "overridden_shared_2_4"
+    prop5: "overridden_shared_2_5"
 task_group_params:
   test_task_prop3:
     inner_prop1: "inner3_value1"
@@ -1348,11 +1444,11 @@ content_shared_group_params:
     prop4: "user_data_shared_4"
     prop5: "user_data_shared_5"
   user_data_overridden:
-    prop1: "user_data_shared_overriden_1"
-    prop2: "user_data_shared_overriden_2"
-    prop3: "user_data_shared_overriden_3"
-    prop4: "user_data_shared_overriden_4"
-    prop5: "user_data_shared_overriden_5"
+    prop1: "user_data_shared_overridden_1"
+    prop2: "user_data_shared_overridden_2"
+    prop3: "user_data_shared_overridden_3"
+    prop4: "user_data_shared_overridden_4"
+    prop5: "user_data_shared_overridden_5"
 content_shared_params:
   user_data_str:
     value: |
@@ -1390,11 +1486,11 @@ content_group_params:
   user_data_shared_5: "value_shared_group_5"
   user_data_overridden_1: "value_group_overridden_1"
   user_data_overridden_2: "value_group_overridden_2"
-  user_data_shared_overriden_1: "value_shared_group_overriden_1"
-  user_data_shared_overriden_2: "value_shared_group_overriden_2"
-  user_data_shared_overriden_3: "value_shared_group_overriden_3"
-  user_data_shared_overriden_4: "value_shared_group_overriden_4"
-  user_data_shared_overriden_5: "value_shared_group_overriden_5"
+  user_data_shared_overridden_1: "value_shared_group_overridden_1"
+  user_data_shared_overridden_2: "value_shared_group_overridden_2"
+  user_data_shared_overridden_3: "value_shared_group_overridden_3"
+  user_data_shared_overridden_4: "value_shared_group_overridden_4"
+  user_data_shared_overridden_5: "value_shared_group_overridden_5"
 repos:
   env_base:
     src: "https://github.com/lucasbasquerotto/env-base.git"
@@ -1437,6 +1533,15 @@ credentials:
   my_credential_middle_2_2: "my_secret_middle_2_2"
   my_credential_bottom_2_1: "my_secret_bottom_2_1"
   my_credential_bottom_2_2: "my_secret_bottom_2_2"
+  my_credential_pod_node_1: "my_secret_pod_node_1"
+  my_credential_pod_node_2: "my_secret_pod_node_2"
+  my_credential_pod_overridden_1: "my_secret_pod_overridden_1"
+  my_credential_pod_overridden_2: "my_secret_pod_overridden_2"
+  my_credential_pod_overridden_ctx_1: "my_secret_pod_overridden_ctx_1"
+  my_credential_pod_overridden_ctx_2: "my_secret_pod_overridden_ctx_2"
+  my_credential_overridden: "my_secret_overridden"
+  my_credential_initial: "my_secret_initial"
+  my_credential_final: "my_secret_final"
   digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
   s3: "{{ params.credentials.s3 | default({}) }}"
   godaddy: "{{ params.credentials.godaddy | default({}) }}"
@@ -1457,6 +1562,8 @@ credentials:
       inner_prop1: "inner2_3_value1"
   test_task_prop4: "value4_credential"
   test_task_prop5: "value5_credential"
+  test_task_overridden: "value_credential_overridden"
+  test_task_run_stage: "value_credential_run_stage"
   node_cred_content_1:
     secret1: "1234556"
     secret2: 2
