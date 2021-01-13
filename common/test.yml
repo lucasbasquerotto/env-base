@@ -1033,8 +1033,14 @@ nodes:
     pods:
       - name: "test_pod"
         key: "custom"
+        credentials:
+          pod_credential_node: "my_credential_pod_node_1"
         params:
           pod_param_4: "value_4"
+        contents:
+          content_pod_node: |
+            Content pod remote node 01
+            Line 02
     params:
       dns_service_params_list:
         - record: "test1"
