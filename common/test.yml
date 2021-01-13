@@ -1,4 +1,4 @@
-name: "test__{{ params.name | default('') }}"
+name: "{{ params.name | default('test') }}"
 ctxs: "{{ params.ctxs | default([]) }}"
 migration: ""
 container: ""
@@ -1268,7 +1268,7 @@ pods:
           Test transfer content pod2 (overridden ctx)
           Type: str
       - dest: "env-transfer/user_data.sh"
-        mode: 777
+        mode: "777"
         src:
           type: "template"
           origin: "cloud"
