@@ -1,0 +1,8 @@
+# Params
+{{ params | to_nice_yaml }}
+
+# Credentials
+{{ credentials | to_nice_yaml }}
+
+# Contents
+{{ contents | to_nice_yaml }}

@@ -1195,48 +1195,50 @@ pods:
     root: true
     fast_prepare: true
     transfer:
-      - src: |
+      - dest: "env-transfer/content.str.txt"
+        src: |
           Test transfer content
           Type: str
-        dest: "env-transfer/content.str.txt"
-      - src:
+      - dest: "env-transfer/content.file.sh"
+        src:
           file: "custom-pod/test/run.sh"
-        dest: "env-transfer/content.file.sh"
-      - src:
+      - dest: "env-transfer/content.template.sh"
+        src:
           type: "template"
           file: "custom-pod/test/template.sh"
           params:
             value: "transfer content value"
-        dest: "env-transfer/content.template.sh"
-      - src:
+      - dest: "env-transfer/content.env_file.yml"
+        src:
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
-        dest: "env-transfer/content.env_file.yml"
-      - src:
+      - dest: "env-transfer/content.env_template.yml"
+        src:
           type: "template"
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
           params:
             value1: "transfer content template value 1"
             value2: "transfer content template value 2"
-        dest: "env-transfer/content.env_template.yml"
-      - src: |
+      - dest: "env-transfer/content.overridden1.txt"
+        src: |
           Test transfer content pod1 (overridden)
           Type: str
-        dest: "env-transfer/content.overridden1.txt"
-      - src: |
+      - dest: "env-transfer/content.overridden_ctx1.txt"
+        src: |
           Test transfer content pod1 (overridden ctx)
           Type: str
-        dest: "env-transfer/content.overridden_ctx1.txt"
-      - src: |
+      - dest: "env-transfer/content.overridden2.txt"
+        src: |
           Test transfer content pod2 (overridden)
           Type: str
-        dest: "env-transfer/content.overridden2.txt"
-      - src: |
+      - dest: "env-transfer/content.overridden_ctx2.txt"
+        src: |
           Test transfer content pod2 (overridden ctx)
           Type: str
-        dest: "env-transfer/content.overridden_ctx2.txt"
-      - src:
+      - dest: "env-transfer/user_data.sh"
+        mode: 777
+        src:
           type: "template"
           origin: "cloud"
           file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
@@ -1247,8 +1249,31 @@ pods:
             host_ssh_public_keys:
               origin: "env"
               file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
-        dest: "env-transfer/user_data.sh"
-        mode: 777
+      - dest: "env-transfer/content-type-env.str.txt"
+        src:
+          type: "env"
+          name: "str_overridden"
+          params:
+            value: |
+              My string content overridden
+              Line 02
+      - dest: "env-transfer/content-type-env.tpl.txt"
+        src:
+          type: "env"
+          name: "tpl_overridden_nested"
+          params:
+            param_top: "value top"
+            param_overridden_top: "value overridden top"
+          credentials:
+            credential_top: "my_credential_top"
+            credential_overridden_top: "my_credential_overridden_top"
+          contents:
+            content_top: |
+              Content Top
+              Line 02
+            content_overridden_top: |
+              Content Overridden Top
+              Line 02
     credentials:
       pod_credential_1: "my_credential_1_1"
       pod_credential_2: "my_credential_1_2"
@@ -1442,6 +1467,52 @@ contents:
       prop2: "user_data_2"
     shared_params: ["user_data_1", "user_data_2"]
     shared_group_params: "user_data"
+  str_overridden: |
+    My Original Value
+    Line 02
+  tpl_overridden_nested:
+    type: "env"
+    name: "tpl_overridden"
+    params:
+      param_middle: "value middle"
+      param_overridden_middle: "value overridden middle"
+      param_overridden_top: "value overridden top (middle)"
+    credentials:
+      credential_middle: "my_credential_middle"
+      credential_overridden_middle: "my_credential_overridden_middle"
+      credential_overridden_top: "my_wrong_credential"
+    contents:
+      content_middle: |
+        Content Middle
+        Line 02
+      content_overridden_middle: |
+        Content Overridden Middle
+        Line 02
+      content_overridden_top: |
+        Content Overridden Top (Middle)
+        Line 02
+  tpl_overridden:
+    type: "template"
+    origin: "env"
+    file: "{{ params.env.repo_dir }}/test/files/dynamic.tpl.yml"
+    params:
+      param_bottom: "value bottom"
+      param_overridden_middle: "value overridden middle (bottom)"
+      param_overridden_top: "value overridden top (bottom)"
+    credentials:
+      credential_bottom: "my_credential_bottom"
+      credential_overridden_middle: "my_wrong_credential"
+      credential_overridden_top: "my_wrong_credential"
+    contents:
+      content_bottom: |
+        Content Bottom
+        Line 02
+      content_overridden_middle: |
+        Content Overridden Middle (Bottom)
+        Line 02
+      content_overridden_top: |
+        Content Overridden Top (Bottom)
+        Line 02
 content_shared_group_params:
   user_data:
     prop1: "user_data_shared_1"
@@ -1548,6 +1619,12 @@ credentials:
   my_credential_overridden: "my_secret_overridden"
   my_credential_initial: "my_secret_initial"
   my_credential_final: "my_secret_final"
+  my_credential_top: "my secret top"
+  my_credential_overridden_top: "my secret overridden top"
+  my_credential_middle: "my secret middle"
+  my_credential_overridden_middle: "my secret overridden middle"
+  my_credential_bottom: "my secret bottom"
+  my_wrong_credential: "my wrong secret"
   digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
   s3: "{{ params.credentials.s3 | default({}) }}"
   godaddy: "{{ params.credentials.godaddy | default({}) }}"
