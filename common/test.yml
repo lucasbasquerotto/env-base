@@ -274,6 +274,19 @@ main:
           - repo: "env_base"
             src: "test/extra-repos/file1.yml"
             dest: "tmp/test/link-env-base-file.yml"
+  pod_local:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    nodes:
+      - name: "test_simple_node_local"
+        key: "simple_local"
+        local: true
   node_local:
     repo: "cloud"
     env_repos:
@@ -1053,6 +1066,8 @@ nodes:
         setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
+  simple_local:
+    pods: ["simple"]
   custom_local:
     pods:
       - name: "test_pod_local"
@@ -1185,6 +1200,22 @@ nodes:
         initial_connection_timeout: 3
         setup_finished_timeout: 5
 pods:
+  simple:
+    repo: "custom_pod"
+    ctx: "test/ctx-simple.yml"
+    schema: "test/simple.schema.yml"
+    root: true
+    fast_prepare: true
+    params:
+      env_files_dir: "{{ params.env.repo_dir }}/test/files"
+      test_schema:
+        - 123
+        - { p1: [{ p1: [456, { p1: 111 }] }, 012, { p1: 123 }] }
+        - 789
+        - { p1: 000 }
+      pod_param_1: "sample value 1"
+      pod_param_2: "sample value 2"
+      pod_param_3: "sample value 3"
   custom:
     repo: "pod"
     env_repos:
@@ -1307,13 +1338,13 @@ pods:
             origin: "env"
             file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
     params:
+      custom_dir: "custom-pod"
       env_files_dir: "{{ params.env.repo_dir }}/test/files"
       test_schema:
         - 123
         - { p1: [{ p1: [456, { p1: 111 }] }, 012, { p1: 123 }] }
         - 789
         - { p1: 000 }
-      custom_dir: "custom-pod"
       pod_param_1: "value_1"
       pod_param_2: "value_2"
       pod_param_3: "value_3"
