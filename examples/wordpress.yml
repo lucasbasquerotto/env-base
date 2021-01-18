@@ -53,10 +53,10 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            node_task: true
+            task_target: "node"
           - name: "main_upgrade"
             all_nodes: true
-            pod_task: true
+            task_target: "pod"
   nodes:
     repo: "cloud"
     env_repos:
@@ -97,17 +97,17 @@ main:
       - tasks:
           - name: "docker_compose_install"
             all_nodes: true
-            node_task: true
+            task_target: "node"
           - name: "main_build"
             all_nodes: true
-            pod_task: true
+            task_target: "pod"
           - name: "main_upgrade"
             nodes: ["db"]
-            pod_task: true
+            task_target: "pod"
       - tasks:
           - name: "main_upgrade"
             nodes: ["web"]
-            pod_task: true
+            task_target: "pod"
 services:
   s3_buckets:
     list: true
@@ -205,6 +205,10 @@ services:
         origin: "cloud"
         file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
         schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        params:
+          install_docker: true
+          install_podman: false
+          install_packages: false
         credentials:
           node: "host"
         contents:

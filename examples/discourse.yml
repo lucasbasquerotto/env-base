@@ -22,10 +22,10 @@ main:
       - tasks:
           - name: "discourse_setup"
             all_nodes: true
-            pod_task: true
+            task_target: "pod"
           - name: "discourse_rebuild"
             all_nodes: true
-            pod_task: true
+            task_target: "pod"
 services:
   s3_no_bucket:
     list: true
@@ -127,6 +127,10 @@ services:
         origin: "cloud"
         file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
         schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        params:
+          install_docker: true
+          install_podman: false
+          install_packages: false
         credentials:
           node: "host"
         contents:
