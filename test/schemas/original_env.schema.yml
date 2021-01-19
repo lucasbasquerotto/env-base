@@ -68,6 +68,9 @@ schemas:
         type: "list"
         elem_schema: "service"
         elem_non_empty: true
+      host_ssh_public_keys_content:
+        schema: "content"
+        non_empty: true
   node:
     type: "simple_dict"
     alternative_type: "str"
@@ -106,6 +109,55 @@ schemas:
         type: "bool"
       can_destroy:
         type: "bool"
+  content:
+    type: "simple_dict"
+    alternative_type: "str"
+    description: "content schema (used when content type is env)"
+    props:
+      type:
+        type: "str"
+        choices: ["str", "file", "template", "env"]
+        description: "content type"
+      name:
+        type: "str"
+        description: "content name (when type is env)"
+      key:
+        type: "str"
+        description: "content key (when type is env)"
+      origin:
+        type: "str"
+        choices: ["custom", "env", "cloud"]
+        description: >-
+          content origin; defaults to custom
+          (the custom origin path depends on where the content is specified)
+      file:
+        type: "str"
+        description: "content file (when type is file or template)"
+      schema:
+        type: "str"
+        description: "content schema (when type is template)"
+      credentials:
+        type: "map"
+        elem_type: "str"
+        description: "content credentials (when type is template)"
+      contents:
+        type: "map"
+        elem_schema: "content"
+        description: "content inner contents (when type is template)"
+      params:
+        type: "dict"
+        description: "content params (when type is env, str or template)"
+      group_params:
+        type: "map"
+        elem_type: "str"
+        description: "content group_params (when type is env, str or template)"
+      shared_params:
+        type: "list"
+        elem_type: "str"
+        description: "content shared_params (when type is env, str or template)"
+      shared_group_params:
+        type: "str"
+        description: "content shared_group_params (when type is env, str or template)"
   credentials:
     type: "dict"
     props:
@@ -126,9 +178,6 @@ schemas:
         type: "str"
         non_empty: true
       host_pass:
-        type: "str"
-        non_empty: true
-      host_ssh_public_keys_path:
         type: "str"
         non_empty: true
       ssh_file:

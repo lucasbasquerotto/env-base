@@ -134,9 +134,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys:
-            origin: "env"
-            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
+          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
 nodes:
   discourse:
     service: "{{ params.env_params.node_service }}"

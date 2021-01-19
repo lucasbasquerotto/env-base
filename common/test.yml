@@ -528,9 +528,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys:
-            origin: "env"
-            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
+          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
   node_dns_service:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
@@ -561,9 +559,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys:
-            origin: "env"
-            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
+          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
     params:
       prop1: "test value 1"
       user_datas:
@@ -1298,9 +1294,7 @@ pods:
           credentials:
             node: "host"
           contents:
-            host_ssh_public_keys:
-              origin: "env"
-              file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
+            host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
       - dest: "env-transfer/content-type-env.str.txt"
         src:
           type: "env"
@@ -1355,9 +1349,7 @@ pods:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys:
-            origin: "env"
-            file: "{{ params.credentials.host.host_ssh_public_keys_path | default('') }}"
+          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
     params:
       custom_dir: "custom-pod"
       env_files_dir: "{{ params.env.repo_dir }}/test/files"

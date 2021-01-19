@@ -75,6 +75,9 @@ env_params:
     main_domain: "localhost"
     fullchain: "{{ params.env_dir }}/ssl/bundle.crt"
     privkey: "{{ params.env_dir }}/ssl/localhost.key"
+  host_ssh_public_keys_content:
+    origin: "env"
+    file: "{{ params.env_dir }}/ssh/host.pub"
 credentials:
   digital_ocean:
     api_token: "<api_token>"
@@ -116,7 +119,6 @@ credentials:
   host:
     host_user: "host"
     host_pass: "111222"
-    host_ssh_public_keys_path: "{{ params.env_dir }}/ssh/host.pub"
     ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
   user:
     host_user: "root"
