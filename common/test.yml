@@ -540,6 +540,11 @@ services:
       dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
       zone: "{{ params.env_params.domain | default('') }}"
+  service_simple_node_local:
+    base_dir: "custom-cloud"
+    namespace: "ext_node"
+    task: "test/services/node/test.main.node.yml"
+    schema: "test/services/node/test.schema.node.yml"
   service_node_local:
     base_dir: "custom-cloud"
     namespace: "ext_node"
@@ -1073,7 +1078,7 @@ nodes:
         initial_connection_timeout: 90
         setup_finished_timeout: 300
   simple_local:
-    service: "service_node_local"
+    service: "service_simple_node_local"
     base_dir: "/var/cloud"
     credential: "user"
     params:
