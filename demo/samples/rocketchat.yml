@@ -21,9 +21,6 @@ env_params:
   filestash_dns_name: "godaddy"
   filestash_dns_record: "s3-chat"
   filestash_full_domain: "s3-chat.lucasbasquerotto.com"
-  nextcloud_dns_name: "godaddy"
-  nextcloud_dns_record: "nextcloud-chat"
-  nextcloud_full_domain: "nextcloud-chat.lucasbasquerotto.com"
   minio_gateway_dns_name: "godaddy"
   minio_gateway_dns_record: "s3-chat"
   minio_gateway_full_domain: "s3-chat.lucasbasquerotto.com"
@@ -42,7 +39,6 @@ env_params:
   use_theia: true
   use_minio_gateway: true
   use_filestash: false
-  use_nextcloud: false
   use_fluentd: true
   use_certbot: true
   block_ips: true
@@ -124,6 +120,3 @@ credentials:
     user: "mybot"
     password: "botpassword"
     bot_name: "bothere"
-  nextcloud:
-    admin_user: "test"
-    admin_pass: "123456"

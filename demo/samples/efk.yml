@@ -19,9 +19,6 @@ env_params:
   filestash_dns_name: "godaddy"
   filestash_dns_record: "s3-log"
   filestash_full_domain: "s3-log.lucasbasquerotto.com"
-  nextcloud_dns_name: "godaddy"
-  nextcloud_dns_record: "nextcloud-log"
-  nextcloud_full_domain: "nextcloud-log.lucasbasquerotto.com"
   minio_gateway_dns_name: "godaddy"
   minio_gateway_dns_record: "s3-log"
   minio_gateway_full_domain: "s3-log.lucasbasquerotto.com"
@@ -36,7 +33,6 @@ env_params:
   use_theia: true
   use_minio_gateway: true
   use_filestash: false
-  use_nextcloud: false
   use_fluentd: true
   use_certbot: true
   ssl: true
@@ -88,9 +84,6 @@ credentials:
     ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
   user:
     host_user: "root"
-  nextcloud:
-    admin_user: "test"
-    admin_pass: "123456"
   efk:
     db:
       root_password: "1234556"

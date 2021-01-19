@@ -24,9 +24,6 @@ env_params:
   filestash_dns_name: "godaddy"
   filestash_dns_record: "s3-blog"
   filestash_full_domain: "s3-blog.lucasbasquerotto.com"
-  nextcloud_dns_name: "godaddy"
-  nextcloud_dns_record: "nextcloud-blog"
-  nextcloud_full_domain: "nextcloud-blog.lucasbasquerotto.com"
   minio_gateway_dns_name: "godaddy"
   minio_gateway_dns_record: "s3-blog"
   minio_gateway_full_domain: "s3-blog.lucasbasquerotto.com"
@@ -55,7 +52,6 @@ env_params:
   use_theia: true
   use_minio_gateway: true
   use_filestash: false
-  use_nextcloud: false
   use_fluentd: true
   use_w3tc: false
   use_certbot: true
@@ -143,6 +139,3 @@ credentials:
   mysql:
     root_password: "1234556"
     viewer_password: "123456"
-  nextcloud:
-    admin_user: "test"
-    admin_pass: "123456"

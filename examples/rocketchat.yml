@@ -264,7 +264,6 @@ pods:
       rocketchat: "rocketchat"
       hubot: "hubot"
       minio_gateway: "minio_gateway"
-      nextcloud: "nextcloud"
       backup_bucket: "s3"
       uploads_bucket: "s3"
       backup_replica_bucket: "s3_replica"
@@ -281,7 +280,6 @@ pods:
       use_theia: "{{ params.env_params.use_theia }}"
       use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
       use_filestash: "{{ params.env_params.use_filestash }}"
-      use_nextcloud: "{{ params.env_params.use_nextcloud }}"
       use_fluentd: "{{ params.env_params.use_fluentd }}"
       use_certbot: "{{ params.env_params.use_certbot }}"
       block_ips: "{{ params.env_params.block_ips }}"
@@ -348,8 +346,6 @@ pod_group_params:
     minio_gateway_ssl: "{{ params.env_params.ssl }}"
     filestash_domain: "{{ params.env_params.filestash_full_domain }}"
     filestash_ssl: "{{ params.env_params.ssl }}"
-    nextcloud_domain: "{{ params.env_params.nextcloud_full_domain }}"
-    nextcloud_ssl: "{{ params.env_params.ssl }}"
   rocketchat_custom_domain_local:
     public_http_port: "8080"
     public_https_port: "8443"
@@ -365,8 +361,6 @@ pod_group_params:
     minio_gateway_ssl: "{{ params.env_params.ssl }}"
     filestash_domain: "filestash.localhost"
     filestash_ssl: "{{ params.env_params.ssl }}"
-    nextcloud_domain: "nextcloud.localhost"
-    nextcloud_ssl: "{{ params.env_params.ssl }}"
   rocketchat_custom_images:
     nginx_image: "nginx"
     nginx_version: "1.14.2-alpine"
@@ -384,8 +378,6 @@ pod_group_params:
     minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
     filestash_image: "machines/filestash"
     filestash_version: "4cbeb2c"
-    nextcloud_image: "nextcloud"
-    nextcloud_version: "19.0.0-apache"
     toolbox_image: "lucasbasquerotto/image"
     toolbox_version: "toolbox-20200715-02"
     certbot_image: "certbot/certbot"
@@ -405,7 +397,6 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
-    nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
     mongo_init: 512mb
@@ -425,7 +416,6 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
-    nextcloud: 512mb
     toolbox: 512mb
     certbot: 256mb
     s3_cli: 512mb
