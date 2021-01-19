@@ -208,7 +208,7 @@ services:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
 nodes:
   prometheus_local:
-    credential: "user"
+    credential: "localhost"
     pods:
       - name: "prometheus"
         params:

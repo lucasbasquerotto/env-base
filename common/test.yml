@@ -1076,7 +1076,7 @@ nodes:
   simple_local:
     service: "service_simple_node_local"
     base_dir: "/var/cloud"
-    credential: "user"
+    credential: "localhost"
     params:
       host_test:
         setup_log_file: "/var/log/setup.log"
@@ -1208,7 +1208,7 @@ nodes:
   custom_node_service_local:
     service: "service_node_local"
     base_dir: "/var/cloud"
-    credential: "user"
+    credential: "localhost"
     params:
       host_test:
         setup_log_file: "/var/log/setup.log"
@@ -1633,7 +1633,7 @@ credentials:
   fake_user:
     host_user: "test"
     host_pass: "123456"
-  user:
+  localhost:
     host_user: "root"
   host: "{{ params.credentials.host | default({}) }}"
   my_credential_1_1: "my_secret_1_1"

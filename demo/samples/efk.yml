@@ -82,7 +82,7 @@ credentials:
     host_user: "host"
     host_pass: "111222"
     ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
-  user:
+  localhost:
     host_user: "root"
   efk:
     db:

@@ -118,7 +118,7 @@ credentials:
     host_user: "host"
     host_pass: "111222"
     ssh_encrypted_key_path_rel: "{{ params.env_dir }}/ssh/host.encrypted.key"
-  user:
+  localhost:
     host_user: "root"
   mediawiki:
     secret_key: "ce4e374745180efeeb2202833493d13242de589d59209f43f8325d59c7d4ebbe"
