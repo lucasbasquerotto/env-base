@@ -83,8 +83,13 @@ main:
       - name: "web"
         key: "mediawiki"
         dependencies:
-          - host: "mysql"
-            node: "db"
+          mysql:
+            type: "node"
+            private: true
+            host: "db"
+            protocol: "ssh"
+            port: 3306
+          test: "https://github.com"
         pods:
           mediawiki:
             params:
