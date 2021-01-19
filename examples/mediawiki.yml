@@ -85,7 +85,7 @@ main:
         dependencies:
           mysql:
             type: "node"
-            private: true
+            node_ip_type: "private"
             host: "db"
             protocol: "ssh"
             port: 3306
