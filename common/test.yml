@@ -285,78 +285,44 @@ main:
       [host]
       [host:children]
       test_simple_node_local
-      test_simple_node_local_fake
-      test_simple_node_local_fake2
       [test_simple_node_local]
-      [test_simple_node_local_fake]
-      [test_simple_node_local_fake2]
     nodes:
       - name: "test_simple_node_local"
         key: "simple_local"
         local: true
         dependencies:
           test1:
-            type: "node"
-            node_ip_type: "ipv4"
-            host: "test_simple_node_local_fake"
+            type: "url"
+            host: "test-my-host"
             limit: -1
-            required_amount: -1
             protocol: "ssh"
             port: 22
           test2:
-            type: "node"
-            host: "test_simple_node_local_fake"
-            limit: 3
-            required_amount: 2
-            protocol: "https"
-            port: 8443
-          test3:
-            type: "node"
-            host: "test_simple_node_local_fake"
-            limit: 4
-            required_amount: 2
-            protocol: "https"
-            port: 8443
-          test4:
-            type: "node"
-            host: "test_simple_node_local_fake"
-            limit: 2
-            protocol: "https"
-            port: 8443
-          test5:
-            type: "node"
-            host: "test_simple_node_local_fake2"
-            limit: 2
-            protocol: "https"
-            port: 8443
-      - name: "test_simple_node_local_fake"
-        key: "simple_local"
-        amount: 7
-        max_amount: 15
-        dependencies:
-          test_fake1:
-            type: "node"
-            node_ip_type: "ipv6"
-            host: "test_simple_node_local_fake2"
+            type: "url"
+            host: "test-new-host"
             limit: -1
-            required_amount: -1
             protocol: "ssh"
             port: 22
-          test_fake2:
-            type: "node"
-            host: "test_simple_node_local_fake2"
-            protocol: "https"
-            port: 8443
-          test_fake3:
-            type: "node"
-            host: "test_simple_node_local_fake2"
-            limit: 3
-            required_amount: 1
-            protocol: "https"
-            port: 8443
-      - name: "test_simple_node_local_fake2"
-        key: "simple_local"
-        amount: 5
+          test3:
+            type: "url"
+            host: "https://test-new-host:9443"
+            limit: -1
+          test4:
+            type: "url"
+            host: "test-new-host4"
+            limit: -1
+            protocol: "http"
+          test5:
+            type: "url"
+            host: "test-new-host5"
+            limit: -1
+            port: 443
+          test_ip:
+            type: "ip"
+            host: "1.2.3.4"
+            limit: -1
+            protocol: "ssh"
+            port: 22
   node_local:
     repo: "cloud"
     env_repos:

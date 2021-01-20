@@ -76,6 +76,10 @@ main:
     nodes:
       - name: "db"
         key: "wp"
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.env_params.elasticsearch_url | default('') }}"
         pods:
           wp:
             params:
@@ -85,8 +89,12 @@ main:
       - name: "web"
         key: "wp"
         dependencies:
-          - host: "mysql"
-            node: "db"
+          mysql:
+            type: "node"
+            host: "db"
+          elasticsearch:
+            type: "url"
+            host: "{{ params.env_params.elasticsearch_url | default('') }}"
         pods:
           wp:
             params:
