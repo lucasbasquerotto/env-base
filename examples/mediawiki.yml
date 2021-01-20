@@ -146,7 +146,6 @@ services:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
     task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
-    namespace: "ext_dns"
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
