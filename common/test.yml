@@ -26,8 +26,8 @@ main:
       after_initial_services: "custom-cloud/test/hooks/after_initial_services.yml"
       before_nodes: "custom-cloud/test/hooks/before_nodes.yml"
       after_nodes: "custom-cloud/test/hooks/after_nodes.yml"
-      before_wait_nodes: "custom-cloud/test/hooks/before_wait_nodes.yml"
-      after_wait_nodes: "custom-cloud/test/hooks/after_wait_nodes.yml"
+      before_nodes_setup: "custom-cloud/test/hooks/before_nodes_setup.yml"
+      after_nodes_setup: "custom-cloud/test/hooks/after_nodes_setup.yml"
       before_prepare_nodes: "custom-cloud/test/hooks/before_prepare_nodes.yml"
       after_prepare_nodes: "custom-cloud/test/hooks/after_prepare_nodes.yml"
       before_prepare_pods: "custom-cloud/test/hooks/before_prepare_pods.yml"
@@ -285,10 +285,33 @@ main:
       [host]
       [host:children]
       test_simple_node_local
+      test_simple_node_local_fake
       [test_simple_node_local]
+      [test_simple_node_local_fake]
     nodes:
       - name: "test_simple_node_local"
         key: "simple_local"
+        local: true
+        dependencies:
+          test1:
+            type: "node"
+            node_ip_type: "ipv4"
+            host: "test_simple_node_local_fake"
+            limit: 2
+            required: -1
+            protocol: "ssh"
+            port: 22
+          test2:
+            type: "node"
+            host: "test_simple_node_local_fake"
+            limit: 3
+            required: 2
+            protocol: "https"
+            port: 8443
+      - name: "test_simple_node_local_fake"
+        key: "simple_local"
+        amount: 3
+        max_amount: 5
   node_local:
     repo: "cloud"
     env_repos:
