@@ -317,12 +317,46 @@ main:
             host: "test-new-host5"
             limit: -1
             port: 443
+          test6: "https://test-url:9443"
           test_ip:
             type: "ip"
             host: "1.2.3.4"
             limit: -1
             protocol: "ssh"
             port: 22
+      - name: "test_simple_node_local2"
+        key: "simple_local"
+        amount: 3
+      - name: "test_simple_node_local3"
+        key: "simple_local"
+        amount: 4
+      - name: "test_simple_node_local4"
+        key: "simple_local"
+        amount: 5
+    run_stages:
+      - tasks:
+          - name: "test_sleep_30"
+            nodes: ["test_simple_node_local2"]
+            task_target: "node"
+          - name: "test_sleep_5"
+            nodes: ["test_simple_node_local3"]
+            task_target: "node"
+          - name: "test_sleep_15"
+            nodes: ["test_simple_node_local4"]
+            task_target: "node"
+      - tasks:
+          - name: "test_sleep_15"
+            nodes: ["test_simple_node_local2"]
+            task_target: "node"
+          - name: "test_sleep_5"
+            nodes: ["test_simple_node_local3"]
+            task_target: "node"
+          - name: "test_sleep_30"
+            nodes: ["test_simple_node_local4"]
+            task_target: "node"
+          - name: "test_sleep_5"
+            nodes: ["test_simple_node_local3"]
+            task_target: "node"
   node_local:
     repo: "cloud"
     env_repos:
@@ -1468,6 +1502,15 @@ tasks:
   test:
     type: "shell"
     cmd: "bash custom-pod/test/run.sh"
+  test_sleep_5:
+    type: "shell"
+    cmd: "sleep 5"
+  test_sleep_15:
+    type: "shell"
+    cmd: "sleep 15"
+  test_sleep_30:
+    type: "shell"
+    cmd: "sleep 30"
   test_skip:
     type: "skip"
 task_shared_params:
