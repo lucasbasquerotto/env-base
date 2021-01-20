@@ -139,15 +139,18 @@ services:
       s3: "s3"
   node_dns_service:
     base_dir: "custom-cloud"
-    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
     namespace: "ext_dns"
+    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
+    schema: "tasks/dns/{{ params.env_params.dns_provider }}.schema.dns.yml"
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
       zone: "{{ params.env_params.domain }}"
   digital_ocean_vpn:
     base_dir: "custom-cloud"
+    namespace: "ext_vpn"
     task: "tasks/vpn/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -245,6 +248,7 @@ nodes:
     service: "{{ params.env_params.node_service }}"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
+    root: true
     credential: "host"
     pods:
       - name: "wp"

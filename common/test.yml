@@ -1116,8 +1116,8 @@ nodes:
     service: "digital_ocean_node_service"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
-    credential: "host"
     root: true
+    credential: "host"
     pods:
       - name: "test_pod"
         key: "custom"
