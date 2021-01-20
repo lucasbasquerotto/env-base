@@ -297,7 +297,7 @@ main:
             type: "node"
             node_ip_type: "ipv4"
             host: "test_simple_node_local_fake"
-            limit: 2
+            limit: -1
             required: -1
             protocol: "ssh"
             port: 22
@@ -306,6 +306,19 @@ main:
             host: "test_simple_node_local_fake"
             limit: 3
             required: 2
+            protocol: "https"
+            port: 8443
+          test3:
+            type: "node"
+            host: "test_simple_node_local_fake"
+            limit: 4
+            required: 2
+            protocol: "https"
+            port: 8443
+          test4:
+            type: "node"
+            host: "test_simple_node_local_fake"
+            limit: 2
             protocol: "https"
             port: 8443
       - name: "test_simple_node_local_fake"
