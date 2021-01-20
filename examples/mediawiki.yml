@@ -42,7 +42,8 @@ main:
       [app]
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-      - "s3_buckets"
+      - name: "s3_buckets"
+        can_destroy: true
     nodes:
       - name: "app"
         key: "mediawiki"
@@ -70,7 +71,8 @@ main:
       [web]
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-      - "s3_buckets"
+      - name: "s3_buckets"
+        can_destroy: true
     nodes:
       - name: "db"
         key: "mediawiki"

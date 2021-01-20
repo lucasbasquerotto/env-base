@@ -285,7 +285,13 @@ main:
       [host]
       [host:children]
       test_simple_node_local
+      test_simple_node_local2
+      test_simple_node_local3
+      test_simple_node_local4
       [test_simple_node_local]
+      [test_simple_node_local2]
+      [test_simple_node_local3]
+      [test_simple_node_local4]
     nodes:
       - name: "test_simple_node_local"
         key: "simple_local"
@@ -354,7 +360,8 @@ main:
           - name: "test_sleep_30"
             nodes: ["test_simple_node_local4"]
             task_target: "node"
-          - name: "test_sleep_5"
+          - name: "test_sleep_5_new"
+            key: "test_sleep_5"
             nodes: ["test_simple_node_local3"]
             task_target: "node"
   node_local:
