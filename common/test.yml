@@ -286,8 +286,10 @@ main:
       [host:children]
       test_simple_node_local
       test_simple_node_local_fake
+      test_simple_node_local_fake2
       [test_simple_node_local]
       [test_simple_node_local_fake]
+      [test_simple_node_local_fake2]
     nodes:
       - name: "test_simple_node_local"
         key: "simple_local"
@@ -298,21 +300,21 @@ main:
             node_ip_type: "ipv4"
             host: "test_simple_node_local_fake"
             limit: -1
-            required: -1
+            required_amount: -1
             protocol: "ssh"
             port: 22
           test2:
             type: "node"
             host: "test_simple_node_local_fake"
             limit: 3
-            required: 2
+            required_amount: 2
             protocol: "https"
             port: 8443
           test3:
             type: "node"
             host: "test_simple_node_local_fake"
             limit: 4
-            required: 2
+            required_amount: 2
             protocol: "https"
             port: 8443
           test4:
@@ -321,10 +323,40 @@ main:
             limit: 2
             protocol: "https"
             port: 8443
+          test5:
+            type: "node"
+            host: "test_simple_node_local_fake2"
+            limit: 2
+            protocol: "https"
+            port: 8443
       - name: "test_simple_node_local_fake"
         key: "simple_local"
-        amount: 3
-        max_amount: 5
+        amount: 7
+        max_amount: 15
+        dependencies:
+          test_fake1:
+            type: "node"
+            node_ip_type: "ipv6"
+            host: "test_simple_node_local_fake2"
+            limit: -1
+            required_amount: -1
+            protocol: "ssh"
+            port: 22
+          test_fake2:
+            type: "node"
+            host: "test_simple_node_local_fake2"
+            protocol: "https"
+            port: 8443
+          test_fake3:
+            type: "node"
+            host: "test_simple_node_local_fake2"
+            limit: 3
+            required_amount: 1
+            protocol: "https"
+            port: 8443
+      - name: "test_simple_node_local_fake2"
+        key: "simple_local"
+        amount: 5
   node_local:
     repo: "cloud"
     env_repos:
