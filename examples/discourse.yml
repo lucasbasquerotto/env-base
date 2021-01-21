@@ -162,18 +162,18 @@ pods:
     flat: true
     base_dir: "discourse"
     transfer:
-      - src:
+      - dest: "shared/setup.sh"
+        mode: "0755"
+        src:
           origin: "env"
           file: "custom-cloud/run-tasks/discourse-setup.sh"
-        dest: "shared/setup.sh"
-        mode: "0755"
-      - src:
+      - dest: "containers/app.yml"
+        src:
           type: "template"
           origin: "env"
           file: "examples/discourse/app.yml"
           credentials:
             discourse: "discourse"
-        dest: "containers/app.yml"
     credentials:
       discourse_backup_bucket: "s3"
 tasks:

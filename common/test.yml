@@ -147,111 +147,111 @@ main:
       - repo: "env_base"
         dir: "env-base"
         transfer:
-          - src:
+          - dest: "tmp/test/ef1.yml"
+            src:
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
-            dest: "tmp/test/ef1.yml"
-          - src:
+          - dest: "tmp/test/etpl1.yml"
+            src:
               type: "template"
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
               params:
                 value1: "env_base_1_1"
                 value2: "env_base_1_2"
-            dest: "tmp/test/etpl1.yml"
-          - src:
+          - dest: "tmp/test/etpl2.yml"
+            src:
               type: "template"
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/template2.yml"
               params:
                 value1: "env_base_2_1"
                 value2: "env_base_2_2"
-            dest: "tmp/test/etpl2.yml"
-          - src:
+          - dest: "tmp/test/f1.yml"
+            src:
               origin: "custom"
               file: "test/extra-repos/repo_file1.yml"
-            dest: "tmp/test/f1.yml"
-          - src:
+          - dest: "tmp/test/f2.yml"
+            src:
               file: "test/extra-repos/repo_file2.yml"
-            dest: "tmp/test/f2.yml"
-          - src:
+          - dest: "tmp/test/tpl1.yml"
+            src:
               type: "template"
               file: "test/extra-repos/repo_template1.yml"
               params:
                 value1: "env_base_1_1 (repo)"
                 value2: "env_base_1_2 (repo)"
                 value3: "env_base_1_3 (repo)"
-            dest: "tmp/test/tpl1.yml"
-          - src:
+          - dest: "tmp/test/tpl2.yml"
+            src:
               type: "template"
               file: "test/extra-repos/repo_template2.yml"
               params:
                 value1: "env_base_2_1 (repo)"
                 value2: "env_base_2_2 (repo)"
                 value3: "env_base_2_3 (repo)"
-            dest: "tmp/test/tpl2.yml"
         links:
-          - src: ""
-            dest: "tmp/test/link-env-base"
-          - repo: "custom_cloud"
+          - dest: "tmp/test/link-env-base"
             src: ""
-            dest: "tmp/test/link-custom-cloud"
-          - repo: "pod"
+          - dest: "tmp/test/link-custom-cloud"
+            repo: "custom_cloud"
+            src: ""
+          - dest: "tmp/test/link-pod-run.sh"
+            repo: "pod"
             src: "run"
-            dest: "tmp/test/link-pod-run.sh"
       - repo: "custom_cloud"
         dir: "custom-cloud"
         transfer:
-          - src:
+          - dest: "tmp/test/ef2.yml"
+            src:
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
-            dest: "tmp/test/ef2.yml"
-          - src:
+          - dest: "tmp/test/etpl1.yml"
+            src:
               type: "template"
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
               params:
                 value1: "custom_cloud_1"
                 value2: "custom_cloud_2"
-            dest: "tmp/test/etpl1.yml"
-          - src:
+          - dest: "tmp/test/cf1.yml"
+            src:
               type: "file"
               file: "test/extra-repos/cloud_file1.yml"
-            dest: "tmp/test/cf1.yml"
-          - src:
+          - dest: "tmp/test/cf2.yml"
+            src:
               file: "test/extra-repos/cloud_file2.yml"
-            dest: "tmp/test/cf2.yml"
-          - src:
+          - dest: "tmp/test/ct1.yml"
+            src:
               type: "template"
               file: "test/extra-repos/cloud_template1.yml"
               params:
                 value1: "custom_cloud_1_1 (repo)"
                 value2: "custom_cloud_1_2 (repo)"
-            dest: "tmp/test/ct1.yml"
-          - src:
+          - dest: "tmp/test/ct2.yml"
+            src:
               type: "template"
               file: "test/extra-repos/cloud_template2.yml"
               params:
                 value1: "custom_cloud_2_1 (repo)"
                 value2: "custom_cloud_2_2 (repo)"
-            dest: "tmp/test/ct2.yml"
         links:
-          - src: ""
-            dest: "tmp/test/link-custom-cloud"
-          - repo: "pod"
+          - dest: "tmp/test/link-custom-cloud"
+            src: ""
+          - dest: "tmp/test/link-pod-run.sh"
+            repo: "pod"
             src: "run"
-            dest: "tmp/test/link-pod-run.sh"
       - repo: "pod"
         dir: "pod"
         transfer:
-          - src:
+          - dest: "tmp/test/etpl2.yml"
+            src:
               type: "template"
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/template2.yml"
               params:
                 value1: "pod_1"
                 value2: "pod_2"
-            dest: "tmp/test/etpl2.yml"
         links:
           - repo: "env_base"
             src: ""
@@ -259,14 +259,14 @@ main:
       - repo: "custom_pod"
         dir: "custom-pod"
         transfer:
-          - src:
+          - dest: "tmp/test/ef1.yml"
+            src:
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
-            dest: "tmp/test/ef1.yml"
-          - src:
+          - dest: "tmp/test/ef2.yml"
+            src:
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
-            dest: "tmp/test/ef2.yml"
         links:
           - repo: "env_base"
             src: "common/test.yml"
@@ -340,17 +340,42 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
+        transfer:
+          - dest: "env-transfer/content.node.info_str.txt"
+            src: |
+              Test transfer node info content
+              Type: str
+          - dest: "env-transfer/content.node.overridden.txt"
+            src: |
+              Test transfer node content overridden (overridden)
+              Type: str
+          - dest: "env-transfer/content.node.print.yml"
+            src:
+              type: "template"
+              origin: "cloud"
+              file: "custom-cloud/test/files/transfer.tpl.yml"
+              schema: "custom-cloud/test/files/transfer.schema.yml"
+              params:
+                prop1: "test value node 1"
+                prop2: "test value node 2"
+              contents:
+                content1: |
+                  test content node 1
+                  line 02
+                content2: |
+                  test content node 2
+                  line 02
         pods:
           test_pod_local:
             transfer:
-              - src: |
+              - dest: "env-transfer/content.str_ctx1.txt"
+                src: |
                   Test transfer content pod1 ctx
                   Type: str
-                dest: "env-transfer/content.str_ctx1.txt"
-              - src: |
+              - dest: "env-transfer/content.overridden_ctx1.txt"
+                src: |
                   Test transfer content pod1 overridden ctx (overridden ctx)
                   Type: str
-                dest: "env-transfer/content.overridden_ctx1.txt"
             params:
               pod_param_1: "ctx overridden value"
             credentials:
@@ -361,14 +386,14 @@ main:
                 Line 02
           test_pod_local_2:
             transfer:
-              - src: |
+              - dest: "env-transfer/content.str_ctx2.txt"
+                src: |
                   Test transfer content pod2 ctx
                   Type: str
-                dest: "env-transfer/content.str_ctx2.txt"
-              - src: |
+              - dest: "env-transfer/content.overridden_ctx2.txt"
+                src: |
                   Test transfer content pod2 overridden ctx (overridden ctx)
                   Type: str
-                dest: "env-transfer/content.overridden_ctx2.txt"
             params:
               pod_param_1: "ctx overridden value"
             credentials:
@@ -377,17 +402,8 @@ main:
               content_pod_overridden_ctx: |
                 Content pod overridden ctx 02
                 Line 02
-        transfer:
-          - src: |
-              Test transfer node info content
-              Type: str
-            dest: "env-transfer/content.node.info_str.txt"
-          - src: |
-              Test transfer node content overridden (overridden)
-              Type: str
-            dest: "env-transfer/content.node.overridden.txt"
       - name: "custom_node_service_local"
-        amount: 3
+        amount: 1
         max_amount: 5
     run_stages:
       - tasks:
@@ -1125,18 +1141,18 @@ nodes:
       - name: "test_pod_local"
         key: "custom"
         transfer:
-          - src: |
+          - dest: "env-transfer/content.str1.txt"
+            src: |
               Test transfer content pod1
               Type: str
-            dest: "env-transfer/content.str1.txt"
-          - src: |
+          - dest: "env-transfer/content.overridden1.txt"
+            src: |
               Test transfer content pod1 overridden (overridden)
               Type: str
-            dest: "env-transfer/content.overridden1.txt"
-          - src: |
+          - dest: "env-transfer/content.overridden_ctx1.txt"
+            src: |
               Test transfer content pod1 overridden (overridden ctx)
               Type: str
-            dest: "env-transfer/content.overridden_ctx1.txt"
         params:
           pod_param_2: "node overridden value"
         credentials:
@@ -1156,18 +1172,18 @@ nodes:
       - name: "test_pod_local_2"
         key: "custom"
         transfer:
-          - src: |
+          - dest: "env-transfer/content.str2.txt"
+            src: |
               Test transfer content pod2
               Type: str
-            dest: "env-transfer/content.str2.txt"
-          - src: |
+          - dest: "env-transfer/content.overridden2.txt"
+            src: |
               Test transfer content pod2 overridden (overridden)
               Type: str
-            dest: "env-transfer/content.overridden2.txt"
-          - src: |
+          - dest: "env-transfer/content.overridden_ctx2.txt"
+            src: |
               Test transfer content pod2 overridden (overridden ctx)
               Type: str
-            dest: "env-transfer/content.overridden_ctx2.txt"
         params:
           pod_param_2: "node overridden value"
         credentials:
@@ -1185,37 +1201,38 @@ nodes:
             Content pod overridden 02 (node pod - ctx)
             Line 02
     transfer:
-      - src: |
+      - dest: "env-transfer/content.node.str.txt"
+        src: |
           Test transfer node content
           Type: str
-        dest: "env-transfer/content.node.str.txt"
-      - src:
+      - dest: "env-transfer/content.node.file.sh"
+        src:
           file: "custom-cloud/test/extra-repos/cloud_file1.yml"
-        dest: "env-transfer/content.node.file.sh"
-      - src:
+      - dest: "env-transfer/content.node.template.sh"
+        src:
           type: "template"
           file: "custom-cloud/test/extra-repos/cloud_template1.yml"
           params:
             value1: "transfer node content value1"
             value2: "transfer node content value2"
-        dest: "env-transfer/content.node.template.sh"
-      - src:
+      - dest: "env-transfer/content.node.env_file.yml"
+        src:
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
-        dest: "env-transfer/content.node.env_file.yml"
-      - src:
+      - dest: "env-transfer/content.node.env_template.yml"
+        src:
           type: "template"
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
           params:
             value1: "transfer node env content template value 1"
             value2: "transfer node env content template value 2"
-        dest: "env-transfer/content.node.env_template.yml"
-      - src: |
+      - dest: "env-transfer/content.node.overridden.txt"
+        src: |
           Test transfer node content (overridden)
           Type: str
-        dest: "env-transfer/content.node.overridden.txt"
-      - src:
+      - dest: "env-transfer/content.node.env_template.content.yml"
+        src:
           type: "template"
           origin: "env"
           file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
@@ -1226,7 +1243,6 @@ nodes:
           params:
             value1: "transfer node env main content template value 1"
             value2: "transfer node env main content template value 2"
-        dest: "env-transfer/content.node.env_template.content.yml"
     params:
       host_test:
         setup_log_file: "/var/log/setup.log"
@@ -1355,6 +1371,22 @@ pods:
             content_overridden_top: |
               Content Overridden Top
               Line 02
+      - dest: "env-transfer/content.pod.print.yml"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "custom-cloud/test/files/transfer.tpl.yml"
+          schema: "custom-cloud/test/files/transfer.schema.yml"
+          params:
+            prop1: "test value pod 1"
+            prop2: "test value pod 2"
+          contents:
+            content1: |
+              test content pod 1
+              line 02
+            content2: |
+              test content pod 2
+              line 02
     credentials:
       pod_credential_1: "my_credential_1_1"
       pod_credential_2: "my_credential_1_2"
