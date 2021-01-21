@@ -512,12 +512,6 @@ main:
         amount: 2
         tmp: true
         can_destroy: true
-        params:
-          dns_service_params_list:
-            - record: "test1"
-              ttl: 100
-            - record: "test2"
-              ttl: 200
       - name: "app3"
         key: "digital_ocean_node"
         amount: 3
