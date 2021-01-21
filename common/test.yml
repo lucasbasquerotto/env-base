@@ -484,6 +484,70 @@ main:
       - "{{ params.env_params.vpn_service | default({}) }}"
     nodes: "{{ params.env_params.nodes | default([]) }}"
     original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
+  nodes_run_stages:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts:
+      type: "template"
+      file: "files/hosts.tpl.ini"
+      schema: "files/hosts.schema.yml"
+    initial_services:
+      - "{{ params.env_params.vpn_service | default({}) }}"
+    nodes:
+      - name: "app"
+        key: "digital_ocean_node"
+        amount: 1
+        tmp: true
+        can_destroy: true
+        params:
+          dns_service_params_list:
+            - record: "test1"
+              ttl: 100
+            - record: "test2"
+              ttl: 200
+      - name: "app2"
+        key: "digital_ocean_node"
+        amount: 2
+        tmp: true
+        can_destroy: true
+        params:
+          dns_service_params_list:
+            - record: "test1"
+              ttl: 100
+            - record: "test2"
+              ttl: 200
+      - name: "app3"
+        key: "digital_ocean_node"
+        amount: 3
+        tmp: true
+        can_destroy: true
+    run_stages:
+      - tasks:
+          - name: "test_sleep_15"
+            nodes: ["app", "app2"]
+            task_target: "node"
+          - name: "test_sleep_30"
+            nodes: ["app3"]
+            task_target: "node"
+          - name: "test_sleep_5"
+            nodes: ["app2", "app3"]
+            task_target: "node"
+          - name: "test_sleep_5_2"
+            key: "test_sleep_5"
+            nodes: ["app2"]
+            task_target: "node"
+      - tasks:
+          - name: "test_sleep_30"
+            nodes: ["app"]
+            task_target: "node"
+          - name: "test_sleep_15"
+            nodes: ["app3"]
+            task_target: "node"
+          - name: "test_sleep_5"
+            nodes: ["app2"]
+            task_target: "node"
   services:
     repo: "cloud"
     env_repos:
@@ -1130,11 +1194,6 @@ nodes:
             Content pod remote node 01
             Line 02
     params:
-      dns_service_params_list:
-        - record: "test1"
-          ttl: 100
-        - record: "test2"
-          ttl: 200
       host_test:
         setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "^Setup Finished.*$"
