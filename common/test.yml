@@ -291,6 +291,12 @@ main:
         key: "simple_local"
         local: true
         dependencies:
+          test_ip:
+            type: "ip"
+            host: "1.2.3.4"
+            limit: -1
+            protocol: "ssh"
+            port: 22
           test1:
             type: "url"
             host: "test-my-host"
@@ -299,14 +305,14 @@ main:
             port: 22
           test2:
             type: "url"
+            host: "https://test-new-host:9443"
+            limit: -1
+          test3:
+            type: "url"
             host: "test-new-host"
             limit: -1
             protocol: "ssh"
             port: 22
-          test3:
-            type: "url"
-            host: "https://test-new-host:9443"
-            limit: -1
           test4:
             type: "url"
             host: "test-new-host4"
@@ -318,12 +324,6 @@ main:
             limit: -1
             port: 443
           test6: "https://test-url:9443"
-          test_ip:
-            type: "ip"
-            host: "1.2.3.4"
-            limit: -1
-            protocol: "ssh"
-            port: 22
   node_local:
     repo: "cloud"
     env_repos:
@@ -340,6 +340,23 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
+        dependencies:
+          test_ip:
+            type: "ip"
+            host: "5.6.7.8"
+            limit: -1
+            protocol: "ssh"
+            port: 22
+          test1:
+            type: "url"
+            host: "test-my-host"
+            limit: -1
+            protocol: "http"
+            port: 8080
+          test2:
+            type: "url"
+            host: "https://test-new-host:9443"
+            limit: -1
         transfer:
           - dest: "env-transfer/content.node.info_str.txt"
             src: |
@@ -1137,6 +1154,62 @@ nodes:
         setup_finished_timeout: 5
     pods: ["simple"]
   custom_local:
+    transfer:
+      - dest: "env-transfer/content.node.str.txt"
+        src: |
+          Test transfer node content
+          Type: str
+      - dest: "env-transfer/content.node.file.sh"
+        src:
+          file: "custom-cloud/test/extra-repos/cloud_file1.yml"
+      - dest: "env-transfer/content.node.template.sh"
+        src:
+          type: "template"
+          file: "custom-cloud/test/extra-repos/cloud_template1.yml"
+          params:
+            value1: "transfer node content value1"
+            value2: "transfer node content value2"
+      - dest: "env-transfer/content.node.env_file.yml"
+        src:
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+      - dest: "env-transfer/content.node.env_template.yml"
+        src:
+          type: "template"
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+          params:
+            value1: "transfer node env content template value 1"
+            value2: "transfer node env content template value 2"
+      - dest: "env-transfer/content.node.overridden.txt"
+        src: |
+          Test transfer node content (overridden)
+          Type: str
+      - dest: "env-transfer/content.node.env_template.content.yml"
+        src:
+          type: "template"
+          origin: "env"
+          file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
+          schema: "{{ params.env.repo_dir }}/test/files/template.content.schema.yml"
+          credentials:
+            cred1: "node_cred_content_1"
+            cred2: "node_cred_content_2"
+          params:
+            value1: "transfer node env main content template value 1"
+            value2: "transfer node env main content template value 2"
+    params:
+      host_test:
+        setup_log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "Setup Finished"
+        setup_success_log_last_line: "Setup Finished"
+        initial_connection_timeout: 3
+        setup_finished_timeout: 5
+      cron:
+        - user: "root"
+          src:
+            origin: "env"
+            file: "{{ params.env.repo_dir }}/cron/app.cron"
+          dest: "/var/spool/cron/crontabs/root"
     pods:
       - name: "test_pod_local"
         key: "custom"
@@ -1200,62 +1273,6 @@ nodes:
           content_pod_overridden_ctx: |
             Content pod overridden 02 (node pod - ctx)
             Line 02
-    transfer:
-      - dest: "env-transfer/content.node.str.txt"
-        src: |
-          Test transfer node content
-          Type: str
-      - dest: "env-transfer/content.node.file.sh"
-        src:
-          file: "custom-cloud/test/extra-repos/cloud_file1.yml"
-      - dest: "env-transfer/content.node.template.sh"
-        src:
-          type: "template"
-          file: "custom-cloud/test/extra-repos/cloud_template1.yml"
-          params:
-            value1: "transfer node content value1"
-            value2: "transfer node content value2"
-      - dest: "env-transfer/content.node.env_file.yml"
-        src:
-          origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
-      - dest: "env-transfer/content.node.env_template.yml"
-        src:
-          type: "template"
-          origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
-          params:
-            value1: "transfer node env content template value 1"
-            value2: "transfer node env content template value 2"
-      - dest: "env-transfer/content.node.overridden.txt"
-        src: |
-          Test transfer node content (overridden)
-          Type: str
-      - dest: "env-transfer/content.node.env_template.content.yml"
-        src:
-          type: "template"
-          origin: "env"
-          file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
-          schema: "{{ params.env.repo_dir }}/test/files/template.content.schema.yml"
-          credentials:
-            cred1: "node_cred_content_1"
-            cred2: "node_cred_content_2"
-          params:
-            value1: "transfer node env main content template value 1"
-            value2: "transfer node env main content template value 2"
-    params:
-      host_test:
-        setup_log_file: "/var/log/setup.log"
-        setup_finished_log_regex: "Setup Finished"
-        setup_success_log_last_line: "Setup Finished"
-        initial_connection_timeout: 3
-        setup_finished_timeout: 5
-      cron:
-        - user: "root"
-          src:
-            origin: "env"
-            file: "{{ params.env.repo_dir }}/cron/app.cron"
-          dest: "/var/spool/cron/crontabs/root"
   custom_node_service_local:
     service: "service_node_local"
     base_dir: "/var/cloud"
