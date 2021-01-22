@@ -6,6 +6,7 @@ original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.schema
 meta:
   lax: true
   template_no_empty_lines: true
+  no_node_type_dependency: false
 main:
   local_cloud_hooks:
     repo: "cloud"
@@ -285,7 +286,9 @@ main:
       [host]
       [host:children]
       test_simple_node_local
+      custom_node_service_local
       [test_simple_node_local]
+      [custom_node_service_local]
     nodes:
       - name: "test_simple_node_local"
         key: "simple_local"
@@ -324,6 +327,13 @@ main:
             limit: -1
             port: 443
           test6: "https://test-url:9443"
+      - name: "custom_node_service_local"
+        amount: 3
+        max_amount: 5
+        dependencies:
+          test_custom:
+            type: "url"
+            host: ["url1", "url2"]
   node_local:
     repo: "cloud"
     env_repos:
