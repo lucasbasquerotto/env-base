@@ -286,9 +286,7 @@ main:
       [host]
       [host:children]
       test_simple_node_local
-      custom_node_service_local
       [test_simple_node_local]
-      [custom_node_service_local]
     nodes:
       - name: "test_simple_node_local"
         key: "simple_local"
@@ -327,13 +325,6 @@ main:
             limit: -1
             port: 443
           test6: "https://test-url:9443"
-      - name: "custom_node_service_local"
-        amount: 3
-        max_amount: 5
-        dependencies:
-          test_custom:
-            type: "url"
-            host: ["url1", "url2"]
   node_local:
     repo: "cloud"
     env_repos:
@@ -351,6 +342,11 @@ main:
         key: "custom_local"
         local: true
         dependencies:
+          test_node:
+            type: "node"
+            host: "custom_node_service_local"
+            limit: -1
+            required_amount: 3
           test_ip:
             type: "ip"
             host: "5.6.7.8"
@@ -430,7 +426,7 @@ main:
                 Content pod overridden ctx 02
                 Line 02
       - name: "custom_node_service_local"
-        amount: 1
+        amount: 4
         max_amount: 5
     run_stages:
       - tasks:
