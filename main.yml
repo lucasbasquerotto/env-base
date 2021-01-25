@@ -145,6 +145,7 @@ pods:
         dir: "env-main"
     root: true
     fast_prepare: true
+    pod_dir_relpath: "ctl"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"

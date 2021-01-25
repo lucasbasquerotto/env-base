@@ -6,6 +6,7 @@ original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.schema
 meta:
   lax: true
   template_no_empty_lines: true
+  no_node_type_dependency: false
 main:
   local_cloud_hooks:
     repo: "cloud"
@@ -341,6 +342,11 @@ main:
         key: "custom_local"
         local: true
         dependencies:
+          test_node:
+            type: "node"
+            host: "custom_node_service_local"
+            limit: -1
+            required_amount: 3
           test_ip:
             type: "ip"
             host: "5.6.7.8"
@@ -420,7 +426,7 @@ main:
                 Content pod overridden ctx 02
                 Line 02
       - name: "custom_node_service_local"
-        amount: 1
+        amount: 4
         max_amount: 5
     run_stages:
       - tasks:

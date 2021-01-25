@@ -180,6 +180,7 @@ services:
             - ports: "22"
               sources:
                 tags: ["main"]
+                addresses: "{{ params.env_params.private_ips }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -363,7 +364,7 @@ pod_group_params:
     private_https_port: "9443"
     main_domain: "{{ params.env_params.mediawiki_full_domain }}"
     main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "{{ params.env_params.mediawiki_full_domain }}"
+    pma_domain: "{{ params.env_params.pma_full_domain }}"
     pma_ssl: "{{ params.env_params.ssl }}"
     adminer_domain: "{{ params.env_params.adminer_full_domain }}"
     adminer_ssl: "{{ params.env_params.ssl }}"

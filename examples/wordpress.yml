@@ -175,6 +175,7 @@ services:
             - ports: "22"
               sources:
                 tags: ["main"]
+                addresses: "{{ params.env_params.private_ips }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
