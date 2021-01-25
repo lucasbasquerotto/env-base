@@ -298,16 +298,14 @@ main:
             limit: -1
             protocol: "ssh"
             port: 22
+            required_amount: 1
           test1:
             type: "url"
             host: "test-my-host"
             limit: -1
             protocol: "ssh"
             port: 22
-          test2:
-            type: "url"
-            host: "https://test-new-host:9443"
-            limit: -1
+          test2: "https://test-new-host:9443"
           test3:
             type: "url"
             host: "test-new-host"
@@ -316,9 +314,13 @@ main:
             port: 22
           test4:
             type: "url"
-            host: "test-new-host4"
+            host:
+              - "test-new-host4-1"
+              - "test-new-host4-2"
+              - "test-new-host4-3"
             limit: -1
             protocol: "http"
+            required_amount: 2
           test5:
             type: "url"
             host: "test-new-host5"
@@ -359,10 +361,7 @@ main:
             limit: -1
             protocol: "http"
             port: 8080
-          test2:
-            type: "url"
-            host: "https://test-new-host:9443"
-            limit: -1
+          test2: "https://test-new-host:9443"
         transfer:
           - dest: "env-transfer/content.node.info_str.txt"
             src: |
@@ -430,6 +429,9 @@ main:
         max_amount: 5
     run_stages:
       - tasks:
+          - name: "task_dependencies"
+            all_nodes: true
+            task_target: "node"
           - name: "test_task_cloud"
             all_nodes: true
             task_target: "node"
@@ -1511,6 +1513,13 @@ pods:
       pod_param_2: "value_2"
       pod_param_3: "value_3"
 tasks:
+  task_dependencies:
+    type: "task"
+    root: true
+    file: "tasks/run/dependencies.yml"
+    schema: "tasks/run/dependencies.schema.yml"
+    params:
+      timeout: 5
   test_task_cloud:
     type: "task"
     root: true
