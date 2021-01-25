@@ -298,7 +298,7 @@ main:
             limit: -1
             protocol: "ssh"
             port: 22
-            required_amount: 1
+            required_amount: 0
           test1:
             type: "url"
             host: "test-my-host"
@@ -353,7 +353,7 @@ main:
             type: "node"
             host: "custom_node_service_local"
             limit: -1
-            required_amount: 3
+            required_amount: 0
           test_ip:
             type: "ip"
             host: "5.6.7.8"
@@ -437,53 +437,53 @@ main:
           - name: "task_dependencies"
             all_nodes: true
             task_target: "node"
-          - name: "test_task_cloud"
-            all_nodes: true
-            task_target: "node"
-            credentials:
-              overridden: "test_task_overridden"
-              run_stage: "test_task_run_stage"
-            params:
-              prop4: "overridden_cloud_1_4"
-            shared_params: ["test_task_overridden_1"]
-            contents:
-              content_task_run_stage: |
-                Content Tasks Cloud Run Stage
-                Line 02
-              content_task_overridden: |
-                Content Tasks Cloud Overridden
-                Line 02
-          - name: "test"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local"]
-            task_target: "pod"
-          - name: "test_skip"
-            all_nodes: true
-            task_target: "node"
-      - tasks:
-          - name: "test_task_env"
-            nodes: ["test_node_local"]
-            task_target: "node"
-            params:
-              prop4: "overridden_env_1_4"
-            shared_params: ["test_task_overridden_1"]
-          - name: "test_task_pod_1"
-            key: "test_task_pod"
-            all_nodes: true
-            task_target: "pod"
-            params:
-              prop4: "overridden_pod_1_4"
-            shared_params: ["test_task_overridden_1"]
-          - name: "test_task_pod_2"
-            key: "test_task_pod"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local_2"]
-            task_target: "pod"
-            params:
-              prop4: "overridden_pod_2_4"
-            shared_params: ["test_task_overridden_2"]
+      #     - name: "test_task_cloud"
+      #       all_nodes: true
+      #       task_target: "node"
+      #       credentials:
+      #         overridden: "test_task_overridden"
+      #         run_stage: "test_task_run_stage"
+      #       params:
+      #         prop4: "overridden_cloud_1_4"
+      #       shared_params: ["test_task_overridden_1"]
+      #       contents:
+      #         content_task_run_stage: |
+      #           Content Tasks Cloud Run Stage
+      #           Line 02
+      #         content_task_overridden: |
+      #           Content Tasks Cloud Overridden
+      #           Line 02
+      #     - name: "test"
+      #       nodes:
+      #         - name: "test_node_local"
+      #           pods: ["test_pod_local"]
+      #       task_target: "pod"
+      #     - name: "test_skip"
+      #       all_nodes: true
+      #       task_target: "node"
+      # - tasks:
+      #     - name: "test_task_env"
+      #       nodes: ["test_node_local"]
+      #       task_target: "node"
+      #       params:
+      #         prop4: "overridden_env_1_4"
+      #       shared_params: ["test_task_overridden_1"]
+      #     - name: "test_task_pod_1"
+      #       key: "test_task_pod"
+      #       all_nodes: true
+      #       task_target: "pod"
+      #       params:
+      #         prop4: "overridden_pod_1_4"
+      #       shared_params: ["test_task_overridden_1"]
+      #     - name: "test_task_pod_2"
+      #       key: "test_task_pod"
+      #       nodes:
+      #         - name: "test_node_local"
+      #           pods: ["test_pod_local_2"]
+      #       task_target: "pod"
+      #       params:
+      #         prop4: "overridden_pod_2_4"
+      #       shared_params: ["test_task_overridden_2"]
   node:
     repo: "cloud"
     env_repos:
@@ -1203,7 +1203,7 @@ nodes:
             Content pod remote node 01
             Line 02
     params:
-      host_test:
+      node_setup:
         setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "^Setup Finished.*$"
         setup_success_log_last_line: "Setup Finished - Success"
@@ -1214,7 +1214,7 @@ nodes:
     base_dir: "/var/cloud"
     credential: "localhost"
     params:
-      host_test:
+      node_setup:
         setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
         setup_success_log_last_line: "Setup Finished"
@@ -1266,7 +1266,7 @@ nodes:
             value1: "transfer node env main content template value 1"
             value2: "transfer node env main content template value 2"
     params:
-      host_test:
+      node_setup:
         setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
         setup_success_log_last_line: "Setup Finished"
@@ -1346,7 +1346,7 @@ nodes:
     base_dir: "/var/cloud"
     credential: "localhost"
     params:
-      host_test:
+      node_setup:
         setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "Setup Finished"
         setup_success_log_last_line: "Setup Finished"
