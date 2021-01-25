@@ -329,9 +329,9 @@ main:
           test6: "https://test-url:9443"
     run_stages:
       - tasks:
-        - name: "task_dependencies"
-          all_nodes: true
-          task_target: "node"
+          - name: "task_dependencies"
+            all_nodes: true
+            task_target: "node"
   node_local:
     repo: "cloud"
     env_repos:
@@ -437,53 +437,53 @@ main:
           - name: "task_dependencies"
             all_nodes: true
             task_target: "node"
-      #     - name: "test_task_cloud"
-      #       all_nodes: true
-      #       task_target: "node"
-      #       credentials:
-      #         overridden: "test_task_overridden"
-      #         run_stage: "test_task_run_stage"
-      #       params:
-      #         prop4: "overridden_cloud_1_4"
-      #       shared_params: ["test_task_overridden_1"]
-      #       contents:
-      #         content_task_run_stage: |
-      #           Content Tasks Cloud Run Stage
-      #           Line 02
-      #         content_task_overridden: |
-      #           Content Tasks Cloud Overridden
-      #           Line 02
-      #     - name: "test"
-      #       nodes:
-      #         - name: "test_node_local"
-      #           pods: ["test_pod_local"]
-      #       task_target: "pod"
-      #     - name: "test_skip"
-      #       all_nodes: true
-      #       task_target: "node"
-      # - tasks:
-      #     - name: "test_task_env"
-      #       nodes: ["test_node_local"]
-      #       task_target: "node"
-      #       params:
-      #         prop4: "overridden_env_1_4"
-      #       shared_params: ["test_task_overridden_1"]
-      #     - name: "test_task_pod_1"
-      #       key: "test_task_pod"
-      #       all_nodes: true
-      #       task_target: "pod"
-      #       params:
-      #         prop4: "overridden_pod_1_4"
-      #       shared_params: ["test_task_overridden_1"]
-      #     - name: "test_task_pod_2"
-      #       key: "test_task_pod"
-      #       nodes:
-      #         - name: "test_node_local"
-      #           pods: ["test_pod_local_2"]
-      #       task_target: "pod"
-      #       params:
-      #         prop4: "overridden_pod_2_4"
-      #       shared_params: ["test_task_overridden_2"]
+          - name: "test_task_cloud"
+            all_nodes: true
+            task_target: "node"
+            credentials:
+              overridden: "test_task_overridden"
+              run_stage: "test_task_run_stage"
+            params:
+              prop4: "overridden_cloud_1_4"
+            shared_params: ["test_task_overridden_1"]
+            contents:
+              content_task_run_stage: |
+                Content Tasks Cloud Run Stage
+                Line 02
+              content_task_overridden: |
+                Content Tasks Cloud Overridden
+                Line 02
+          - name: "test"
+            nodes:
+              - name: "test_node_local"
+                pods: ["test_pod_local"]
+            task_target: "pod"
+          - name: "test_skip"
+            all_nodes: true
+            task_target: "node"
+      - tasks:
+          - name: "test_task_env"
+            nodes: ["test_node_local"]
+            task_target: "node"
+            params:
+              prop4: "overridden_env_1_4"
+            shared_params: ["test_task_overridden_1"]
+          - name: "test_task_pod_1"
+            key: "test_task_pod"
+            all_nodes: true
+            task_target: "pod"
+            params:
+              prop4: "overridden_pod_1_4"
+            shared_params: ["test_task_overridden_1"]
+          - name: "test_task_pod_2"
+            key: "test_task_pod"
+            nodes:
+              - name: "test_node_local"
+                pods: ["test_pod_local_2"]
+            task_target: "pod"
+            params:
+              prop4: "overridden_pod_2_4"
+            shared_params: ["test_task_overridden_2"]
   node:
     repo: "cloud"
     env_repos:
@@ -510,23 +510,17 @@ main:
       - "{{ params.env_params.vpn_service | default({}) }}"
     nodes:
       - name: "app"
-        key: "digital_ocean_node"
+        key: "digital_ocean_simple_node"
         amount: 1
         tmp: true
         can_destroy: true
-        params:
-          dns_service_params_list:
-            - record: "test1"
-              ttl: 100
-            - record: "test2"
-              ttl: 200
       - name: "app2"
-        key: "digital_ocean_node"
+        key: "digital_ocean_simple_node"
         amount: 2
         tmp: true
         can_destroy: true
       - name: "app3"
-        key: "digital_ocean_node"
+        key: "digital_ocean_simple_node"
         amount: 3
         tmp: true
         can_destroy: true
@@ -696,7 +690,8 @@ services:
         file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
         schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
         params:
-          user_directories: ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
+          user_directories:
+            ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
         credentials:
           node: "host"
         contents:
@@ -1185,6 +1180,11 @@ service_group_params:
   shared_bottom_2_3: "value_group_shared_bottom_2_3"
   shared_bottom_2_4: "value_group_shared_bottom_2_4"
 nodes:
+  digital_ocean_simple_node:
+    service: "digital_ocean_node_service"
+    base_dir: "/var/cloud"
+    root: true
+    credential: "host"
   digital_ocean_node:
     service: "digital_ocean_node_service"
     dns_service: "node_dns_service"
@@ -1428,7 +1428,12 @@ pods:
           file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
           schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
           params:
-            user_directories: ["test-transfer-dir-1", "test-transfer-dir-2", "test-transfer-dir-2/test-transfer-dir-2-inner"]
+            user_directories:
+              [
+                "test-transfer-dir-1",
+                "test-transfer-dir-2",
+                "test-transfer-dir-2/test-transfer-dir-2-inner",
+              ]
           credentials:
             node: "host"
           contents:
@@ -1501,7 +1506,8 @@ pods:
         file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
         schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
         params:
-          user_directories: ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
+          user_directories:
+            ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
         credentials:
           node: "host"
         contents:
