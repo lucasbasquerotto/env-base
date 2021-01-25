@@ -315,9 +315,9 @@ main:
           test4:
             type: "url"
             host:
-              - "test-new-host4-1"
-              - "test-new-host4-2"
-              - "test-new-host4-3"
+              - "github.com"
+              - "google.com"
+              - "unknown.internal"
             limit: -1
             protocol: "http"
             required_amount: 2
@@ -327,6 +327,11 @@ main:
             limit: -1
             port: 443
           test6: "https://test-url:9443"
+    run_stages:
+      - tasks:
+        - name: "task_dependencies"
+          all_nodes: true
+          task_target: "node"
   node_local:
     repo: "cloud"
     env_repos:
