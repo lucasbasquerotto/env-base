@@ -208,6 +208,7 @@ services:
         file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
         schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
         params:
+          user_directories: ["/var/cloud"]
           install_docker: true
           install_podman: false
           install_packages: false

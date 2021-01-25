@@ -86,6 +86,8 @@ schemas:
         type: "bool"
       can_destroy:
         type: "bool"
+      params:
+        type: "dict"
   dns_record:
     type: "dict"
     props:

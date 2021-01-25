@@ -682,6 +682,8 @@ services:
         origin: "cloud"
         file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
         schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+        params:
+          user_directories: ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
         credentials:
           node: "host"
         contents:
@@ -1412,6 +1414,8 @@ pods:
           origin: "cloud"
           file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
           schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+          params:
+            user_directories: ["test-transfer-dir-1", "test-transfer-dir-2", "test-transfer-dir-2/test-transfer-dir-2-inner"]
           credentials:
             node: "host"
           contents:
@@ -1483,6 +1487,8 @@ pods:
         origin: "cloud"
         file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
         schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+        params:
+          user_directories: ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
         credentials:
           node: "host"
         contents:

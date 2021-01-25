@@ -130,6 +130,7 @@ services:
         file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
         schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
         params:
+          user_directories: ["/var/discourse", "/var/cloud"]
           install_docker: true
           install_podman: false
           install_packages: false
@@ -141,8 +142,7 @@ nodes:
   discourse:
     service: "{{ params.env_params.node_service }}"
     dns_service: "node_dns_service"
-    base_dir: "/var"
-    tmp_dir: "/tmp/discourse/node"
+    base_dir: "/var/cloud"
     root: true
     credential: "host"
     pods: ["discourse"]
@@ -157,15 +157,15 @@ nodes:
 pods:
   discourse:
     repo: "discourse_docker"
+    base_dir: "/var/discourse"
+    flat: true
     root: "yes"
     fast_prepare: "true"
-    flat: true
-    base_dir: "discourse"
     transfer:
-      - dest: "shared/setup.sh"
-        mode: "0755"
+      - dest: "shared/bin/setup"
+        executable: true
         src:
-          origin: "env"
+          origin: "cloud"
           file: "custom-cloud/run-tasks/discourse-setup.sh"
       - dest: "containers/app.yml"
         src:
@@ -180,7 +180,7 @@ tasks:
   discourse_setup:
     type: "shell"
     root: true
-    cmd: "./shared/setup.sh"
+    cmd: "./shared/bin/setup"
   discourse_rebuild:
     type: "shell"
     root: true
