@@ -85,8 +85,9 @@ main:
       - name: "web"
         key: "efk"
         dependencies:
-          - host: "elasticsearch"
-            node: "db"
+          elasticsearch:
+            type: "node"
+            host: "db"
         pods:
           efk:
             params:

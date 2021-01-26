@@ -84,8 +84,9 @@ main:
       - name: "web"
         key: "rocketchat"
         dependencies:
-          - host: "mongo"
-            node: "db"
+          mongo:
+            type: "node"
+            host: "db"
         pods:
           rocketchat:
             params:

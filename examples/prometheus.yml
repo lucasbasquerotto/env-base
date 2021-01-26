@@ -85,8 +85,9 @@ main:
       - name: "web"
         key: "prometheus"
         dependencies:
-          - host: "prometheus"
-            node: "db"
+          prometheus:
+            type: "node"
+            host: "db"
         pods:
           prometheus:
             params:
