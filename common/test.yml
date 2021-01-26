@@ -1619,6 +1619,9 @@ tasks:
   test_sleep_30:
     type: "shell"
     cmd: "sleep 30"
+  test_error:
+    type: "shell"
+    cmd: "unknown-command-error"
   test_skip:
     type: "skip"
 task_shared_params:
