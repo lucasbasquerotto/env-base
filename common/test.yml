@@ -514,11 +514,33 @@ main:
         amount: 1
         tmp: true
         can_destroy: true
+        dependencies:
+          app2:
+            type: "node"
+            host: "app2"
+            protocol: "ssh"
+            port: 22
+            required_amount: 1
+          app3:
+            type: "node"
+            host: "app3"
+            limit: -1
+            protocol: "ssh"
+            port: 22
+            required_amount: 2
       - name: "app2"
         key: "digital_ocean_simple_node"
         amount: 2
         tmp: true
         can_destroy: true
+        dependencies:
+          my_app3:
+            type: "node"
+            host: "app3"
+            limit: -1
+            protocol: "ssh"
+            port: 22
+            required_amount: 3
       - name: "app3"
         key: "digital_ocean_simple_node"
         amount: 3
@@ -526,27 +548,36 @@ main:
         can_destroy: true
     run_stages:
       - tasks:
-          - name: "test_sleep_15"
+          - name: "task_dependencies"
+            all_nodes: true
+            task_target: "node"
+          - name: "test_sleep_150"
             nodes: ["app", "app2"]
             task_target: "node"
-          - name: "test_sleep_30"
+          - name: "test_sleep_300"
             nodes: ["app3"]
             task_target: "node"
-          - name: "test_sleep_5"
+          - name: "test_error"
+            nodes: ["app2"]
+            task_target: "node"
+          - name: "test_sleep_50"
             nodes: ["app2", "app3"]
             task_target: "node"
-          - name: "test_sleep_5_2"
-            key: "test_sleep_5"
+          - name: "test_sleep_50_2"
+            key: "test_sleep_50"
             nodes: ["app2"]
             task_target: "node"
       - tasks:
-          - name: "test_sleep_30"
+          - name: "task_dependencies"
+            all_nodes: true
+            task_target: "node"
+          - name: "test_sleep_300"
             nodes: ["app"]
             task_target: "node"
-          - name: "test_sleep_15"
+          - name: "test_sleep_150"
             nodes: ["app3"]
             task_target: "node"
-          - name: "test_sleep_5"
+          - name: "test_sleep_50"
             nodes: ["app2"]
             task_target: "node"
   services:
@@ -587,7 +618,7 @@ services:
           inbound_rules:
             - ports: "22"
               sources:
-                tags: ["main"]
+                tags: ["main", "auto"]
                 addresses: "{{ params.env_params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
@@ -1610,13 +1641,13 @@ tasks:
   test:
     type: "shell"
     cmd: "bash custom-pod/test/run.sh"
-  test_sleep_5:
+  test_sleep_50:
     type: "shell"
     cmd: "sleep 5"
-  test_sleep_15:
+  test_sleep_150:
     type: "shell"
     cmd: "sleep 15"
-  test_sleep_30:
+  test_sleep_300:
     type: "shell"
     cmd: "sleep 30"
   test_error:
