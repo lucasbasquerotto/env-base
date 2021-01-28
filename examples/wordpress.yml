@@ -266,6 +266,7 @@ nodes:
       cron:
         - user: "root"
           src:
+            type: "template"
             origin: "env"
             file: "{{ params.env.repo_dir }}/cron/app.cron"
           dest: "/var/spool/cron/crontabs/root"
