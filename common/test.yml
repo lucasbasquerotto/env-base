@@ -315,11 +315,10 @@ main:
           test4:
             type: "url"
             host:
-              - "github.com"
+              - "https://github.com"
               - "google.com"
-              - "unknown.internal"
+              - "unknown.invalid:8080"
             limit: -1
-            protocol: "http"
             required_amount: 2
           test5:
             type: "url"
@@ -343,7 +342,9 @@ main:
       [host]
       [host:children]
       custom_node_service_local
+      node_2
       [custom_node_service_local]
+      [node_2]
     nodes:
       - name: "test_node_local"
         key: "custom_local"
@@ -430,8 +431,32 @@ main:
                 Content pod overridden ctx 02
                 Line 02
       - name: "custom_node_service_local"
-        amount: 1
-        max_amount: 5
+        amount: 10
+        dependencies:
+          dependency_1:
+            type: "url"
+            limit: 30
+            host:
+              - "target-host-1"
+              - "target-host-2"
+              - "target-host-3"
+              - "target-host-4"
+              - "target-host-5"
+              - "target-host-6"
+              - "target-host-7"
+              - "target-host-8"
+          dependency_2: "http://mydomain.com"
+          dependency_3:
+            type: "ip"
+            host: "1.2.3.4"
+          dependency_4:
+            type: "node"
+            node_ip_type: "ipv4"
+            host: "node_2"
+            limit: 2
+      - name: "node_2"
+        key: "custom_node_service_local"
+        amount: 3
     run_stages:
       - tasks:
           - name: "task_dependencies"
@@ -1564,7 +1589,6 @@ pods:
 tasks:
   task_dependencies:
     type: "task"
-    root: true
     file: "tasks/run/dependencies.yml"
     schema: "tasks/run/dependencies.schema.yml"
     params:
