@@ -430,7 +430,7 @@ main:
                 Content pod overridden ctx 02
                 Line 02
       - name: "custom_node_service_local"
-        amount: 4
+        amount: 1
         max_amount: 5
     run_stages:
       - tasks:
@@ -1641,6 +1641,7 @@ tasks:
   test:
     type: "shell"
     cmd: "bash custom-pod/test/run.sh"
+    sync: true
   test_sleep_50:
     type: "shell"
     cmd: "sleep 5"
