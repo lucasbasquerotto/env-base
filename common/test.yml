@@ -341,18 +341,18 @@ main:
       localhost ansible_connection=local
       [host]
       [host:children]
-      custom_node_service_local
-      [custom_node_service_local]
+      #custom_node_service_local
+      #[custom_node_service_local]
     nodes:
       - name: "test_node_local"
         key: "custom_local"
         local: true
         dependencies:
-          test_node:
-            type: "node"
-            host: "custom_node_service_local"
-            limit: -1
-            required_amount: 0
+          # test_node:
+          #   type: "node"
+          #   host: "custom_node_service_local"
+          #   limit: -1
+          #   required_amount: 0
           test_ip:
             type: "ip"
             host: "5.6.7.8"
@@ -428,79 +428,79 @@ main:
               content_pod_overridden_ctx: |
                 Content pod overridden ctx 02
                 Line 02
-      - name: "custom_node_service_local"
-        amount: 5
-        dependencies:
-          dependency_1:
-            type: "url"
-            limit: 3
-            host:
-              - "target-host-1"
-              - "target-host-2"
-              - "target-host-3"
-              - "target-host-4"
-              - "target-host-5"
-              - "target-host-6"
-              - "target-host-7"
-              - "target-host-8"
-          dependency_2: "http://mydomain.com"
-          dependency_3:
-            type: "ip"
-            host: "1.2.3.4"
-            protocol: "ssh"
-            port: 22
-    run_stages:
-      - tasks:
-          - name: "task_dependencies"
-            all_nodes: true
-            task_target: "node"
-          - name: "test_task_cloud"
-            all_nodes: true
-            task_target: "node"
-            credentials:
-              overridden: "test_task_overridden"
-              run_stage: "test_task_run_stage"
-            params:
-              prop4: "overridden_cloud_1_4"
-            shared_params: ["test_task_overridden_1"]
-            contents:
-              content_task_run_stage: |
-                Content Tasks Cloud Run Stage
-                Line 02
-              content_task_overridden: |
-                Content Tasks Cloud Overridden
-                Line 02
-          - name: "test"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local"]
-            task_target: "pod"
-          - name: "test_skip"
-            all_nodes: true
-            task_target: "node"
-      - tasks:
-          - name: "test_task_env"
-            nodes: ["test_node_local"]
-            task_target: "node"
-            params:
-              prop4: "overridden_env_1_4"
-            shared_params: ["test_task_overridden_1"]
-          - name: "test_task_pod_1"
-            key: "test_task_pod"
-            all_nodes: true
-            task_target: "pod"
-            params:
-              prop4: "overridden_pod_1_4"
-            shared_params: ["test_task_overridden_1"]
-          - name: "test_task_pod_2"
-            key: "test_task_pod"
-            nodes:
-              - name: "test_node_local"
-                pods: ["test_pod_local_2"]
-            task_target: "pod"
-            params:
-              prop4: "overridden_pod_2_4"
-            shared_params: ["test_task_overridden_2"]
+      # - name: "custom_node_service_local"
+      #   amount: 5
+      #   dependencies:
+      #     dependency_1:
+      #       type: "url"
+      #       limit: 3
+      #       host:
+      #         - "target-host-1"
+      #         - "target-host-2"
+      #         - "target-host-3"
+      #         - "target-host-4"
+      #         - "target-host-5"
+      #         - "target-host-6"
+      #         - "target-host-7"
+      #         - "target-host-8"
+      #     dependency_2: "http://mydomain.com"
+      #     dependency_3:
+      #       type: "ip"
+      #       host: "1.2.3.4"
+      #       protocol: "ssh"
+      #       port: 22
+    # run_stages:
+    #   - tasks:
+    #       - name: "task_dependencies"
+    #         all_nodes: true
+    #         task_target: "node"
+    #       - name: "test_task_cloud"
+    #         all_nodes: true
+    #         task_target: "node"
+    #         credentials:
+    #           overridden: "test_task_overridden"
+    #           run_stage: "test_task_run_stage"
+    #         params:
+    #           prop4: "overridden_cloud_1_4"
+    #         shared_params: ["test_task_overridden_1"]
+    #         contents:
+    #           content_task_run_stage: |
+    #             Content Tasks Cloud Run Stage
+    #             Line 02
+    #           content_task_overridden: |
+    #             Content Tasks Cloud Overridden
+    #             Line 02
+    #       - name: "test"
+    #         nodes:
+    #           - name: "test_node_local"
+    #             pods: ["test_pod_local"]
+    #         task_target: "pod"
+    #       - name: "test_skip"
+    #         all_nodes: true
+    #         task_target: "node"
+    #   - tasks:
+    #       - name: "test_task_env"
+    #         nodes: ["test_node_local"]
+    #         task_target: "node"
+    #         params:
+    #           prop4: "overridden_env_1_4"
+    #         shared_params: ["test_task_overridden_1"]
+    #       - name: "test_task_pod_1"
+    #         key: "test_task_pod"
+    #         all_nodes: true
+    #         task_target: "pod"
+    #         params:
+    #           prop4: "overridden_pod_1_4"
+    #         shared_params: ["test_task_overridden_1"]
+    #       - name: "test_task_pod_2"
+    #         key: "test_task_pod"
+    #         nodes:
+    #           - name: "test_node_local"
+    #             pods: ["test_pod_local_2"]
+    #         task_target: "pod"
+    #         params:
+    #           prop4: "overridden_pod_2_4"
+    #         shared_params: ["test_task_overridden_2"]
   node:
     repo: "cloud"
     env_repos:
@@ -1330,6 +1330,7 @@ nodes:
       cron:
         - user: "root"
           src:
+            type: "template"
             origin: "env"
             file: "{{ params.env.repo_dir }}/cron/app.cron"
           dest: "/var/spool/cron/crontabs/root"

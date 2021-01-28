@@ -1,2 +1,9 @@
-*/5 * * * * . $HOME/.profile; mkdir -p "$DATA_DIR/log/cron/" && "$MAIN_DIR"/run backup >> "$DATA_DIR/log/cron/backup.`date '+\%F'`.log" 2>&1
-*/1 * * * * . $HOME/.profile; mkdir -p "$DATA_DIR/log/cron/" && "$MAIN_DIR"/run "sync:verify" >> "$DATA_DIR/log/cron/sync.`date '+\%F'`.log" 2>&1
+{% set var_pods = input.node.pods | default([]) %}
+
+{% for var_pod in var_pods %}
+
+# pod: {{ var_pod.description }}
+*/1 * * * * mkdir -p {{ (var_pod.data_dir + '/log/cron/') | quote }} && {{ (var_pod.pod_dir + '/run') | quote }} sync:verify >> {{ (var_pod.data_dir + "/sync.`date '+\%F'`.log") | quote }} 2>&1
+*/5 * * * * mkdir -p {{ (var_pod.data_dir + '/log/cron/') | quote }} && {{ (var_pod.pod_dir + '/run') | quote }} backup >> {{ (var_pod.data_dir + "/backup.`date '+\%F'`.log") | quote }} 2>&1
+
+{% endfor %}
