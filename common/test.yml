@@ -342,9 +342,7 @@ main:
       [host]
       [host:children]
       custom_node_service_local
-      node_2
       [custom_node_service_local]
-      [node_2]
     nodes:
       - name: "test_node_local"
         key: "custom_local"
@@ -431,11 +429,11 @@ main:
                 Content pod overridden ctx 02
                 Line 02
       - name: "custom_node_service_local"
-        amount: 10
+        amount: 5
         dependencies:
           dependency_1:
             type: "url"
-            limit: 30
+            limit: 3
             host:
               - "target-host-1"
               - "target-host-2"
@@ -449,14 +447,8 @@ main:
           dependency_3:
             type: "ip"
             host: "1.2.3.4"
-          dependency_4:
-            type: "node"
-            node_ip_type: "ipv4"
-            host: "node_2"
-            limit: 2
-      - name: "node_2"
-        key: "custom_node_service_local"
-        amount: 3
+            protocol: "ssh"
+            port: 22
     run_stages:
       - tasks:
           - name: "task_dependencies"
