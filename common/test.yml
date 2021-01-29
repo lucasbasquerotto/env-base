@@ -1272,6 +1272,10 @@ nodes:
         setup_success_log_last_line: "Setup Finished"
         initial_connection_timeout: 3
         setup_finished_timeout: 5
+      cron:
+        - dest: "/var/spool/cron/crontabs/root"
+          user: "root"
+          src: { type: "env", name: "cron" }
     pods: ["simple"]
   custom_local:
     transfer:
@@ -1325,12 +1329,9 @@ nodes:
         initial_connection_timeout: 3
         setup_finished_timeout: 5
       cron:
-        - user: "root"
-          src:
-            type: "template"
-            origin: "env"
-            file: "{{ params.env.repo_dir }}/cron/app.cron"
-          dest: "/var/spool/cron/crontabs/root"
+        - dest: "/var/spool/cron/crontabs/root"
+          user: "root"
+          src: { type: "env", name: "cron" }
     pods:
       - name: "test_pod_local"
         key: "custom"
@@ -1703,6 +1704,20 @@ task_group_params:
     inner_prop3:
       inner_prop1: "inner3_3_value1"
 contents:
+  cron:
+    type: "template"
+    origin: "cloud"
+    file: "custom-cloud/files/cron/pod.tpl.sh"
+    schema: "custom-cloud/files/cron/pod.schema.yml"
+    params:
+      tasks:
+        - name: "sync"
+          task: "sync:verify"
+          cron: "*/1 * * * *"
+        - name: "backup"
+          cron: "*/5 * * * *"
+        - name: "destroy"
+          cron: "*/6 * 6 * */6"
   user_data_str_1: |
     User Data Env 1 1
     User Data Env 1 2
