@@ -18,6 +18,7 @@ main:
     nodes:
       - name: "app"
         key: "discourse"
+        can_destroy: true
     run_stages:
       - tasks:
           - name: "discourse_setup"

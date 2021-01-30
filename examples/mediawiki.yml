@@ -76,6 +76,7 @@ main:
     nodes:
       - name: "db"
         key: "mediawiki"
+        can_destroy: true
         pods:
           mediawiki:
             params:
@@ -84,6 +85,7 @@ main:
               custom_memory: "mediawiki_custom_memory_db"
       - name: "web"
         key: "mediawiki"
+        can_destroy: true
         dependencies:
           mysql:
             type: "node"

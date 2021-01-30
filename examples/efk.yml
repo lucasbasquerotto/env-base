@@ -47,6 +47,7 @@ main:
     nodes:
       - name: "app"
         key: "efk"
+        can_destroy: true
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -75,6 +76,7 @@ main:
     nodes:
       - name: "db"
         key: "efk"
+        can_destroy: true
         pods:
           efk:
             params:
@@ -84,6 +86,7 @@ main:
               custom_memory: "efk_custom_memory_db"
       - name: "web"
         key: "efk"
+        can_destroy: true
         dependencies:
           elasticsearch:
             type: "node"

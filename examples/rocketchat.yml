@@ -47,6 +47,7 @@ main:
     nodes:
       - name: "app"
         key: "rocketchat"
+        can_destroy: true
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -75,6 +76,7 @@ main:
     nodes:
       - name: "db"
         key: "rocketchat"
+        can_destroy: true
         pods:
           rocketchat:
             params:
@@ -83,6 +85,7 @@ main:
               custom_memory: "rocketchat_custom_memory_db"
       - name: "web"
         key: "rocketchat"
+        can_destroy: true
         dependencies:
           mongo:
             type: "node"

@@ -79,6 +79,7 @@ main:
     nodes:
       - name: "db"
         key: "wp"
+        can_destroy: true
         dependencies:
           elasticsearch:
             type: "url"
@@ -91,6 +92,7 @@ main:
               custom_memory: "wp_custom_memory_db"
       - name: "web"
         key: "wp"
+        can_destroy: true
         dependencies:
           mysql:
             type: "node"
