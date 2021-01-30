@@ -50,6 +50,7 @@ main:
     nodes:
       - name: "app"
         key: "wp"
+        can_destroy: true
     run_stages:
       - tasks:
           - name: "docker_compose_install"
