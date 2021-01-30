@@ -9,6 +9,8 @@ schemas:
       credentials:
         schema: "credentials"
         non_empty: true
+      input:
+        type: "dict"
   params:
     type: "dict"
     props:
