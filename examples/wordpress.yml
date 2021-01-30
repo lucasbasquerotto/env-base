@@ -476,7 +476,7 @@ pod_group_params:
     memcached: 512mb
     pma: 512mb
     adminer: 512mb
-    mysql: 758gb
+    mysql: 512mb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb

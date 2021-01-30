@@ -126,11 +126,18 @@ nodes:
     pods: ["main"]
     params:
       cron:
-        - user: "root"
+        - dest: "/var/spool/cron/crontabs/root"
+          user: "root"
           src:
-            origin: "env"
-            file: "{{ params.env.repo_dir }}/cron/app.cron"
-          dest: "/var/spool/cron/crontabs/root"
+            type: "template"
+            origin: "cloud"
+            file: "custom-cloud/files/cron/pod.tpl.sh"
+            schema: "custom-cloud/files/cron/pod.schema.yml"
+            params:
+              tasks:
+                - name: "sync"
+                  task: "sync:verify"
+                  cron: "*/1 * * * *"
       node_setup:
         setup_log_file: "/var/log/setup.log"
         setup_finished_log_regex: "^Setup Finished.*$"
