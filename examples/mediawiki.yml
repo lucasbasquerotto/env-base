@@ -216,7 +216,7 @@ services:
       image_id: "ubuntu-18-04-x64"
       ipv6: true
       region_id: "ams3"
-      size_id: "s-1vcpu-1gb"
+      size_id: "s-2vcpu-2gb"
       tags:
         - "auto"
         - "dmz"
