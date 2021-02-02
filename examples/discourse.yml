@@ -150,8 +150,8 @@ nodes:
       host: "host"
     params:
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
-      node_setup:
-        host:
+      host_users:
+        - name: "host"
           setup_log_file: "/var/log/setup.log"
           setup_finished_log_regex: "^Setup Finished.*$"
           setup_success_log_last_line: "Setup Finished - Success"

@@ -131,6 +131,13 @@ nodes:
       host: "host"
     pods: ["main"]
     params:
+      host_users:
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 90
+          setup_finished_timeout: 300
       cron:
         - dest: "/var/spool/cron/crontabs/root"
           user: "root"
@@ -144,13 +151,6 @@ nodes:
                 - name: "sync"
                   task: "sync:verify"
                   cron: "*/1 * * * *"
-      node_setup:
-        host:
-          setup_log_file: "/var/log/setup.log"
-          setup_finished_log_regex: "^Setup Finished.*$"
-          setup_success_log_last_line: "Setup Finished - Success"
-          initial_connection_timeout: 90
-          setup_finished_timeout: 300
 pods:
   main:
     repo: "main"

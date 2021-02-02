@@ -344,6 +344,7 @@ main:
       - name: "test_node_local"
         key: "custom_local"
         local: true
+        local_node_setup: true
         dependencies:
           test_node:
             type: "node"
@@ -427,6 +428,7 @@ main:
                 Line 02
       - name: "custom_node_service_local"
         amount: 5
+        local_node_setup: true
         dependencies:
           dependency_1:
             type: "url"
@@ -1232,8 +1234,8 @@ nodes:
     credentials:
       host: "host"
     params:
-      node_setup:
-        host:
+      host_users:
+        - name: "host"
           setup_log_file: "/var/log/setup.log"
           setup_finished_log_regex: "^Setup Finished.*$"
           setup_success_log_last_line: "Setup Finished - Success"
@@ -1258,8 +1260,8 @@ nodes:
             Content pod remote node 01
             Line 02
     params:
-      node_setup:
-        host:
+      host_users:
+        - name: "host"
           setup_log_file: "/var/log/setup.log"
           setup_finished_log_regex: "^Setup Finished.*$"
           setup_success_log_last_line: "Setup Finished - Success"
@@ -1271,11 +1273,11 @@ nodes:
     credentials:
       host: "localhost"
     params:
-      node_setup:
-        host:
+      host_users:
+        - name: "host"
           setup_log_file: "/var/log/setup.log"
-          setup_finished_log_regex: "Setup Finished"
-          setup_success_log_last_line: "Setup Finished"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 3
           setup_finished_timeout: 5
       cron:
@@ -1284,6 +1286,22 @@ nodes:
           src: { type: "env", name: "cron" }
     pods: ["simple"]
   custom_local:
+    credentials:
+      host: "localhost"
+      host2: "fake_user"
+    params:
+      host_users:
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 3
+          setup_finished_timeout: 5
+        - "host2"
+      cron:
+        - dest: "/var/spool/cron/crontabs/root"
+          user: "root"
+          src: { type: "env", name: "cron" }
     transfer:
       - dest: "env-transfer/content.node.str.txt"
         src: |
@@ -1327,18 +1345,6 @@ nodes:
           params:
             value1: "transfer node env main content template value 1"
             value2: "transfer node env main content template value 2"
-    params:
-      node_setup:
-        host:
-          setup_log_file: "/var/log/setup.log"
-          setup_finished_log_regex: "Setup Finished"
-          setup_success_log_last_line: "Setup Finished"
-          initial_connection_timeout: 3
-          setup_finished_timeout: 5
-      cron:
-        - dest: "/var/spool/cron/crontabs/root"
-          user: "root"
-          src: { type: "env", name: "cron" }
     pods:
       - name: "test_pod_local"
         key: "custom"
@@ -1407,12 +1413,19 @@ nodes:
     base_dir: "/var/cloud"
     credentials:
       host: "localhost"
+      root: "fake_user"
     params:
-      node_setup:
-        host:
+      host_users:
+        - name: "root"
           setup_log_file: "/var/log/setup.log"
-          setup_finished_log_regex: "Setup Finished"
-          setup_success_log_last_line: "Setup Finished"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 3
+          setup_finished_timeout: 5
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 3
           setup_finished_timeout: 5
 pods:
