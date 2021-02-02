@@ -50,6 +50,11 @@ main:
               ipv4: "{{ params.env_params.external_ipv4 | default('') }}"
               ipv6: "{{ params.env_params.external_ipv6 | default('') }}"
               private_ip: "{{ params.env_params.external_private_ip | default('') }}"
+            - name: "test-external-host"
+              ip: "1.1.1.1"
+              ipv4: "2.2.2.2"
+              ipv6: "::2"
+              private_ip: "3.3.3.3"
     initial_services:
       - "{{ params.env_params.vpn_service | default('') }}"
     nodes:
@@ -122,7 +127,8 @@ nodes:
     service: "{{ params.env_params.node_service | default('') }}"
     base_dir: "/var/cloud"
     root: true
-    credential: "host"
+    credentials:
+      host: "host"
     pods: ["main"]
     params:
       cron:

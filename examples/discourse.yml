@@ -146,8 +146,8 @@ nodes:
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
-    credential: "host"
-    pods: ["discourse"]
+    credentials:
+      host: "host"
     params:
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       node_setup:
@@ -156,6 +156,7 @@ nodes:
         setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
+    pods: ["discourse"]
 pods:
   discourse:
     repo: "discourse_docker"

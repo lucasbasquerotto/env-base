@@ -237,7 +237,8 @@ services:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
 nodes:
   mediawiki_local:
-    credential: "localhost"
+    credentials:
+      host: "localhost"
     pods:
       - name: "mediawiki"
         params:
@@ -255,14 +256,8 @@ nodes:
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
-    credential: "host"
-    pods:
-      - name: "mediawiki"
-        params:
-          local: false
-        group_params:
-          custom_args: "mediawiki_custom_args"
-          custom_domain: "mediawiki_custom_domain"
+    credentials:
+      host: "host"
     params:
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       cron:
@@ -286,6 +281,13 @@ nodes:
         setup_success_log_last_line: "Setup Finished - Success"
         initial_connection_timeout: 90
         setup_finished_timeout: 300
+    pods:
+      - name: "mediawiki"
+        params:
+          local: false
+        group_params:
+          custom_args: "mediawiki_custom_args"
+          custom_domain: "mediawiki_custom_domain"
 pods:
   mediawiki:
     repo: "pod"
