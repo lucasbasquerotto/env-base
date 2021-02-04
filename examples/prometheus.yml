@@ -227,6 +227,8 @@ nodes:
           local: true
           named_volumes: "{{ params.env_params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
+          enable_logs_setup: false
+          enable_sync_setup: false
         group_params:
           custom_args: "prometheus_custom_args"
           custom_domain: "prometheus_custom_domain_local"

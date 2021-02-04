@@ -245,6 +245,8 @@ nodes:
           migrate_new_domain_host: >-
             {{ params.env_params.ssl | bool | ternary('https', 'http')
             }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}/
+          enable_logs_setup: false
+          enable_sync_setup: false
         group_params:
           custom_args: "wp_custom_args_local"
           custom_domain: "wp_custom_domain_local"
