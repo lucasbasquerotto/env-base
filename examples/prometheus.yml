@@ -291,6 +291,7 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "custom-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
+      use_ssl: "{{ params.env_params.ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
       use_node_exporter: "{{ params.env_params.use_node_exporter }}"
