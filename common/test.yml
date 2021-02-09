@@ -1551,6 +1551,7 @@ pods:
           origin: "cloud"
           file: "custom-cloud/test/files/transfer.tpl.yml"
           schema: "custom-cloud/test/files/transfer.schema.yml"
+          validator: "custom-cloud/test/files/transfer.validator.yml"
           params:
             prop1: "test value pod 1"
             prop2: "test value pod 2"
@@ -1560,6 +1561,23 @@ pods:
               line 02
             content2: |
               test content pod 2
+              line 02
+      - dest: "env-transfer/content.pod.origin.print.yml"
+        src:
+          type: "template"
+          origin: "custom"
+          file: "custom-pod/test/transfer/transfer.tpl.yml"
+          schema: "custom-pod/test/transfer/transfer.schema.yml"
+          validator: "custom-pod/test/transfer/transfer.validator.yml"
+          params:
+            prop1: "test value pod origin 1"
+            prop2: "test value pod origin 2"
+          contents:
+            content1: |
+              test content pod origin 1
+              line 02
+            content2: |
+              test content pod origin 2
               line 02
     credentials:
       pod_credential_1: "my_credential_1_1"
