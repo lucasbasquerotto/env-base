@@ -4,6 +4,7 @@ migration: ""
 container: ""
 meta:
   ignore_validators: false
+  skip_local_pod_preparation: false
   template_no_empty_lines: true
 main:
   cloud:
