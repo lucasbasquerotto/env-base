@@ -380,6 +380,7 @@ main:
               origin: "cloud"
               file: "custom-cloud/test/files/transfer.tpl.yml"
               schema: "custom-cloud/test/files/transfer.schema.yml"
+              validator: "custom-cloud/test/files/transfer.validator.yml"
               params:
                 prop1: "test value node 1"
                 prop2: "test value node 2"
@@ -1616,6 +1617,7 @@ tasks:
     root: true
     file: "custom-cloud/test/run-tasks/task.yml"
     schema: "custom-cloud/test/run-tasks/task.schema.yml"
+    validator: "custom-cloud/test/run-tasks/task.validator.yml"
     credentials:
       prop1: "test_task_prop1_cloud"
       prop2: "test_task_prop2"
@@ -1638,6 +1640,7 @@ tasks:
     root: true
     file: "{{ params.env.repo_dir }}/test/run-tasks/task.yml"
     schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
+    validator: "{{ params.env.repo_dir }}/test/run-tasks/task.validator.yml"
     credentials:
       prop1: "test_task_prop1_env"
       prop2: "test_task_prop2"
@@ -1662,6 +1665,7 @@ tasks:
     root: true
     file: "custom-pod/test/run-tasks/task.yml"
     schema: "custom-pod/test/run-tasks/task.schema.yml"
+    validator: "custom-pod/test/run-tasks/task.validator.yml"
     credentials:
       prop1: "test_task_prop1_pod"
       prop2: "test_task_prop2"
