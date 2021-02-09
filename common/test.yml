@@ -5,6 +5,7 @@ container: ""
 original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.schema.yml"
 meta:
   lax: true
+  ignore_validators: false
   template_no_empty_lines: true
   no_node_type_dependency: false
 main:
@@ -816,6 +817,7 @@ services:
   test_service_1:
     base_dir: "custom-cloud"
     task: "test/services/general/01.yml"
+    validator: "test/services/general/validator.yml"
     credentials:
       service_credential_1: "my_credential_1_1"
       service_credential_2: "my_credential_1_2"
@@ -853,6 +855,7 @@ services:
   test_service_3:
     base_dir: "custom-cloud"
     task: "test/services/general/03.yml"
+    validator: "test/services/general/validator.yml"
     credentials:
       service_credential_1: "my_credential_3_1"
       service_credential_2: "my_credential_3_2"
@@ -1270,6 +1273,7 @@ nodes:
   simple_local:
     service: "service_simple_node_local"
     base_dir: "/var/cloud"
+    validator: "custom-cloud/test/services/node/files/validator.yml"
     credentials:
       host: "localhost"
     params:
@@ -1433,6 +1437,7 @@ pods:
     repo: "custom_pod"
     ctx: "test/ctx-simple.yml"
     schema: "test/simple.schema.yml"
+    validator: "test/validator.yml"
     root: true
     fast_prepare: true
     params:
