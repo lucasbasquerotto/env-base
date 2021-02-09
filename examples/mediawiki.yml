@@ -3,6 +3,7 @@ ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
 meta:
+  ignore_validators: false
   template_no_empty_lines: true
 main:
   cloud:
@@ -298,7 +299,9 @@ pods:
       - repo: "custom_pod"
         dir: "custom-pod"
     root: true
-    ctx: "custom-pod/mediawiki/ctx.yml"
+    ctx: "custom-pod/mediawiki/mediawiki.ctx.yml"
+    schema: "custom-pod/mediawiki/mediawiki.schema.yml"
+    validator: "custom-pod/mediawiki/mediawiki.validator.yml"
     fast_prepare: "true"
     credentials:
       mediawiki: "mediawiki"

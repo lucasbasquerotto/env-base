@@ -3,6 +3,7 @@ ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
 meta:
+  ignore_validators: false
   template_no_empty_lines: true
 main:
   cloud:
@@ -281,7 +282,9 @@ pods:
   rocketchat:
     repo: "pod"
     root: "yes"
-    ctx: "custom-pod/rocketchat/ctx.yml"
+    ctx: "custom-pod/rocketchat/rocketchat.ctx.yml"
+    schema: "custom-pod/rocketchat/rocketchat.schema.yml"
+    validator: "custom-pod/rocketchat/rocketchat.validator.yml"
     fast_prepare: "true"
     env_repos:
       - repo: "custom_pod"

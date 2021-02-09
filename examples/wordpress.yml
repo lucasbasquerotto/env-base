@@ -3,6 +3,7 @@ ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
 meta:
+  ignore_validators: false
   template_no_empty_lines: true
 main:
   cloud:
@@ -296,7 +297,9 @@ pods:
   wp:
     repo: "pod"
     root: "yes"
-    ctx: "custom-pod/wordpress/ctx.yml"
+    ctx: "custom-pod/wordpress/wordpress.ctx.yml"
+    schema: "custom-pod/wordpress/wordpress.schema.yml"
+    validator: "custom-pod/wordpress/wordpress.validator.yml"
     fast_prepare: "true"
     env_repos:
       - repo: "custom_pod"

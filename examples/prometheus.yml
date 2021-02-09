@@ -3,6 +3,7 @@ ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
 meta:
+  ignore_validators: false
   template_no_empty_lines: true
 main:
   cloud:
@@ -276,7 +277,9 @@ pods:
   prometheus:
     repo: "pod"
     root: "yes"
-    ctx: "custom-pod/prometheus/ctx.yml"
+    ctx: "custom-pod/prometheus/prometheus.ctx.yml"
+    schema: "custom-pod/prometheus/prometheus.schema.yml"
+    validator: "custom-pod/prometheus/prometheus.validator.yml"
     fast_prepare: "true"
     env_repos:
       - repo: "custom_pod"

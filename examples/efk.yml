@@ -3,6 +3,7 @@ ctxs: "{{ params.ctxs }}"
 migration: ""
 container: ""
 meta:
+  ignore_validators: false
   template_no_empty_lines: true
 main:
   cloud:
@@ -275,7 +276,9 @@ pods:
   efk:
     repo: "pod"
     root: "yes"
-    ctx: "custom-pod/efk/ctx.yml"
+    ctx: "custom-pod/efk/efk.ctx.yml"
+    schema: "custom-pod/efk/efk.schema.yml"
+    validator: "custom-pod/efk/efk.validator.yml"
     fast_prepare: "true"
     env_repos:
       - repo: "custom_pod"
