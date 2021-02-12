@@ -234,6 +234,8 @@ services:
       size_id: "s-2vcpu-2gb"
       tags:
         - "auto"
+        - "mysql"
+        - "web"
         - "dmz"
     contents:
       user_data:
