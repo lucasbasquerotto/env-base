@@ -450,6 +450,9 @@ main:
             host: "1.2.3.4"
             protocol: "ssh"
             port: 22
+        params:
+          service_params:
+            prop2: "value 02 overridden (node params)"
     run_stages:
       - tasks:
           - name: "task_dependencies"
@@ -1414,7 +1417,11 @@ nodes:
             Content pod overridden 02 (node pod - ctx)
             Line 02
   custom_node_service_local:
-    service: "service_node_local"
+    service:
+      name: "service_node_local"
+      params:
+        prop1: "value 01 overriden (node)"
+        prop2: "value 02 (node)"
     base_dir: "/var/cloud"
     credentials:
       host: "localhost"
