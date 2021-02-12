@@ -163,6 +163,8 @@ services:
     params:
       tags:
         - "auto"
+        - "mysql"
+        - "web"
         - "dmz"
       firewalls:
         - name: "private"
@@ -194,6 +196,21 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "mysql"
+          tags: ["mysql"]
+          inbound_rules:
+            - ports: "3306"
+              sources:
+                tags: ["web"]
+        - name: "web"
+          tags: ["web"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                tags: ["dmz"]
+            - ports: "443"
+              sources:
+                tags: ["dmz"]
         - name: "dmz"
           tags: ["dmz"]
           inbound_rules:
@@ -217,6 +234,8 @@ services:
       size_id: "s-2vcpu-2gb"
       tags:
         - "auto"
+        - "mysql"
+        - "web"
         - "dmz"
     contents:
       user_data:
