@@ -79,6 +79,11 @@ main:
       - name: "db"
         key: "prometheus"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "prometheus"
         pods:
           prometheus:
             params:
@@ -93,6 +98,13 @@ main:
           prometheus:
             type: "node"
             host: "db"
+            port: "9090"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "web"
+              - "dmz"
         pods:
           prometheus:
             params:
@@ -149,6 +161,8 @@ services:
     params:
       tags:
         - "auto"
+        - "prometheus"
+        - "web"
         - "dmz"
       firewalls:
         - name: "private"
@@ -180,6 +194,21 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "prometheus"
+          tags: ["prometheus"]
+          inbound_rules:
+            - ports: "9090"
+              sources:
+                tags: ["web"]
+        - name: "web"
+          tags: ["web"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                tags: ["dmz"]
+            - ports: "443"
+              sources:
+                tags: ["dmz"]
         - name: "dmz"
           tags: ["dmz"]
           inbound_rules:
@@ -237,7 +266,12 @@ nodes:
           certbot: "certbot_local"
           db_backup: "db_backup_no_sync"
   prometheus:
-    service: "{{ params.env_params.node_service }}"
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

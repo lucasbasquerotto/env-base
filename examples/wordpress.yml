@@ -86,6 +86,11 @@ main:
           elasticsearch:
             type: "url"
             host: "{{ params.env_params.elasticsearch_url | default('') }}"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "mysql"
         pods:
           wp:
             params:
@@ -99,9 +104,16 @@ main:
           mysql:
             type: "node"
             host: "db"
+            port: "3306"
           elasticsearch:
             type: "url"
             host: "{{ params.env_params.elasticsearch_url | default('') }}"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "web"
+              - "dmz"
         pods:
           wp:
             params:
@@ -232,11 +244,6 @@ services:
       ipv6: true
       region_id: "ams3"
       size_id: "s-2vcpu-2gb"
-      tags:
-        - "auto"
-        - "mysql"
-        - "web"
-        - "dmz"
     contents:
       user_data:
         type: "template"
@@ -276,7 +283,12 @@ nodes:
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
   wp:
-    service: "{{ params.env_params.node_service }}"
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

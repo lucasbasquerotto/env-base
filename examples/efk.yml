@@ -79,6 +79,11 @@ main:
       - name: "db"
         key: "efk"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "elasticsearch"
         pods:
           efk:
             params:
@@ -93,6 +98,13 @@ main:
           elasticsearch:
             type: "node"
             host: "db"
+            port: "9200"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "web"
+              - "dmz"
         pods:
           efk:
             params:
@@ -149,6 +161,8 @@ services:
     params:
       tags:
         - "auto"
+        - "elasticsearch"
+        - "web"
         - "dmz"
       firewalls:
         - name: "private"
@@ -180,6 +194,21 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "elasticsearch"
+          tags: ["elasticsearch"]
+          inbound_rules:
+            - ports: "9200"
+              sources:
+                tags: ["web"]
+        - name: "web"
+          tags: ["web"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                tags: ["dmz"]
+            - ports: "443"
+              sources:
+                tags: ["dmz"]
         - name: "dmz"
           tags: ["dmz"]
           inbound_rules:
@@ -236,7 +265,12 @@ nodes:
           custom_domain: "efk_custom_domain_local"
           certbot: "certbot_local"
   efk:
-    service: "{{ params.env_params.node_service }}"
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

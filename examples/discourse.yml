@@ -14,11 +14,18 @@ main:
       [app]
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-      - "{{ params.env_params.s3_buckets_service | default('s3_no_bucket', true) }}"
+      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
     nodes:
       - name: "app"
         key: "discourse"
         can_destroy: true
+        params:
+          dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+        pods:
+          discourse:
+            transfer:
+              - dest: "containers/app.yml"
+                src: "{{ params.env_params.discourse_app_container_content | default({}) }}"
     run_stages:
       - tasks:
           - name: "discourse_setup"
@@ -37,12 +44,12 @@ services:
       - name: "s3_backup"
         key: "s3_service_base"
         params:
-          bucket: "{{ params.env_params.backup_bucket_name }}"
+          bucket: "{{ params.env_params.discourse.backup_bucket_name | default('') }}"
           permission: "private"
       - name: "s3_uploads"
         key: "s3_service_base"
         params:
-          bucket: "{{ params.env_params.uploads_bucket_name }}"
+          bucket: "{{ params.env_params.discourse.uploads_bucket_name | default('') }}"
           permission: "public-read"
   s3_service_base:
     base_dir: "custom-cloud"
@@ -50,7 +57,7 @@ services:
     task: "tasks/s3/aws.main.s3.yml"
     schema: "tasks/s3/schema.s3.yml"
     credentials:
-      s3: "s3"
+      s3: "discourse_s3"
   node_dns_service:
     base_dir: "custom-cloud"
     namespace: "ext_dns"
@@ -149,7 +156,6 @@ nodes:
     credentials:
       host: "host"
     params:
-      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
       host_users:
         - name: "host"
           setup_log_file: "/var/log/setup.log"
@@ -170,16 +176,7 @@ pods:
         executable: true
         src:
           origin: "cloud"
-          file: "custom-cloud/run-tasks/discourse-setup.sh"
-      - dest: "containers/app.yml"
-        src:
-          type: "template"
-          origin: "env"
-          file: "examples/discourse/app.yml"
-          credentials:
-            discourse: "discourse"
-    credentials:
-      discourse_backup_bucket: "s3"
+          file: "custom-cloud/files/discourse/discourse-setup.sh"
 tasks:
   discourse_setup:
     type: "shell"
@@ -189,6 +186,8 @@ tasks:
     type: "shell"
     root: true
     cmd: "./launcher rebuild app"
+content_shared_params:
+  discourse_params: "{{ params.env_params.discourse | default({}) }}"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"

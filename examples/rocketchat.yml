@@ -79,6 +79,11 @@ main:
       - name: "db"
         key: "rocketchat"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "mongo"
         pods:
           rocketchat:
             params:
@@ -92,6 +97,13 @@ main:
           mongo:
             type: "node"
             host: "db"
+            port: "27017"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "web"
+              - "dmz"
         pods:
           rocketchat:
             params:
@@ -153,6 +165,8 @@ services:
     params:
       tags:
         - "auto"
+        - "mongo"
+        - "web"
         - "dmz"
       firewalls:
         - name: "private"
@@ -184,6 +198,21 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "mongo"
+          tags: ["mongo"]
+          inbound_rules:
+            - ports: "27017"
+              sources:
+                tags: ["web"]
+        - name: "web"
+          tags: ["web"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                tags: ["dmz"]
+            - ports: "443"
+              sources:
+                tags: ["dmz"]
         - name: "dmz"
           tags: ["dmz"]
           inbound_rules:
@@ -242,7 +271,12 @@ nodes:
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
   rocketchat:
-    service: "{{ params.env_params.node_service }}"
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

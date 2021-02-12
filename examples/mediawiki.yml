@@ -79,6 +79,11 @@ main:
       - name: "db"
         key: "mediawiki"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "mysql"
         pods:
           mediawiki:
             params:
@@ -91,11 +96,14 @@ main:
         dependencies:
           mysql:
             type: "node"
-            node_ip_type: "private"
             host: "db"
-            protocol: "ssh"
-            port: 3306
-          test: "https://github.com"
+            port: "3306"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "web"
+              - "dmz"
         pods:
           mediawiki:
             params:
@@ -167,6 +175,8 @@ services:
     params:
       tags:
         - "auto"
+        - "mysql"
+        - "web"
         - "dmz"
       firewalls:
         - name: "private"
@@ -198,6 +208,21 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "mysql"
+          tags: ["mysql"]
+          inbound_rules:
+            - ports: "3306"
+              sources:
+                tags: ["web"]
+        - name: "web"
+          tags: ["web"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                tags: ["dmz"]
+            - ports: "443"
+              sources:
+                tags: ["dmz"]
         - name: "dmz"
           tags: ["dmz"]
           inbound_rules:
@@ -219,9 +244,6 @@ services:
       ipv6: true
       region_id: "ams3"
       size_id: "s-2vcpu-2gb"
-      tags:
-        - "auto"
-        - "dmz"
     contents:
       user_data:
         type: "template"
@@ -256,7 +278,12 @@ nodes:
           uploads_backup: "uploads_backup_no_sync"
           certbot: "certbot_local"
   mediawiki:
-    service: "{{ params.env_params.node_service }}"
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
