@@ -458,10 +458,11 @@ pod_group_params:
     email: "{{ params.env_params.certbot_email | default('') }}"
     force: "{{ params.env_params.certbot_force | default(false) }}"
   db_backup:
-    use_s3: "{{ params.env_params.db_backup_use_s3 }}"
-    is_compressed_file: "{{ params.env_params.db_backup_use_s3 | bool | ternary(false, true) }}"
+    s3_snapshot: "{{ params.env_params.db_backup_s3_snapshot | default(false) }}"
+    is_compressed_file: "{{ not (params.env_params.db_backup_s3_snapshot | default(false) | bool) }}"
+    backup_bucket_sync_dir: "db"
   db_setup:
-    use_s3: "{{ params.env_params.db_setup_use_s3 | default(params.env_params.db_backup_use_s3) }}"
+    use_s3: "{{ params.env_params.db_setup_use_s3 | default(false) }}"
     snapshot_name: "{{ params.env_params.snapshot_name | default('') }}"
     restore_remote_file: "{{ params.env_params.db_setup_restore_remote_file | default('') }}"
 tasks:
