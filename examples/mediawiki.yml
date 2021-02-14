@@ -83,7 +83,7 @@ main:
           service_params:
             tags:
               - "auto"
-              - "mediawiki_mysql"
+              - "mediawiki-mysql"
         pods:
           mediawiki:
             params:
@@ -102,8 +102,8 @@ main:
           service_params:
             tags:
               - "auto"
-              - "mediawiki_web"
-              - "mediawiki_dmz"
+              - "mediawiki-web"
+              - "mediawiki-dmz"
         pods:
           mediawiki:
             params:
@@ -175,9 +175,9 @@ services:
     params:
       tags:
         - "auto"
-        - "mediawiki_mysql"
-        - "mediawiki_web"
-        - "mediawiki_dmz"
+        - "mediawiki-mysql"
+        - "mediawiki-web"
+        - "mediawiki-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -208,23 +208,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "mediawiki_mysql"
-          tags: ["mediawiki_mysql"]
+        - name: "mediawiki-mysql"
+          tags: ["mediawiki-mysql"]
           inbound_rules:
             - ports: "3306"
               sources:
-                tags: ["mediawiki_web"]
-        - name: "mediawiki_web"
-          tags: ["mediawiki_web"]
+                tags: ["mediawiki-web"]
+        - name: "mediawiki-web"
+          tags: ["mediawiki-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["mediawiki_dmz"]
+                tags: ["mediawiki-dmz"]
             - ports: "443"
               sources:
-                tags: ["mediawiki_dmz"]
-        - name: "mediawiki_dmz"
-          tags: ["mediawiki_dmz"]
+                tags: ["mediawiki-dmz"]
+        - name: "mediawiki-dmz"
+          tags: ["mediawiki-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -283,7 +283,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "mediawiki_dmz"
+          - "mediawiki-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

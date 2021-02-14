@@ -103,8 +103,8 @@ main:
           service_params:
             tags:
               - "auto"
-              - "efk_web"
-              - "efk_dmz"
+              - "efk-web"
+              - "efk-dmz"
         pods:
           efk:
             params:
@@ -162,8 +162,8 @@ services:
       tags:
         - "auto"
         - "elasticsearch"
-        - "efk_web"
-        - "efk_dmz"
+        - "efk-web"
+        - "efk-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -199,18 +199,18 @@ services:
           inbound_rules:
             - ports: "9200"
               sources:
-                tags: ["auto", "efk_web"]
-        - name: "efk_web"
-          tags: ["efk_web"]
+                tags: ["auto", "efk-web"]
+        - name: "efk-web"
+          tags: ["efk-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["efk_dmz"]
+                tags: ["efk-dmz"]
             - ports: "443"
               sources:
-                tags: ["efk_dmz"]
-        - name: "efk_dmz"
-          tags: ["efk_dmz"]
+                tags: ["efk-dmz"]
+        - name: "efk-dmz"
+          tags: ["efk-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -267,7 +267,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "efk_dmz"
+          - "efk-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
