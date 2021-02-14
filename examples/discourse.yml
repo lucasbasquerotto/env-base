@@ -1,5 +1,7 @@
 name: "{{ params.name }}"
 ctxs: ["app"]
+meta:
+  template_no_empty_lines: true
 main:
   app:
     repo: "cloud"
