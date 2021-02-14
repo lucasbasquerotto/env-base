@@ -103,8 +103,8 @@ main:
           service_params:
             tags:
               - "auto"
-              - "web"
-              - "dmz"
+              - "prometheus_web"
+              - "prometheus_dmz"
         pods:
           prometheus:
             params:
@@ -162,8 +162,8 @@ services:
       tags:
         - "auto"
         - "prometheus"
-        - "web"
-        - "dmz"
+        - "prometheus_web"
+        - "prometheus_dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -199,18 +199,18 @@ services:
           inbound_rules:
             - ports: "9090"
               sources:
-                tags: ["web"]
-        - name: "web"
-          tags: ["web"]
+                tags: ["auto", "prometheus_web"]
+        - name: "prometheus_web"
+          tags: ["prometheus_web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["dmz"]
+                tags: ["prometheus_dmz"]
             - ports: "443"
               sources:
-                tags: ["dmz"]
-        - name: "dmz"
-          tags: ["dmz"]
+                tags: ["prometheus_dmz"]
+        - name: "prometheus_dmz"
+          tags: ["prometheus_dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -230,9 +230,6 @@ services:
       ipv6: true
       region_id: "ams3"
       size_id: "s-2vcpu-2gb"
-      tags:
-        - "auto"
-        - "dmz"
     contents:
       user_data:
         type: "template"
@@ -271,7 +268,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "dmz"
+          - "prometheus_dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

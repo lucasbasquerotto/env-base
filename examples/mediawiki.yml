@@ -83,7 +83,7 @@ main:
           service_params:
             tags:
               - "auto"
-              - "mysql"
+              - "mediawiki_mysql"
         pods:
           mediawiki:
             params:
@@ -102,8 +102,8 @@ main:
           service_params:
             tags:
               - "auto"
-              - "web"
-              - "dmz"
+              - "mediawiki_web"
+              - "mediawiki_dmz"
         pods:
           mediawiki:
             params:
@@ -175,9 +175,9 @@ services:
     params:
       tags:
         - "auto"
-        - "mysql"
-        - "web"
-        - "dmz"
+        - "mediawiki_mysql"
+        - "mediawiki_web"
+        - "mediawiki_dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -208,23 +208,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "mysql"
-          tags: ["mysql"]
+        - name: "mediawiki_mysql"
+          tags: ["mediawiki_mysql"]
           inbound_rules:
             - ports: "3306"
               sources:
-                tags: ["web"]
-        - name: "web"
-          tags: ["web"]
+                tags: ["mediawiki_web"]
+        - name: "mediawiki_web"
+          tags: ["mediawiki_web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["dmz"]
+                tags: ["mediawiki_dmz"]
             - ports: "443"
               sources:
-                tags: ["dmz"]
-        - name: "dmz"
-          tags: ["dmz"]
+                tags: ["mediawiki_dmz"]
+        - name: "mediawiki_dmz"
+          tags: ["mediawiki_dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -283,7 +283,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "dmz"
+          - "mediawiki_dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
