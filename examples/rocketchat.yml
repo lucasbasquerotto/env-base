@@ -83,7 +83,7 @@ main:
           service_params:
             tags:
               - "auto"
-              - "rocketchat_mongo"
+              - "rocketchat-mongo"
         pods:
           rocketchat:
             params:
@@ -102,8 +102,8 @@ main:
           service_params:
             tags:
               - "auto"
-              - "rocketchat_web"
-              - "rocketchat_dmz"
+              - "rocketchat-web"
+              - "rocketchat-dmz"
         pods:
           rocketchat:
             params:
@@ -165,9 +165,9 @@ services:
     params:
       tags:
         - "auto"
-        - "rocketchat_mongo"
-        - "rocketchat_web"
-        - "rocketchat_dmz"
+        - "rocketchat-mongo"
+        - "rocketchat-web"
+        - "rocketchat-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -198,23 +198,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "rocketchat_mongo"
-          tags: ["rocketchat_mongo"]
+        - name: "rocketchat-mongo"
+          tags: ["rocketchat-mongo"]
           inbound_rules:
             - ports: "27017"
               sources:
-                tags: ["rocketchat_web"]
-        - name: "rocketchat_web"
-          tags: ["rocketchat_web"]
+                tags: ["rocketchat-web"]
+        - name: "rocketchat-web"
+          tags: ["rocketchat-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["rocketchat_dmz"]
+                tags: ["rocketchat-dmz"]
             - ports: "443"
               sources:
-                tags: ["rocketchat_dmz"]
-        - name: "rocketchat_dmz"
-          tags: ["rocketchat_dmz"]
+                tags: ["rocketchat-dmz"]
+        - name: "rocketchat-dmz"
+          tags: ["rocketchat-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -273,7 +273,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "rocketchat_dmz"
+          - "rocketchat-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true

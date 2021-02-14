@@ -90,7 +90,7 @@ main:
           service_params:
             tags:
               - "auto"
-              - "wp_mysql"
+              - "wp-mysql"
         pods:
           wp:
             params:
@@ -112,8 +112,8 @@ main:
           service_params:
             tags:
               - "auto"
-              - "wp_web"
-              - "wp_dmz"
+              - "wp-web"
+              - "wp-dmz"
         pods:
           wp:
             params:
@@ -175,9 +175,9 @@ services:
     params:
       tags:
         - "auto"
-        - "wp_mysql"
-        - "wp_web"
-        - "wp_dmz"
+        - "wp-mysql"
+        - "wp-web"
+        - "wp-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -208,23 +208,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "wp_mysql"
-          tags: ["wp_mysql"]
+        - name: "wp-mysql"
+          tags: ["wp-mysql"]
           inbound_rules:
             - ports: "3306"
               sources:
-                tags: ["wp_web"]
-        - name: "wp_web"
-          tags: ["wp_web"]
+                tags: ["wp-web"]
+        - name: "wp-web"
+          tags: ["wp-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["wp_dmz"]
+                tags: ["wp-dmz"]
             - ports: "443"
               sources:
-                tags: ["wp_dmz"]
-        - name: "wp_dmz"
-          tags: ["wp_dmz"]
+                tags: ["wp-dmz"]
+        - name: "wp-dmz"
+          tags: ["wp-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -288,7 +288,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "wp_dmz"
+          - "wp-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
