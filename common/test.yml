@@ -59,6 +59,7 @@ main:
         single: true
         tmp: true
         can_destroy: true
+        delay_errors: true
         credentials:
           service_credential_overridden: "my_credential_overridden"
           service_credential_initial: "my_credential_initial"
@@ -93,6 +94,7 @@ main:
         key: "test_service_1"
         single: true
         tmp: true
+        delay_errors: true
         credentials:
           service_credential_final: "my_credential_final"
         contents:
@@ -875,6 +877,7 @@ services:
     services:
       - name: "test_service_1"
         single: true
+        delay_errors: true
       - name: "test_service_2_overridden"
         key: "test_service_2"
         single: true
