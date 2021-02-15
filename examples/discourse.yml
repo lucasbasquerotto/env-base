@@ -94,16 +94,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host:children]
-      web
-      [web]
-      redis
-      [redis]
-      db
-      [db]
+    hosts:
+      type: "template"
+      file: "files/hosts.tpl.ini"
+      schema: "files/hosts.schema.yml"
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
@@ -323,15 +317,15 @@ tasks:
   discourse_rebuild_db:
     type: "shell"
     root: true
-    cmd: "./launcher rebuild app"
+    cmd: "./launcher rebuild db"
   discourse_rebuild_redis:
     type: "shell"
     root: true
-    cmd: "./launcher rebuild app"
+    cmd: "./launcher rebuild redis"
   discourse_rebuild_web:
     type: "shell"
     root: true
-    cmd: "./launcher rebuild app"
+    cmd: "./launcher rebuild web"
 contents:
   discourse_app_container:
     type: "env"
@@ -373,7 +367,7 @@ contents:
     shared_params: ["discourse_params"]
     credentials:
       db: "db"
-      discourse_smtp: "discourse_smtp_sendgrid"
+      discourse_smtp: "discourse_smtp"
       discourse_s3: "discourse_s3"
 content_shared_params:
   discourse_params: "{{ params.env_params.discourse | default({}) }}"

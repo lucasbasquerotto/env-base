@@ -63,14 +63,10 @@ main:
     env_repos:
       - repo: "custom_cloud"
         dir: "custom-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host:children]
-      db
-      web
-      [db]
-      [web]
+    hosts:
+      type: "template"
+      file: "files/hosts.tpl.ini"
+      schema: "files/hosts.schema.yml"
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - name: "s3_buckets"
