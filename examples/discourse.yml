@@ -109,9 +109,13 @@ main:
           db:
             type: "node"
             host: "db"
+            port: "5432"
+            required_amount: 1
           redis:
             type: "node"
             host: "redis"
+            port: "6379"
+            required_amount: 1
         params:
           dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
         pods:
@@ -148,6 +152,10 @@ main:
                     | default({ 'type': 'env', 'name': 'discourse_db_container' })
                   }}
     run_stages:
+      - tasks:
+          - name: "task_dependencies"
+            all_nodes: true
+            task_target: "node"
       - tasks:
           - name: "discourse_setup"
             all_nodes: true
@@ -205,17 +213,10 @@ services:
     params:
       tags:
         - "auto"
-        - "dmz"
+        - "discourse-pg"
+        - "discourse-web"
+        - "discourse-dmz"
       firewalls:
-        - name: "private"
-          tags: ["auto"]
-          inbound_rules:
-            - ports: "9080"
-              sources:
-                addresses: "{{ params.env_params.private_ips }}"
-            - ports: "9443"
-              sources:
-                addresses: "{{ params.env_params.private_ips }}"
         - name: "auto"
           tags: ["auto"]
           inbound_rules:
@@ -236,8 +237,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "dmz"
-          tags: ["dmz"]
+        - name: "discourse-pg"
+          tags: ["discourse-pg"]
+          inbound_rules:
+            - ports: "5432"
+              sources:
+                tags: ["discourse-web"]
+        - name: "discourse-web"
+          tags: ["discourse-web"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                tags: ["discourse-dmz"]
+            - ports: "443"
+              sources:
+                tags: ["discourse-dmz"]
+        - name: "discourse-dmz"
+          tags: ["discourse-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -306,6 +322,12 @@ pods:
           origin: "cloud"
           file: "custom-cloud/files/discourse/discourse-setup.sh"
 tasks:
+  task_dependencies:
+    type: "task"
+    file: "tasks/run/dependencies.yml"
+    schema: "tasks/run/dependencies.schema.yml"
+    params:
+      timeout: 5
   discourse_setup:
     type: "shell"
     root: true
