@@ -1,9 +1,9 @@
 name: "{{ params.name }}"
-ctxs: ["app"]
+ctxs: "{{ params.ctxs }}"
 meta:
   template_no_empty_lines: true
 main:
-  app:
+  remote:
     repo: "cloud"
     env_repos:
       - repo: "custom_cloud"
