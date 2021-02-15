@@ -2,6 +2,8 @@ name: "{{ params.name }}"
 ctxs: "{{ params.ctxs }}"
 meta:
   template_no_empty_lines: true
+  skip_local_node_preparation: false
+  skip_local_pod_preparation: false
 main:
   remote:
     repo: "cloud"
@@ -27,7 +29,11 @@ main:
           discourse:
             transfer:
               - dest: "containers/app.yml"
-                src: "{{ params.env_params.discourse_app_container_content | default({}) }}"
+                src: >-
+                  {{
+                    params.env_params.discourse_app_container_content
+                    | default({ 'type': 'env', 'name': 'discourse_app_container' })
+                  }}
     run_stages:
       - tasks:
           - name: "discourse_setup"
@@ -35,6 +41,132 @@ main:
             task_target: "pod"
           - name: "discourse_rebuild"
             all_nodes: true
+            task_target: "pod"
+  multicontainer:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+      app
+      [app]
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
+    nodes:
+      - name: "app"
+        key: "discourse"
+        can_destroy: true
+        params:
+          dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+        pods:
+          discourse:
+            transfer:
+              - dest: "containers/web.yml"
+                src: >-
+                  {{
+                    params.env_params.discourse_web_internal_container_content
+                    | default({ 'type': 'env', 'name': 'discourse_web_internal_container' })
+                  }}
+              - dest: "containers/db.yml"
+                src: >-
+                  {{
+                    params.env_params.discourse_db_internal_container_content
+                    | default({ 'type': 'env', 'name': 'discourse_db_internal_container' })
+                  }}
+    run_stages:
+      - tasks:
+          - name: "discourse_setup"
+            all_nodes: true
+            task_target: "pod"
+          - name: "discourse_rebuild_db"
+            all_nodes: true
+            task_target: "pod"
+      - tasks:
+          - name: "discourse_rebuild_web"
+            all_nodes: true
+            task_target: "pod"
+  nodes:
+    repo: "cloud"
+    env_repos:
+      - repo: "custom_cloud"
+        dir: "custom-cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+      web
+      [web]
+      redis
+      [redis]
+      db
+      [db]
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
+    nodes:
+      - name: "web"
+        key: "discourse"
+        can_destroy: true
+        dependencies:
+          db:
+            type: "node"
+            host: "db"
+          redis:
+            type: "node"
+            host: "redis"
+        params:
+          dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+        pods:
+          discourse:
+            transfer:
+              - dest: "containers/web.yml"
+                src: >-
+                  {{
+                    params.env_params.discourse_web_container_content
+                    | default({ 'type': 'env', 'name': 'discourse_web_container' })
+                  }}
+      - name: "redis"
+        key: "discourse"
+        can_destroy: true
+        pods:
+          discourse:
+            transfer:
+              - dest: "containers/redis.yml"
+                src: >-
+                  {{
+                    params.env_params.discourse_redis_container_content
+                    | default({ 'type': 'env', 'name': 'discourse_redis_container' })
+                  }}
+      - name: "db"
+        key: "discourse"
+        can_destroy: true
+        pods:
+          discourse:
+            transfer:
+              - dest: "containers/db.yml"
+                src: >-
+                  {{
+                    params.env_params.discourse_db_container_content
+                    | default({ 'type': 'env', 'name': 'discourse_db_container' })
+                  }}
+    run_stages:
+      - tasks:
+          - name: "discourse_setup"
+            all_nodes: true
+            task_target: "pod"
+          - name: "discourse_rebuild_db"
+            nodes: ["db"]
+            task_target: "pod"
+          - name: "discourse_rebuild_redis"
+            nodes: ["redis"]
+            task_target: "pod"
+      - tasks:
+          - name: "discourse_rebuild_web"
+            nodes: ["web"]
             task_target: "pod"
 services:
   s3_no_bucket:
@@ -188,6 +320,61 @@ tasks:
     type: "shell"
     root: true
     cmd: "./launcher rebuild app"
+  discourse_rebuild_db:
+    type: "shell"
+    root: true
+    cmd: "./launcher rebuild app"
+  discourse_rebuild_redis:
+    type: "shell"
+    root: true
+    cmd: "./launcher rebuild app"
+  discourse_rebuild_web:
+    type: "shell"
+    root: true
+    cmd: "./launcher rebuild app"
+contents:
+  discourse_app_container:
+    type: "env"
+    name: "discourse_container"
+    params:
+      type: "app"
+  discourse_web_internal_container:
+    type: "env"
+    name: "discourse_container"
+    params:
+      type: "web"
+      internal_redis: true
+      db_same_host: true
+  discourse_db_internal_container:
+    type: "env"
+    name: "discourse_container"
+    params:
+      type: "db"
+      db_same_host: true
+  discourse_web_container:
+    type: "env"
+    name: "discourse_container"
+    params:
+      type: "web"
+  discourse_db_container:
+    type: "env"
+    name: "discourse_container"
+    params:
+      type: "db"
+  discourse_redis_container:
+    type: "env"
+    name: "discourse_container"
+    params:
+      type: "redis"
+  discourse_container:
+    type: "template"
+    origin: "cloud"
+    file: "custom-cloud/files/discourse/container.tpl.yml"
+    shared_params: ["discourse_params"]
+    credentials:
+      db: "db"
+      discourse_smtp: "discourse_smtp_sendgrid"
+      discourse_s3: "discourse_s3"
 content_shared_params:
   discourse_params: "{{ params.env_params.discourse | default({}) }}"
 repos:
