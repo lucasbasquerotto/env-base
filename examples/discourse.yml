@@ -117,6 +117,11 @@ main:
             port: "6379"
             required_amount: 1
         params:
+          service_params:
+            tags:
+              - "auto"
+              - "discourse-web"
+              - "discourse-dmz"
           dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
         pods:
           discourse:
@@ -130,6 +135,11 @@ main:
       - name: "redis"
         key: "discourse"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "discourse-redis"
         pods:
           discourse:
             transfer:
@@ -142,6 +152,11 @@ main:
       - name: "db"
         key: "discourse"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "discourse-pg"
         pods:
           discourse:
             transfer:
@@ -153,10 +168,6 @@ main:
                   }}
     run_stages:
       - tasks:
-          - name: "task_dependencies"
-            all_nodes: true
-            task_target: "node"
-      - tasks:
           - name: "discourse_setup"
             all_nodes: true
             task_target: "pod"
@@ -167,6 +178,9 @@ main:
             nodes: ["redis"]
             task_target: "pod"
       - tasks:
+          # - name: "task_dependencies"
+          #   nodes: ["web"]
+          #   task_target: "node"
           - name: "discourse_rebuild_web"
             nodes: ["web"]
             task_target: "pod"
@@ -214,6 +228,7 @@ services:
       tags:
         - "auto"
         - "discourse-pg"
+        - "discourse-redis"
         - "discourse-web"
         - "discourse-dmz"
       firewalls:
@@ -241,6 +256,12 @@ services:
           tags: ["discourse-pg"]
           inbound_rules:
             - ports: "5432"
+              sources:
+                tags: ["discourse-web"]
+        - name: "discourse-redis"
+          tags: ["discourse-redis"]
+          inbound_rules:
+            - ports: "6379"
               sources:
                 tags: ["discourse-web"]
         - name: "discourse-web"
@@ -273,9 +294,6 @@ services:
       ipv6: true
       region_id: "ams3"
       size_id: "s-1vcpu-1gb"
-      tags:
-        - "auto"
-        - "dmz"
     contents:
       user_data:
         type: "template"
@@ -293,7 +311,12 @@ services:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
 nodes:
   discourse:
-    service: "{{ params.env_params.node_service }}"
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "discourse-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
