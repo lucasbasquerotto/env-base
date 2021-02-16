@@ -305,13 +305,13 @@ pods:
   prometheus:
     repo: "pod"
     root: "yes"
-    ctx: "custom-pod/prometheus/prometheus.ctx.yml"
-    schema: "custom-pod/prometheus/prometheus.schema.yml"
-    validator: "custom-pod/prometheus/prometheus.validator.yml"
+    ctx: "ext-pod/prometheus/prometheus.ctx.yml"
+    schema: "ext-pod/prometheus/prometheus.schema.yml"
+    validator: "ext-pod/prometheus/prometheus.validator.yml"
     fast_prepare: "true"
     env_repos:
-      - repo: "custom_pod"
-        dir: "custom-pod"
+      - repo: "ext_pod"
+        dir: "ext-pod"
     credentials:
       grafana: "grafana"
       minio_gateway: "minio_gateway"
@@ -320,7 +320,7 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
-      custom_dir: "custom-pod"
+      custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
       use_ssl: "{{ params.env_params.ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
@@ -508,7 +508,7 @@ repos:
   pod:
     src: "https://github.com/lucasbasquerotto/pod.git"
     version: "master"
-  custom_pod:
-    src: "https://github.com/lucasbasquerotto/custom-pod.git"
+  ext_pod:
+    src: "https://github.com/lucasbasquerotto/ext-pod.git"
     version: "master"
 credentials: "{{ params.credentials }}"

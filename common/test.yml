@@ -260,8 +260,8 @@ main:
           - repo: "env_base"
             src: ""
             dest: "tmp/test/link-env-base"
-      - repo: "custom_pod"
-        dir: "custom-pod"
+      - repo: "ext_pod"
+        dir: "ext-pod"
         transfer:
           - dest: "tmp/test/ef1.yml"
             src:
@@ -1445,7 +1445,7 @@ nodes:
           setup_finished_timeout: 5
 pods:
   simple:
-    repo: "custom_pod"
+    repo: "ext_pod"
     ctx: "test/ctx-simple.yml"
     schema: "test/simple.schema.yml"
     validator: "test/validator.yml"
@@ -1464,10 +1464,10 @@ pods:
   custom:
     repo: "pod"
     env_repos:
-      - repo: "custom_pod"
-        dir: "custom-pod"
-    ctx: "custom-pod/test/ctx.yml"
-    schema: "custom-pod/test/schema.yml"
+      - repo: "ext_pod"
+        dir: "ext-pod"
+    ctx: "ext-pod/test/ctx.yml"
+    schema: "ext-pod/test/schema.yml"
     root: true
     fast_prepare: true
     transfer:
@@ -1477,11 +1477,11 @@ pods:
           Type: str
       - dest: "env-transfer/content.file.sh"
         src:
-          file: "custom-pod/test/run.sh"
+          file: "ext-pod/test/run.sh"
       - dest: "env-transfer/content.template.sh"
         src:
           type: "template"
-          file: "custom-pod/test/template.sh"
+          file: "ext-pod/test/template.sh"
           params:
             value: "transfer content value"
       - dest: "env-transfer/content.env_file.yml"
@@ -1576,9 +1576,9 @@ pods:
         src:
           type: "template"
           origin: "custom"
-          file: "custom-pod/test/transfer/transfer.tpl.yml"
-          schema: "custom-pod/test/transfer/transfer.schema.yml"
-          validator: "custom-pod/test/transfer/transfer.validator.yml"
+          file: "ext-pod/test/transfer/transfer.tpl.yml"
+          schema: "ext-pod/test/transfer/transfer.schema.yml"
+          validator: "ext-pod/test/transfer/transfer.validator.yml"
           params:
             prop1: "test value pod origin 1"
             prop2: "test value pod origin 2"
@@ -1623,7 +1623,7 @@ pods:
         contents:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
     params:
-      custom_dir: "custom-pod"
+      custom_dir: "ext-pod"
       env_files_dir: "{{ params.env.repo_dir }}/test/files"
       test_schema:
         - 123
@@ -1691,9 +1691,9 @@ tasks:
     type: "task"
     target_origin: "pod"
     root: true
-    file: "custom-pod/test/run-tasks/task.yml"
-    schema: "custom-pod/test/run-tasks/task.schema.yml"
-    validator: "custom-pod/test/run-tasks/task.validator.yml"
+    file: "ext-pod/test/run-tasks/task.yml"
+    schema: "ext-pod/test/run-tasks/task.schema.yml"
+    validator: "ext-pod/test/run-tasks/task.validator.yml"
     credentials:
       prop1: "test_task_prop1_pod"
       prop2: "test_task_prop2"
@@ -1714,7 +1714,7 @@ tasks:
       prop3: "test_task_prop3"
   test:
     type: "shell"
-    cmd: "bash custom-pod/test/run.sh"
+    cmd: "bash ext-pod/test/run.sh"
     sync: true
   test_sleep_50:
     type: "shell"
@@ -1933,8 +1933,8 @@ repos:
   pod:
     src: "https://github.com/lucasbasquerotto/pod.git"
     version: "master"
-  custom_pod:
-    src: "https://github.com/lucasbasquerotto/custom-pod.git"
+  ext_pod:
+    src: "https://github.com/lucasbasquerotto/ext-pod.git"
     version: "master"
 credentials:
   fake: {}
