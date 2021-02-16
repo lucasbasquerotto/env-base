@@ -12,8 +12,8 @@ main:
   local_cloud_hooks:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     cfg: |
       [defaults]
       interpreter_python=/usr/bin/python3
@@ -24,29 +24,29 @@ main:
       localhost ansible_connection=local
       [host]
     hooks:
-      before_initial_services: "custom-cloud/test/hooks/before_initial_services.yml"
-      after_initial_services: "custom-cloud/test/hooks/after_initial_services.yml"
-      before_nodes: "custom-cloud/test/hooks/before_nodes.yml"
-      after_nodes: "custom-cloud/test/hooks/after_nodes.yml"
-      before_nodes_setup: "custom-cloud/test/hooks/before_nodes_setup.yml"
-      after_nodes_setup: "custom-cloud/test/hooks/after_nodes_setup.yml"
-      before_prepare_nodes: "custom-cloud/test/hooks/before_prepare_nodes.yml"
-      after_prepare_nodes: "custom-cloud/test/hooks/after_prepare_nodes.yml"
-      before_prepare_pods: "custom-cloud/test/hooks/before_prepare_pods.yml"
-      after_prepare_pods: "custom-cloud/test/hooks/after_prepare_pods.yml"
-      before_cron: "custom-cloud/test/hooks/before_cron.yml"
-      after_cron: "custom-cloud/test/hooks/after_cron.yml"
-      before_final_services: "custom-cloud/test/hooks/before_final_services.yml"
-      after_final_services: "custom-cloud/test/hooks/after_final_services.yml"
-      before_delete_tmp: "custom-cloud/test/hooks/before_delete_tmp.yml"
-      after_delete_tmp: "custom-cloud/test/hooks/after_delete_tmp.yml"
-      before_delete_main: "custom-cloud/test/hooks/before_delete_main.yml"
-      after_delete_main: "custom-cloud/test/hooks/after_delete_main.yml"
+      before_initial_services: "ext-cloud/test/hooks/before_initial_services.yml"
+      after_initial_services: "ext-cloud/test/hooks/after_initial_services.yml"
+      before_nodes: "ext-cloud/test/hooks/before_nodes.yml"
+      after_nodes: "ext-cloud/test/hooks/after_nodes.yml"
+      before_nodes_setup: "ext-cloud/test/hooks/before_nodes_setup.yml"
+      after_nodes_setup: "ext-cloud/test/hooks/after_nodes_setup.yml"
+      before_prepare_nodes: "ext-cloud/test/hooks/before_prepare_nodes.yml"
+      after_prepare_nodes: "ext-cloud/test/hooks/after_prepare_nodes.yml"
+      before_prepare_pods: "ext-cloud/test/hooks/before_prepare_pods.yml"
+      after_prepare_pods: "ext-cloud/test/hooks/after_prepare_pods.yml"
+      before_cron: "ext-cloud/test/hooks/before_cron.yml"
+      after_cron: "ext-cloud/test/hooks/after_cron.yml"
+      before_final_services: "ext-cloud/test/hooks/before_final_services.yml"
+      after_final_services: "ext-cloud/test/hooks/after_final_services.yml"
+      before_delete_tmp: "ext-cloud/test/hooks/before_delete_tmp.yml"
+      after_delete_tmp: "ext-cloud/test/hooks/after_delete_tmp.yml"
+      before_delete_main: "ext-cloud/test/hooks/before_delete_main.yml"
+      after_delete_main: "ext-cloud/test/hooks/after_delete_main.yml"
   local_cloud_services:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -114,8 +114,8 @@ main:
   local_cloud_layer_services:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -132,8 +132,8 @@ main:
   local_cloud_sequence_services:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -197,14 +197,14 @@ main:
         links:
           - dest: "tmp/test/link-env-base"
             src: ""
-          - dest: "tmp/test/link-custom-cloud"
-            repo: "custom_cloud"
+          - dest: "tmp/test/link-ext-cloud"
+            repo: "ext_cloud"
             src: ""
           - dest: "tmp/test/link-pod-run.sh"
             repo: "pod"
             src: "run"
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
         transfer:
           - dest: "tmp/test/ef2.yml"
             src:
@@ -216,8 +216,8 @@ main:
               origin: "env"
               file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
               params:
-                value1: "custom_cloud_1"
-                value2: "custom_cloud_2"
+                value1: "ext_cloud_1"
+                value2: "ext_cloud_2"
           - dest: "tmp/test/cf1.yml"
             src:
               type: "file"
@@ -230,17 +230,17 @@ main:
               type: "template"
               file: "test/extra-repos/cloud_template1.yml"
               params:
-                value1: "custom_cloud_1_1 (repo)"
-                value2: "custom_cloud_1_2 (repo)"
+                value1: "ext_cloud_1_1 (repo)"
+                value2: "ext_cloud_1_2 (repo)"
           - dest: "tmp/test/ct2.yml"
             src:
               type: "template"
               file: "test/extra-repos/cloud_template2.yml"
               params:
-                value1: "custom_cloud_2_1 (repo)"
-                value2: "custom_cloud_2_2 (repo)"
+                value1: "ext_cloud_2_1 (repo)"
+                value2: "ext_cloud_2_2 (repo)"
         links:
-          - dest: "tmp/test/link-custom-cloud"
+          - dest: "tmp/test/link-ext-cloud"
             src: ""
           - dest: "tmp/test/link-pod-run.sh"
             repo: "pod"
@@ -281,8 +281,8 @@ main:
   pod_local:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -337,8 +337,8 @@ main:
   node_local:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -380,9 +380,9 @@ main:
             src:
               type: "template"
               origin: "cloud"
-              file: "custom-cloud/test/files/transfer.tpl.yml"
-              schema: "custom-cloud/test/files/transfer.schema.yml"
-              validator: "custom-cloud/test/files/transfer.validator.yml"
+              file: "ext-cloud/test/files/transfer.tpl.yml"
+              schema: "ext-cloud/test/files/transfer.schema.yml"
+              validator: "ext-cloud/test/files/transfer.validator.yml"
               params:
                 prop1: "test value node 1"
                 prop2: "test value node 2"
@@ -510,8 +510,8 @@ main:
   node:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -523,8 +523,8 @@ main:
   nodes_run_stages:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -606,8 +606,8 @@ main:
   services:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -616,7 +616,7 @@ main:
     original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.services.schema.yml"
 services:
   digital_ocean_vpn:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_vpn"
     task: "tasks/vpn/digital_ocean.main.vpn.yml"
     schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
@@ -666,7 +666,7 @@ services:
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
   service_dns:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
     schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.schema.dns.yml"
@@ -678,7 +678,7 @@ services:
       record: "dev"
       value: "{{ params.env_params.dns_records | default([]) }}"
   service_s3:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_s3"
     task: "tasks/s3/aws.main.s3.yml"
     schema: "tasks/s3/schema.s3.yml"
@@ -688,7 +688,7 @@ services:
       bucket: "{{ params.env_params.s3_bucket | default('') }}"
       permission: "public-read"
   digital_ocean_node_service:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_node"
     task: "tasks/node/digital_ocean.main.node.yml"
     schema: "tasks/node/digital_ocean.schema.node.yml"
@@ -706,8 +706,8 @@ services:
       user_data:
         type: "template"
         origin: "cloud"
-        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
         params:
           install_docker: true
           install_podman: false
@@ -717,7 +717,7 @@ services:
         contents:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
   node_dns_service:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
     schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.schema.dns.yml"
@@ -726,12 +726,12 @@ services:
     params:
       zone: "{{ params.env_params.domain | default('') }}"
   service_simple_node_local:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_node"
     task: "test/services/node/test.main.node.yml"
     schema: "test/services/node/test.schema.node.yml"
   service_node_local:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_node"
     task: "test/services/node/test.main.node.yml"
     schema: "test/services/node/test.schema.node.yml"
@@ -741,8 +741,8 @@ services:
       user_data:
         type: "template"
         origin: "cloud"
-        file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
-        schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+        file: "ext-cloud/test/services/node/files/user-data-content.tpl.sh"
+        schema: "ext-cloud/test/services/node/files/user-data-content.schema.yml"
         params:
           user_directories:
             ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
@@ -773,12 +773,12 @@ services:
         - type: "env"
           name: "user_data_str_3"
         - type: "file"
-          file: "custom-cloud/test/services/node/files/user-data.sh"
+          file: "ext-cloud/test/services/node/files/user-data.sh"
         - type: "env"
           name: "user_data_file_1"
           key: "user_data_file"
         - type: "template"
-          file: "custom-cloud/test/services/node/files/user-data.tpl.sh"
+          file: "ext-cloud/test/services/node/files/user-data.tpl.sh"
           params:
             prop1: "value_1"
           group_params:
@@ -821,7 +821,7 @@ services:
           group_params:
             prop1: "user_data_overridden_1"
   test_service_1:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/general/01.yml"
     validator: "test/services/general/validator.yml"
     credentials:
@@ -846,7 +846,7 @@ services:
         My Content (Overridden)
         Line 02
   test_service_2:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/general/02.yml"
     credentials:
       service_credential_1: "my_credential_2_1"
@@ -859,7 +859,7 @@ services:
     shared_params: ["value_s2"]
     shared_group_params: "value_g2"
   test_service_3:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/general/03.yml"
     validator: "test/services/general/validator.yml"
     credentials:
@@ -907,7 +907,7 @@ services:
         single: true
         key: "test_service_2"
   test_top_1:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/layer/top.yml"
     namespace: "ext_test_top"
     credentials:
@@ -932,7 +932,7 @@ services:
     shared_params: ["value_top_s1"]
     shared_group_params: "value_top_g1"
   test_middle_1:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/layer/middle.yml"
     namespace: "ext_test_middle"
     credentials:
@@ -956,7 +956,7 @@ services:
     shared_params: ["value_middle_s1"]
     shared_group_params: "value_middle_g1"
   test_bottom_1:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/layer/bottom.yml"
     namespace: "ext_test_bottom"
     credentials:
@@ -971,7 +971,7 @@ services:
     shared_params: ["value_bottom_s1"]
     shared_group_params: "value_bottom_g1"
   test_top_2:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/layer/top.yml"
     namespace: "ext_test_top"
     credentials:
@@ -990,7 +990,7 @@ services:
     shared_params: ["value_top_s2"]
     shared_group_params: "value_top_g2"
   test_middle_2:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/layer/middle.yml"
     namespace: "ext_test_middle"
     credentials:
@@ -1009,7 +1009,7 @@ services:
     shared_params: ["value_middle_s2"]
     shared_group_params: "value_middle_g2"
   test_bottom_2:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/layer/bottom.yml"
     namespace: "ext_test_bottom"
     credentials:
@@ -1052,18 +1052,18 @@ services:
         params:
           param_changed: "after_value_no_sequence_3"
   test_before:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/sequence/before.yml"
     namespace: "ext_test_before"
     params:
       param_1: "value_1"
       param_2: "value_2"
   test_adapter:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/sequence/adapter.yml"
     namespace: "ext_test_adapter"
   test_after:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     task: "test/services/sequence/after.yml"
     namespace: "ext_test_after"
     params:
@@ -1280,7 +1280,7 @@ nodes:
   simple_local:
     service: "service_simple_node_local"
     base_dir: "/var/cloud"
-    validator: "custom-cloud/test/services/node/files/validator.yml"
+    validator: "ext-cloud/test/services/node/files/validator.yml"
     credentials:
       host: "localhost"
     params:
@@ -1320,11 +1320,11 @@ nodes:
           Type: str
       - dest: "env-transfer/content.node.file.sh"
         src:
-          file: "custom-cloud/test/extra-repos/cloud_file1.yml"
+          file: "ext-cloud/test/extra-repos/cloud_file1.yml"
       - dest: "env-transfer/content.node.template.sh"
         src:
           type: "template"
-          file: "custom-cloud/test/extra-repos/cloud_template1.yml"
+          file: "ext-cloud/test/extra-repos/cloud_template1.yml"
           params:
             value1: "transfer node content value1"
             value2: "transfer node content value2"
@@ -1517,8 +1517,8 @@ pods:
         src:
           type: "template"
           origin: "cloud"
-          file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
-          schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+          file: "ext-cloud/test/services/node/files/user-data-content.tpl.sh"
+          schema: "ext-cloud/test/services/node/files/user-data-content.schema.yml"
           params:
             user_directories:
               [
@@ -1559,9 +1559,9 @@ pods:
         src:
           type: "template"
           origin: "cloud"
-          file: "custom-cloud/test/files/transfer.tpl.yml"
-          schema: "custom-cloud/test/files/transfer.schema.yml"
-          validator: "custom-cloud/test/files/transfer.validator.yml"
+          file: "ext-cloud/test/files/transfer.tpl.yml"
+          schema: "ext-cloud/test/files/transfer.schema.yml"
+          validator: "ext-cloud/test/files/transfer.validator.yml"
           params:
             prop1: "test value pod 1"
             prop2: "test value pod 2"
@@ -1613,8 +1613,8 @@ pods:
       user_data:
         type: "template"
         origin: "cloud"
-        file: "custom-cloud/test/services/node/files/user-data-content.tpl.sh"
-        schema: "custom-cloud/test/services/node/files/user-data-content.schema.yml"
+        file: "ext-cloud/test/services/node/files/user-data-content.tpl.sh"
+        schema: "ext-cloud/test/services/node/files/user-data-content.schema.yml"
         params:
           user_directories:
             ["test-dir-1", "test-dir-2", "test-dir-2/test-dir-2-inner"]
@@ -1643,9 +1643,9 @@ tasks:
   test_task_cloud:
     type: "task"
     root: true
-    file: "custom-cloud/test/run-tasks/task.yml"
-    schema: "custom-cloud/test/run-tasks/task.schema.yml"
-    validator: "custom-cloud/test/run-tasks/task.validator.yml"
+    file: "ext-cloud/test/run-tasks/task.yml"
+    schema: "ext-cloud/test/run-tasks/task.schema.yml"
+    validator: "ext-cloud/test/run-tasks/task.validator.yml"
     credentials:
       prop1: "test_task_prop1_cloud"
       prop2: "test_task_prop2"
@@ -1766,8 +1766,8 @@ contents:
   cron:
     type: "template"
     origin: "cloud"
-    file: "custom-cloud/files/cron/pod.tpl.sh"
-    schema: "custom-cloud/files/cron/pod.schema.yml"
+    file: "ext-cloud/files/cron/pod.tpl.sh"
+    schema: "ext-cloud/files/cron/pod.schema.yml"
     params:
       tasks:
         - name: "sync"
@@ -1793,14 +1793,14 @@ contents:
     shared_params: ["user_data_env_str"]
   user_data_file:
     type: "file"
-    file: "custom-cloud/test/services/node/files/user-data.sh"
+    file: "ext-cloud/test/services/node/files/user-data.sh"
   user_data_file_env:
     type: "file"
     origin: "env"
     file: "{{ params.env.repo_dir }}/test/files/user-data.sh"
   user_data_tpl:
     type: "template"
-    file: "custom-cloud/test/services/node/files/user-data.tpl.sh"
+    file: "ext-cloud/test/services/node/files/user-data.tpl.sh"
     params:
       prop1: "value_env_1"
     group_params:
@@ -1927,8 +1927,8 @@ repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
     version: "master"
-  custom_cloud:
-    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
   pod:
     src: "https://github.com/lucasbasquerotto/pod.git"

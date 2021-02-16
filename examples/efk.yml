@@ -10,8 +10,8 @@ main:
   cloud:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -21,8 +21,8 @@ main:
   local:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -34,8 +34,8 @@ main:
   remote:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -61,8 +61,8 @@ main:
   nodes:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -132,14 +132,14 @@ services:
           bucket: "{{ params.env_params.backup_bucket_name }}"
           permission: "private"
   s3_service_base:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_s3"
     task: "tasks/s3/aws.main.s3.yml"
     schema: "tasks/s3/schema.s3.yml"
     credentials:
       s3: "s3"
   node_dns_service:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
     schema: "tasks/dns/{{ params.env_params.dns_provider }}.schema.dns.yml"
@@ -148,7 +148,7 @@ services:
     params:
       zone: "{{ params.env_params.domain }}"
   digital_ocean_vpn:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_vpn"
     task: "tasks/vpn/digital_ocean.main.vpn.yml"
     schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
@@ -215,7 +215,7 @@ services:
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
   digital_ocean_node:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_node"
     task: "tasks/node/digital_ocean.main.node.yml"
     schema: "tasks/node/digital_ocean.schema.node.yml"
@@ -230,8 +230,8 @@ services:
       user_data:
         type: "template"
         origin: "cloud"
-        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
         params:
           user_directories: ["/var/cloud"]
           install_docker: true
@@ -284,8 +284,8 @@ nodes:
           src:
             type: "template"
             origin: "cloud"
-            file: "custom-cloud/files/cron/pod.tpl.sh"
-            schema: "custom-cloud/files/cron/pod.schema.yml"
+            file: "ext-cloud/files/cron/pod.tpl.sh"
+            schema: "ext-cloud/files/cron/pod.schema.yml"
             params:
               tasks:
                 - name: "sync"
@@ -462,8 +462,8 @@ tasks:
   docker_compose_install:
     type: "task"
     root: true
-    file: "custom-cloud/run-tasks/docker.yml"
-    schema: "custom-cloud/run-tasks/docker.schema.yml"
+    file: "ext-cloud/run-tasks/docker.yml"
+    schema: "ext-cloud/run-tasks/docker.schema.yml"
     params:
       compose:
         version: "1.27.2"
@@ -479,8 +479,8 @@ repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
     version: "master"
-  custom_cloud:
-    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
   pod:
     src: "https://github.com/lucasbasquerotto/pod.git"

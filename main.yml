@@ -6,8 +6,8 @@ main:
   local:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -19,8 +19,8 @@ main:
   remote:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -36,8 +36,8 @@ main:
   external:
     repo: "cloud"
     env_repos:
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -63,7 +63,7 @@ main:
         external: true
 services:
   digital_ocean_vpn:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_vpn"
     task: "tasks/vpn/digital_ocean.main.vpn.yml"
     schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
@@ -93,7 +93,7 @@ services:
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
   digital_ocean_node:
-    base_dir: "custom-cloud"
+    base_dir: "ext-cloud"
     namespace: "ext_node"
     task: "tasks/node/digital_ocean.main.node.yml"
     schema: "tasks/node/digital_ocean.schema.node.yml"
@@ -110,8 +110,8 @@ services:
       user_data:
         type: "template"
         origin: "cloud"
-        file: "custom-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "custom-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
         params:
           install_docker: true
           install_podman: false
@@ -144,8 +144,8 @@ nodes:
           src:
             type: "template"
             origin: "cloud"
-            file: "custom-cloud/files/cron/pod.tpl.sh"
-            schema: "custom-cloud/files/cron/pod.schema.yml"
+            file: "ext-cloud/files/cron/pod.tpl.sh"
+            schema: "ext-cloud/files/cron/pod.schema.yml"
             params:
               tasks:
                 - name: "sync"
@@ -171,8 +171,8 @@ repos:
     src: "ssh://git@bitbucket.org/lucasbasquerotto/ansible-main-env-demo.git"
     version: "master"
     ssh_file: "ssh/env_main.encrypted.key"
-  custom_cloud:
-    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
 credentials:
   host: "{{ params.credentials.host | default({}) }}"

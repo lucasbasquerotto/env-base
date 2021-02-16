@@ -11,8 +11,8 @@ main:
     extra_repos:
       - repo: "env_base"
         dir: "env-base"
-      - repo: "custom_cloud"
-        dir: "custom-cloud"
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
       - repo: "pod"
         dir: "pod"
       - repo: "custom_pod"
@@ -30,8 +30,8 @@ repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
     version: "master"
-  custom_cloud:
-    src: "https://github.com/lucasbasquerotto/custom-cloud.git"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
   pod:
     src: "https://github.com/lucasbasquerotto/pod.git"
