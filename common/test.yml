@@ -574,33 +574,33 @@ main:
           - name: "task_dependencies"
             all_nodes: true
             task_target: "node"
-          - name: "test_sleep_150"
+          - name: "test_sleep_15"
             nodes: ["app", "app2"]
             task_target: "node"
-          - name: "test_sleep_300"
+          - name: "test_sleep_30"
             nodes: ["app3"]
             task_target: "node"
           - name: "test_error"
             nodes: ["app2"]
             task_target: "node"
-          - name: "test_sleep_50"
+          - name: "test_sleep_5"
             nodes: ["app2", "app3"]
             task_target: "node"
-          - name: "test_sleep_50_2"
-            key: "test_sleep_50"
+          - name: "test_sleep_5_2"
+            key: "test_sleep_5"
             nodes: ["app2"]
             task_target: "node"
       - tasks:
           - name: "task_dependencies"
             all_nodes: true
             task_target: "node"
-          - name: "test_sleep_300"
+          - name: "test_sleep_30"
             nodes: ["app"]
             task_target: "node"
-          - name: "test_sleep_150"
+          - name: "test_sleep_15"
             nodes: ["app3"]
             task_target: "node"
-          - name: "test_sleep_50"
+          - name: "test_sleep_5"
             nodes: ["app2"]
             task_target: "node"
   services:
@@ -1716,13 +1716,13 @@ tasks:
     type: "shell"
     cmd: "bash ext-pod/test/run.sh"
     sync: true
-  test_sleep_50:
+  test_sleep_5:
     type: "shell"
     cmd: "sleep 5"
-  test_sleep_150:
+  test_sleep_15:
     type: "shell"
     cmd: "sleep 15"
-  test_sleep_300:
+  test_sleep_30:
     type: "shell"
     cmd: "sleep 30"
   test_error:
