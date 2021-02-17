@@ -634,6 +634,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -646,6 +650,7 @@ services:
     namespace: "ext_vpn"
     task: "tasks/vpn/digital_ocean.main.vpn.yml"
     schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean.validator.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
