@@ -7,7 +7,7 @@ meta:
 main:
   remote:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -44,7 +44,7 @@ main:
             task_target: "pod"
   multicontainer:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -91,7 +91,7 @@ main:
             task_target: "pod"
   nodes:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts:

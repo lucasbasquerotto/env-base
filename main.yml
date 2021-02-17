@@ -5,7 +5,7 @@ meta:
 main:
   local:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -18,7 +18,7 @@ main:
         local: true
   remote:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -35,7 +35,7 @@ main:
         can_destroy: true
   external:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts:
@@ -154,7 +154,7 @@ nodes:
 pods:
   main:
     repo: "main"
-    env_repos:
+    ext_repos:
       - repo: "env_main"
         dir: "env-main"
     root: true

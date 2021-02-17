@@ -11,7 +11,7 @@ meta:
 main:
   local_cloud_hooks:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     cfg: |
@@ -44,7 +44,7 @@ main:
       after_delete_main: "ext-cloud/test/hooks/after_delete_main.yml"
   local_cloud_services:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -113,7 +113,7 @@ main:
         tmp: true
   local_cloud_layer_services:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -131,7 +131,7 @@ main:
         can_destroy: true
   local_cloud_sequence_services:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -280,7 +280,7 @@ main:
             dest: "tmp/test/link-env-base-file.yml"
   pod_local:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -336,7 +336,7 @@ main:
             task_target: "node"
   node_local:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts:
@@ -509,7 +509,7 @@ main:
             shared_params: ["test_task_overridden_2"]
   node:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts:
@@ -522,7 +522,7 @@ main:
     original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
   nodes_run_stages:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts:
@@ -605,7 +605,7 @@ main:
             task_target: "node"
   services:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -1463,7 +1463,7 @@ pods:
       pod_param_3: "sample value 3"
   custom:
     repo: "pod"
-    env_repos:
+    ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"
     ctx: "ext-pod/test/ctx.yml"

@@ -9,7 +9,7 @@ meta:
 main:
   cloud:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -20,7 +20,7 @@ main:
       - "{{ params.env_params.vpn_service }}"
   local:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -33,7 +33,7 @@ main:
         local: true
   remote:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts: |
@@ -60,7 +60,7 @@ main:
             task_target: "pod"
   nodes:
     repo: "cloud"
-    env_repos:
+    ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     hosts:
@@ -308,7 +308,7 @@ pods:
     schema: "ext-pod/efk/efk.schema.yml"
     validator: "ext-pod/efk/efk.validator.yml"
     fast_prepare: "true"
-    env_repos:
+    ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
