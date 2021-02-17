@@ -141,6 +141,32 @@ main:
     initial_services:
       - name: "test_sequence"
         tmp: true
+  local_collections:
+    repo: "cloud"
+    ext_repos:
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
+    collections:
+      - namespace: "my_org_01"
+        path: "ext-cloud/test/collections/my_org_01"
+      - namespace: "new_org"
+        path: "ext-cloud/test/collections/my_org_01"
+      - namespace: "my_org_02"
+        collection: "new_01"
+        path: "ext-cloud/test/collections/my_org_02/my_collection_02_01"
+      - namespace: "my_org_02"
+        collection: "new_02"
+        path: "ext-cloud/test/collections/my_org_02/my_collection_02_02"
+        absent: false
+      - namespace: "new_org_02"
+        collection: "new_03"
+        path: "ext-cloud/test/collections/my_org_02/my_collection_02_03"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    initial_services:
+      - "test_collections"
   local_repos:
     repo: "cloud"
     hosts: |
@@ -820,6 +846,10 @@ services:
             prop3: "value_overridden_env_3"
           group_params:
             prop1: "user_data_overridden_1"
+  test_collections:
+    base_dir: "ext-cloud"
+    task: "test/services/collections/collections.main.yml"
+    validator: "test/services/collections/collections.validator.yml"
   test_service_1:
     base_dir: "ext-cloud"
     task: "test/services/general/01.yml"
