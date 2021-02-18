@@ -8,6 +8,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -21,6 +25,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -38,6 +46,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -65,8 +77,9 @@ services:
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
-    task: "tasks/vpn/digital_ocean.main.vpn.yml"
-    schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
+    task: "tasks/vpn/digital_ocean/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean/digital_ocean.validator.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -95,8 +108,9 @@ services:
   digital_ocean_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
-    task: "tasks/node/digital_ocean.main.node.yml"
-    schema: "tasks/node/digital_ocean.schema.node.yml"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
     credentials:
       node: "digital_ocean"
     params:

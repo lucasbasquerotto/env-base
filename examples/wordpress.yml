@@ -6,27 +6,26 @@ meta:
   ignore_validators: false
   skip_local_pod_preparation: false
   template_no_empty_lines: true
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
 main:
   cloud:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host]
+    extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
   local:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host]
+    extend_cloud: true
     nodes:
       - name: "app"
         key: "wp_local"
@@ -35,16 +34,7 @@ main:
       - repo: "app"
         dir: "app-wp"
   remote:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host:children]
-      app
-      [app]
+    extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - name: "s3_buckets"
@@ -62,14 +52,7 @@ main:
             all_nodes: true
             task_target: "pod"
   nodes:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts:
-      type: "template"
-      file: "files/hosts.tpl.ini"
-      schema: "files/hosts.schema.yml"
+    extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - name: "s3_buckets"
@@ -148,15 +131,32 @@ services:
   s3_service_base:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
-    task: "tasks/s3/aws.main.s3.yml"
+    task: "tasks/s3/main.s3.yml"
     schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
     credentials:
       s3: "s3"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
-    schema: "tasks/dns/{{ params.env_params.dns_provider }}.schema.dns.yml"
+    task: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.main.dns.yml
+    schema: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.schema.dns.yml
+    validator: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.validator.dns.yml
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
@@ -164,8 +164,9 @@ services:
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
-    task: "tasks/vpn/digital_ocean.main.vpn.yml"
-    schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
+    task: "tasks/vpn/digital_ocean/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean/digital_ocean.validator.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -231,8 +232,9 @@ services:
   digital_ocean_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
-    task: "tasks/node/digital_ocean.main.node.yml"
-    schema: "tasks/node/digital_ocean.schema.node.yml"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
     credentials:
       node: "digital_ocean"
     params:
@@ -350,19 +352,19 @@ pods:
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
       use_composer: "{{ params.env_params.use_composer | default(false) }}"
-      use_varnish: "{{ params.env_params.use_varnish }}"
-      use_redis: "{{ params.env_params.use_redis }}"
-      use_memcached: "{{ params.env_params.use_memcached }}"
-      use_pma: "{{ params.env_params.use_pma }}"
-      use_adminer: "{{ params.env_params.use_adminer }}"
-      use_theia: "{{ params.env_params.use_theia }}"
-      use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
-      use_filestash: "{{ params.env_params.use_filestash }}"
-      use_fluentd: "{{ params.env_params.use_fluentd }}"
-      use_certbot: "{{ params.env_params.use_certbot }}"
-      block_ips: "{{ params.env_params.block_ips }}"
-      auth_file: "{{ params.env_params.auth_file }}"
-      s3_cli: "{{ params.env_params.s3_cli }}"
+      use_varnish: "{{ params.env_params.use_varnish | default(false) }}"
+      use_redis: "{{ params.env_params.use_redis | default(false) }}"
+      use_memcached: "{{ params.env_params.use_memcached | default(false) }}"
+      use_pma: "{{ params.env_params.use_pma | default(false) }}"
+      use_adminer: "{{ params.env_params.use_adminer | default(false) }}"
+      use_theia: "{{ params.env_params.use_theia | default(false) }}"
+      use_minio_gateway: "{{ params.env_params.use_minio_gateway | default(false) }}"
+      use_filestash: "{{ params.env_params.use_filestash | default(false) }}"
+      use_fluentd: "{{ params.env_params.use_fluentd | default(false) }}"
+      use_certbot: "{{ params.env_params.use_certbot | default(false) }}"
+      block_ips: "{{ params.env_params.block_ips | default(false) }}"
+      auth_file: "{{ params.env_params.auth_file | default('') }}"
+      s3_cli: "{{ params.env_params.s3_cli | default('') }}"
       backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
       uploads_bucket_name: "{{ params.env_params.uploads_bucket_name }}"
@@ -371,21 +373,20 @@ pods:
       backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
       uploads_replica_bucket_name: "{{ params.env_params.uploads_replica_bucket_name }}"
       uploads_replica_bucket_path: "{{ params.env_params.uploads_replica_bucket_path | default('') }}"
-      restore_db: "{{ params.env_params.restore_db }}"
-      db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
-      use_s3_storage: "{{ params.env_params.use_s3_storage }}"
-      use_w3tc: "{{ params.env_params.use_w3tc }}"
-      enable_db_backup: true
-      enable_db_setup: true
-      enable_db_setup_new: true
-      enable_logs_backup: true
-      enable_logs_setup: true
-      enable_sync_backup: true
-      enable_sync_setup: true
-      enable_uploads_backup: true
-      enable_uploads_setup: true
+      db_gui_root_user: "{{ params.env_params.db_gui_root_user | default('') }}"
+      enable_db_backup: "{{ params.env_params.enable_db_backup | default('') }}"
+      enable_db_setup: "{{ params.env_params.enable_db_setup | default('') }}"
+      enable_db_setup_new: "{{ params.env_params.enable_db_setup_new | default('') }}"
+      enable_logs_backup: "{{ params.env_params.enable_logs_backup | default('') }}"
+      enable_logs_setup: "{{ params.env_params.enable_logs_setup | default('') }}"
+      enable_sync_backup: "{{ params.env_params.enable_sync_backup | default('') }}"
+      enable_sync_setup: "{{ params.env_params.enable_sync_setup | default('') }}"
+      enable_uploads_backup: "{{ params.env_params.enable_uploads_backup | default('') }}"
+      enable_uploads_setup: "{{ params.env_params.enable_uploads_setup | default('') }}"
       enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.env_params.enable_uploads_replica | default(false) }}"
+      use_s3_storage: "{{ params.env_params.use_s3_storage | default('') }}"
+      use_w3tc: "{{ params.env_params.use_w3tc | default('') }}"
       migrate_wp_activate_all_plugins: false
       migrate_wp_plugins_to_activate: >-
         {{ params.env_params.migrate_wp_plugins_to_activate | default('') }}

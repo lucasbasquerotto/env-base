@@ -14,6 +14,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     cfg: |
       [defaults]
       interpreter_python=/usr/bin/python3
@@ -47,6 +51,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -116,6 +124,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -134,6 +146,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -147,6 +163,9 @@ main:
       - repo: "ext_cloud"
         dir: "ext-cloud"
     collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
       - namespace: "my_org_01"
         path: "ext-cloud/test/collections/my_org_01"
       - namespace: "new_org"
@@ -309,6 +328,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts: |
       [main]
       localhost ansible_connection=local
@@ -365,6 +388,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -538,6 +565,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -551,6 +582,10 @@ main:
     ext_repos:
       - repo: "ext_cloud"
         dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
     hosts:
       type: "template"
       file: "files/hosts.tpl.ini"
@@ -648,9 +683,9 @@ services:
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
-    task: "tasks/vpn/digital_ocean.main.vpn.yml"
-    schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
-    validator: "tasks/vpn/digital_ocean.validator.vpn.yml"
+    task: "tasks/vpn/digital_ocean/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean/digital_ocean.validator.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -699,8 +734,24 @@ services:
   service_dns:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
-    schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.schema.dns.yml"
+    task: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.main.dns.yml
+    schema: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.schema.dns.yml
+    validator: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.validator.dns.yml
     credentials:
       dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
@@ -711,8 +762,9 @@ services:
   service_s3:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
-    task: "tasks/s3/aws.main.s3.yml"
+    task: "tasks/s3/main.s3.yml"
     schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
     credentials:
       s3: "s3"
     params:
@@ -721,8 +773,8 @@ services:
   digital_ocean_node_service:
     base_dir: "ext-cloud"
     namespace: "ext_node"
-    task: "tasks/node/digital_ocean.main.node.yml"
-    schema: "tasks/node/digital_ocean.schema.node.yml"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
     credentials:
       node: "digital_ocean"
     params:

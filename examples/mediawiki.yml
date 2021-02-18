@@ -6,42 +6,32 @@ meta:
   ignore_validators: false
   skip_local_pod_preparation: false
   template_no_empty_lines: true
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
 main:
   cloud:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host]
+    extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
   local:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host]
+    extend_cloud: true
     nodes:
       - name: "app"
         key: "mediawiki_local"
         local: true
   remote:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts: |
-      [main]
-      localhost ansible_connection=local
-      [host:children]
-      app
-      [app]
+    extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - name: "s3_buckets"
@@ -59,14 +49,7 @@ main:
             all_nodes: true
             task_target: "pod"
   nodes:
-    repo: "cloud"
-    ext_repos:
-      - repo: "ext_cloud"
-        dir: "ext-cloud"
-    hosts:
-      type: "template"
-      file: "files/hosts.tpl.ini"
-      schema: "files/hosts.schema.yml"
+    extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
       - name: "s3_buckets"
@@ -148,15 +131,32 @@ services:
   s3_service_base:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
-    task: "tasks/s3/aws.main.s3.yml"
+    task: "tasks/s3/main.s3.yml"
     schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
     credentials:
       s3: "s3"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_provider }}.main.dns.yml"
-    schema: "tasks/dns/{{ params.env_params.dns_provider }}.schema.dns.yml"
+    task: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.main.dns.yml
+    schema: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.schema.dns.yml
+    validator: >-
+      tasks/dns/{{
+        params.env_params.dns_provider | default('')
+      }}/{{
+        params.env_params.dns_provider | default('')
+      }}.validator.dns.yml
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
@@ -164,8 +164,9 @@ services:
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
-    task: "tasks/vpn/digital_ocean.main.vpn.yml"
-    schema: "tasks/vpn/digital_ocean.schema.vpn.yml"
+    task: "tasks/vpn/digital_ocean/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean/digital_ocean.validator.vpn.yml"
     credentials:
       vpn: "digital_ocean"
     params:
@@ -231,8 +232,9 @@ services:
   digital_ocean_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
-    task: "tasks/node/digital_ocean.main.node.yml"
-    schema: "tasks/node/digital_ocean.schema.node.yml"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
     credentials:
       node: "digital_ocean"
     params:
