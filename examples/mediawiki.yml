@@ -33,7 +33,8 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - name: "{{ params.env_params.vpn_service }}"
+        can_destroy: true
       - name: "s3_buckets"
         can_destroy: true
     nodes:
