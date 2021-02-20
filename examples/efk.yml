@@ -107,14 +107,6 @@ main:
             task_target: "pod"
 services:
   s3_buckets:
-    list: true
-    services:
-      - name: "s3_backup"
-        key: "s3_service_base"
-        params:
-          bucket: "{{ params.env_params.backup_bucket_name }}"
-          permission: "private"
-  s3_service_base:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
     task: "tasks/s3/main.s3.yml"
@@ -122,6 +114,10 @@ services:
     validator: "tasks/s3/validator.s3.yml"
     credentials:
       s3: "s3"
+    params:
+      list:
+        - bucket: "{{ params.env_params.backup_bucket_name }}"
+          permission: "private"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"

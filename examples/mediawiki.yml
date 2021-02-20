@@ -34,7 +34,7 @@ main:
     extend_cloud: true
     initial_services:
       - name: "{{ params.env_params.vpn_service }}"
-        can_destroy: true
+        # can_destroy: true
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -107,29 +107,6 @@ main:
             task_target: "pod"
 services:
   s3_buckets:
-    list: true
-    services:
-      - name: "s3_backup"
-        key: "s3_service_base"
-        params:
-          bucket: "{{ params.env_params.backup_bucket_name }}"
-          permission: "private"
-      - name: "s3_uploads"
-        key: "s3_service_base"
-        params:
-          bucket: "{{ params.env_params.uploads_bucket_name }}"
-          permission: "public-read"
-      # - name: "s3_backup_replica"
-      #   key: "s3_service_base"
-      #   params:
-      #     bucket: "{{ params.env_params.backup_replica_bucket_name }}"
-      #     permission: "private"
-      # - name: "s3_uploads_replica"
-      #   key: "s3_service_base"
-      #   params:
-      #     bucket: "{{ params.env_params.uploads_replica_bucket_name }}"
-      #     permission: "private"
-  s3_service_base:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
     task: "tasks/s3/main.s3.yml"
@@ -137,6 +114,12 @@ services:
     validator: "tasks/s3/validator.s3.yml"
     credentials:
       s3: "s3"
+    params:
+      list:
+        - bucket: "{{ params.env_params.backup_bucket_name }}"
+          permission: "private"
+        - bucket: "{{ params.env_params.uploads_bucket_name }}"
+          permission: "public-read"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
