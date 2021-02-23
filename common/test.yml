@@ -757,8 +757,13 @@ services:
     params:
       zone: "{{ params.env_params.domain | default('') }}"
       dns_type: "A"
-      record: "dev"
-      value: "{{ params.env_params.dns_records | default([]) }}"
+      list:
+        - record: "dev"
+          value: "{{ params.env_params.dns_records | default([]) }}"
+        - record: "dev-2"
+          value: "{{ params.env_params.dns_records | default([]) }}"
+        - record: "dev-3"
+          value: "{{ params.env_params.dns_records | default([]) }}"
   service_s3:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
