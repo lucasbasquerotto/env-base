@@ -33,8 +33,7 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - name: "{{ params.env_params.vpn_service }}"
-        # can_destroy: true
+      - "{{ params.env_params.vpn_service }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -266,9 +265,7 @@ nodes:
         tags:
           - "auto"
           - "mediawiki-dmz"
-    dns_service:
-      name: "node_dns_service"
-      can_destroy: true
+    dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
     credentials:
