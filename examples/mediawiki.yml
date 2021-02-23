@@ -266,7 +266,9 @@ nodes:
         tags:
           - "auto"
           - "mediawiki-dmz"
-    dns_service: "node_dns_service"
+    dns_service:
+      name: "node_dns_service"
+      can_destroy: true
     base_dir: "/var/cloud"
     root: true
     credentials:
