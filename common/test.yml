@@ -573,8 +573,7 @@ main:
       type: "template"
       file: "files/hosts.tpl.ini"
       schema: "files/hosts.schema.yml"
-    initial_services:
-      - "{{ params.env_params.vpn_service | default({}) }}"
+    initial_services: "{{ params.env_params.node_initial_services | default([]) }}"
     nodes: "{{ params.env_params.nodes | default([]) }}"
     original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
   nodes_run_stages:
@@ -590,8 +589,7 @@ main:
       type: "template"
       file: "files/hosts.tpl.ini"
       schema: "files/hosts.schema.yml"
-    initial_services:
-      - "{{ params.env_params.vpn_service | default({}) }}"
+    initial_services: "{{ params.env_params.node_initial_services | default([]) }}"
     nodes:
       - name: "app"
         key: "digital_ocean_simple_node"
@@ -780,6 +778,7 @@ services:
     namespace: "ext_node"
     task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
     schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
     credentials:
       node: "digital_ocean"
     params:
@@ -804,6 +803,25 @@ services:
           node: "host"
         contents:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+  linode_node_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/linode/linode.main.node.yml"
+    schema: "tasks/node/linode/linode.schema.node.yml"
+    validator: "tasks/node/linode/linode.validator.node.yml"
+    credentials:
+      node: "linode"
+      root: "root"
+    params:
+      image: "linode/debian9"
+      region: "eu-west"
+      type: "g6-nanode-1"
+      private_ip: true
+      tags:
+        - "auto"
+        - "dmz"
+    contents:
+      authorized_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
@@ -1369,6 +1387,18 @@ nodes:
           setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 90
           setup_finished_timeout: 300
+  linode_node:
+    service: "linode_node_service"
+    dns_service: "node_dns_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      root: "root"
+      host: "host"
+    params:
+      host_users:
+        - name: "root"
+          initial_connection_timeout: 90
   simple_local:
     service: "service_simple_node_local"
     base_dir: "/var/cloud"
@@ -2035,6 +2065,7 @@ credentials:
     host_pass: "123456"
   localhost:
     host_user: "root"
+  root: "{{ params.credentials.root | default({}) }}"
   host: "{{ params.credentials.host | default({}) }}"
   my_credential_1_1: "my_secret_1_1"
   my_credential_1_2: "my_secret_1_2"
