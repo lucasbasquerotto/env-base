@@ -67,9 +67,8 @@ main:
           efk:
             params:
               type: "db"
-              use_nginx: false
             group_params:
-              custom_memory: "efk_custom_memory_db"
+              memory: "memory_db"
       - name: "web"
         key: "efk"
         can_destroy: true
@@ -89,7 +88,7 @@ main:
             params:
               type: "web"
             group_params:
-              custom_memory: "efk_custom_memory_web"
+              memory: "memory_web"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -142,7 +141,7 @@ services:
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
-      zone: "{{ params.env_params.domain }}"
+      zone: "{{ params.env_params.main_domain }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -251,10 +250,12 @@ nodes:
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           enable_logs_setup: false
           enable_sync_setup: false
-        group_params:
-          custom_args: "efk_custom_args"
-          custom_domain: "efk_custom_domain_local"
-          certbot: "certbot_local"
+          domains: "{{ params.env_params.local_domains | default({}) }}"
+          ports:
+            public_http_port: "8080"
+            public_https_port: "8443"
+            private_http_port: "9080"
+            private_https_port: "9443"
   efk:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -295,9 +296,12 @@ nodes:
       - name: "efk"
         params:
           local: false
-        group_params:
-          custom_args: "efk_custom_args"
-          custom_domain: "efk_custom_domain"
+          domains: "{{ params.env_params.domains | default({}) }}"
+          ports:
+            public_http_port: "80"
+            public_https_port: "443"
+            private_http_port: "9080"
+            private_https_port: "9443"
 pods:
   efk:
     repo: "pod"
@@ -342,76 +346,56 @@ pods:
       enable_sync_backup: true
       enable_sync_setup: true
       enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
+      db_backup:
+        s3_snapshot: "{{ params.env_params.db_backup_s3_snapshot | default(false) }}"
+        is_compressed_file: "{{ not (params.env_params.db_backup_s3_snapshot | default(false) | bool) }}"
+        backup_bucket_sync_dir: "db"
+      db_setup:
+        use_s3: "{{ params.env_params.db_setup_use_s3 | default(false) }}"
+        snapshot_name: "{{ params.env_params.snapshot_name | default('') }}"
+        restore_remote_file: "{{ params.env_params.db_setup_restore_remote_file | default('') }}"
+      certbot:
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        staging: "{{ params.env_params.certbot_staging | default(false) }}"
+        force: "{{ params.env_params.certbot_force | default(false) }}"
+      services:
+        nginx:
+          enable_validate_origin: true
+        fluentd:
+          port: "24224"
+          output_plugin: "{{ params.env_params.fluentd_output_plugin | default('elasticsearch') }}"
+        elasticsearch:
+          port: "9200"
+          java_opts: "-Xms700m -Xmx700m"
+        kibana:
+          port: "5601"
+      images:
+        nginx_image: "nginx"
+        nginx_version: "1.14.2-alpine"
+        elasticsearch_image: "docker.elastic.co/elasticsearch/elasticsearch"
+        elasticsearch_version: "7.5.0"
+        kibana_image: "docker.elastic.co/kibana/kibana"
+        kibana_version: "7.5.0"
+        theia_image: "theiaide/theia"
+        theia_version: "1.3.0"
+        minio_gateway_image: "minio/minio"
+        minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
+        filestash_image: "machines/filestash"
+        filestash_version: "4cbeb2c"
+        toolbox_image: "lucasbasquerotto/image"
+        toolbox_version: "toolbox-20200715-02"
+        certbot_image: "certbot/certbot"
+        certbot_version: "v1.2.0"
+        awscli_image: "lucasbasquerotto/aws-cli"
+        awscli_version: "1.0.0"
+        logrotator_image: "python"
+        logrotator_version: "3.8.4-buster"
+        fluentd_image: "lucasbasquerotto/image"
+        fluentd_version: "fluentd-20200617"
     group_params:
-      custom_images: "efk_custom_images"
-      custom_memory: "efk_custom_memory_app"
-      db_setup: "db_setup"
-      db_backup: "db_backup"
-      certbot: "certbot"
+      memory: "memory_app"
 pod_group_params:
-  efk_custom_args:
-    nginx:
-      enable_validate_origin: true
-    fluentd:
-      port: "24224"
-      output_plugin: "{{ params.env_params.fluentd_output_plugin | default('elasticsearch') }}"
-    elasticsearch:
-      port: "9200"
-      java_opts: "-Xms700m -Xmx700m"
-    kibana:
-      port: "5601"
-  efk_custom_domain:
-    public_http_port: "80"
-    public_https_port: "443"
-    private_http_port: "9080"
-    private_https_port: "9443"
-    main_domain: "{{ params.env_params.kibana_full_domain }}"
-    kibana_domain: "{{ params.env_params.kibana_full_domain }}"
-    kibana_ssl: "{{ params.env_params.ssl }}"
-    theia_domain: "{{ params.env_params.theia_full_domain }}"
-    theia_ssl: "{{ params.env_params.ssl }}"
-    minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
-    minio_gateway_ssl: "{{ params.env_params.ssl }}"
-    filestash_domain: "{{ params.env_params.filestash_full_domain }}"
-    filestash_ssl: "{{ params.env_params.ssl }}"
-  efk_custom_domain_local:
-    public_http_port: "8080"
-    public_https_port: "8443"
-    private_http_port: "9080"
-    private_https_port: "9443"
-    main_domain: "localhost"
-    kibana_domain: "localhost"
-    kibana_ssl: "{{ params.env_params.ssl }}"
-    theia_domain: "theia.localhost"
-    theia_ssl: "{{ params.env_params.ssl }}"
-    minio_gateway_domain: "minio.localhost"
-    minio_gateway_ssl: "{{ params.env_params.ssl }}"
-    filestash_domain: "filestash.localhost"
-    filestash_ssl: "{{ params.env_params.ssl }}"
-  efk_custom_images:
-    nginx_image: "nginx"
-    nginx_version: "1.14.2-alpine"
-    elasticsearch_image: "docker.elastic.co/elasticsearch/elasticsearch"
-    elasticsearch_version: "7.5.0"
-    kibana_image: "docker.elastic.co/kibana/kibana"
-    kibana_version: "7.5.0"
-    theia_image: "theiaide/theia"
-    theia_version: "1.3.0"
-    minio_gateway_image: "minio/minio"
-    minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
-    filestash_image: "machines/filestash"
-    filestash_version: "4cbeb2c"
-    toolbox_image: "lucasbasquerotto/image"
-    toolbox_version: "toolbox-20200715-02"
-    certbot_image: "certbot/certbot"
-    certbot_version: "v1.2.0"
-    awscli_image: "lucasbasquerotto/aws-cli"
-    awscli_version: "1.0.0"
-    logrotator_image: "python"
-    logrotator_version: "3.8.4-buster"
-    fluentd_image: "lucasbasquerotto/image"
-    fluentd_version: "fluentd-20200617"
-  efk_custom_memory_app:
+  memory_app:
     nginx: 512mb
     kibana: 512mb
     elasticsearch: 1gb
@@ -422,12 +406,12 @@ pod_group_params:
     certbot: 256mb
     fluentd: 256mb
     s3_cli: 512mb
-  efk_custom_memory_db:
+  memory_db:
     elasticsearch: 1gb
     toolbox: 512mb
     fluentd: 256mb
     s3_cli: 512mb
-  efk_custom_memory_web:
+  memory_web:
     nginx: 512mb
     kibana: 512mb
     theia: 512mb
@@ -437,25 +421,6 @@ pod_group_params:
     certbot: 256mb
     fluentd: 256mb
     s3_cli: 512mb
-  certbot:
-    main_domain: "{{ params.env_params.kibana_full_domain }}"
-    domains: "{{ params.env_params.certbot_domains }}"
-    email: "{{ params.env_params.certbot_email | default('') }}"
-    staging: "{{ params.env_params.certbot_staging | default(false) }}"
-    force: "{{ params.env_params.certbot_force | default(false) }}"
-  certbot_local:
-    main_domain: "localhost"
-    domains: "localhost www.localhost"
-    email: "{{ params.env_params.certbot_email | default('') }}"
-    force: "{{ params.env_params.certbot_force | default(false) }}"
-  db_backup:
-    s3_snapshot: "{{ params.env_params.db_backup_s3_snapshot | default(false) }}"
-    is_compressed_file: "{{ not (params.env_params.db_backup_s3_snapshot | default(false) | bool) }}"
-    backup_bucket_sync_dir: "db"
-  db_setup:
-    use_s3: "{{ params.env_params.db_setup_use_s3 | default(false) }}"
-    snapshot_name: "{{ params.env_params.snapshot_name | default('') }}"
-    restore_remote_file: "{{ params.env_params.db_setup_restore_remote_file | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"

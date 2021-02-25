@@ -214,7 +214,7 @@ services:
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
-      zone: "{{ params.env_params.domain }}"
+      zone: "{{ params.env_params.main_domain }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
