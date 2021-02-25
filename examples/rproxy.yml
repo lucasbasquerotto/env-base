@@ -201,7 +201,7 @@ nodes:
                 - location: "= /nginx/basic_status"
                   data: "stub_status;"
                 - location: "/"
-                  data: "root /www;"
+                  data: "root /var/www;"
             - name: "theia"
               when: "{{ params.env_params.use_theia | default(false) }}"
               domain: "{{ params.env_params.local_domains.theia | default('') }}"
@@ -341,7 +341,7 @@ pods:
             - location: "= /nginx/basic_status"
               data: "stub_status;"
             - location: "/"
-              data: "root /www;"
+              data: "root /var/www;"
         - name: "theia"
           when: "{{ params.env_params.use_theia | default(false) }}"
           domain: "{{ params.env_params.domains.theia | default('') }}"
@@ -353,7 +353,7 @@ pods:
           domain: "{{ params.env_params.domains.minio_gateway | default('') }}"
           service: "http://minio_gateway:9000"
           private: true
-      rproxy_custom_services: "{{ params.env_params.rproxy_custom_services | default([]) }}"
+      rproxy_services: "{{ params.env_params.rproxy_custom_services | default([]) }}"
     transfer:
       - dest: "env/nginx/www/index.html"
         src:
