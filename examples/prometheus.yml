@@ -358,8 +358,6 @@ pods:
         staging: "{{ params.env_params.certbot_staging | default(false) }}"
         force: "{{ params.env_params.certbot_force | default(false) }}"
       services:
-        nginx:
-          enable_validate_origin: true
         fluentd:
           port: "24224"
         prometheus:
