@@ -68,7 +68,7 @@ main:
             params:
               type: "db"
             group_params:
-              custom_memory: "mediawiki_custom_memory_db"
+              memory: "memory_db"
       - name: "web"
         key: "mediawiki"
         can_destroy: true
@@ -88,7 +88,7 @@ main:
             params:
               type: "web"
             group_params:
-              custom_memory: "mediawiki_custom_memory_web"
+              memory: "memory_web"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -143,7 +143,7 @@ services:
     credentials:
       dns: "{{ params.env_params.dns_provider }}"
     params:
-      zone: "{{ params.env_params.domain }}"
+      zone: "{{ params.env_params.main_domain }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -252,12 +252,15 @@ nodes:
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           enable_logs_setup: false
           enable_sync_setup: false
+          domains: "{{ params.env_params.local_domains | default({}) }}"
+          ports:
+            public_http_port: "8080"
+            public_https_port: "8443"
+            private_http_port: "9080"
+            private_https_port: "9443"
         group_params:
-          custom_args: "mediawiki_custom_args"
-          custom_domain: "mediawiki_custom_domain_local"
           db_backup: "db_backup_no_sync"
           uploads_backup: "uploads_backup_no_sync"
-          certbot: "certbot_local"
   mediawiki:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -298,9 +301,12 @@ nodes:
       - name: "mediawiki"
         params:
           local: false
-        group_params:
-          custom_args: "mediawiki_custom_args"
-          custom_domain: "mediawiki_custom_domain"
+          domains: "{{ params.env_params.domains | default({}) }}"
+          ports:
+            public_http_port: "80"
+            public_https_port: "443"
+            private_http_port: "9080"
+            private_https_port: "9443"
 pods:
   mediawiki:
     repo: "pod"
@@ -324,6 +330,7 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
+      main_domain: "{{ params.env_params.main_domain }}"
       use_ssl: "{{ params.env_params.ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
@@ -362,9 +369,52 @@ pods:
       enable_uploads_setup: true
       enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.env_params.enable_uploads_replica | default(false) }}"
+      certbot:
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        staging: "{{ params.env_params.certbot_staging | default(false) }}"
+        force: "{{ params.env_params.certbot_force | default(false) }}"
+      services:
+        nginx:
+          enable_validate_origin: true
+        mysql:
+          port: "3306"
+        fluentd:
+          port: "24224"
+      images:
+        nginx_image: "nginx"
+        nginx_version: "1.14.2-alpine"
+        varnish_image: "varnish"
+        varnish_version: "6.4.0-1"
+        mediawiki_image: "lucasbasquerotto/image"
+        mediawiki_version: "mediawiki-20200813"
+        redis_image: "redis"
+        redis_version: "6.0.6"
+        memcached_image: "memcached"
+        memcached_version: "1.6.6"
+        pma_image: "phpmyadmin/phpmyadmin"
+        pma_version: "4.8.5"
+        adminer_image: "lucasbasquerotto/image"
+        adminer_version: "adminer-20200713-03"
+        mysql_image: "mariadb"
+        mysql_version: "10.5.3-bionic"
+        theia_image: "theiaide/theia"
+        theia_version: "1.3.0"
+        minio_gateway_image: "minio/minio"
+        minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
+        filestash_image: "machines/filestash"
+        filestash_version: "4cbeb2c"
+        toolbox_image: "lucasbasquerotto/image"
+        toolbox_version: "toolbox-20200715-02"
+        certbot_image: "certbot/certbot"
+        certbot_version: "v1.2.0"
+        awscli_image: "lucasbasquerotto/aws-cli"
+        awscli_version: "1.0.0"
+        logrotator_image: "python"
+        logrotator_version: "3.8.4-buster"
+        fluentd_image: "lucasbasquerotto/image"
+        fluentd_version: "fluentd-20200617"
     group_params:
-      custom_images: "mediawiki_custom_images"
-      custom_memory: "mediawiki_custom_memory_app"
+      memory: "memory_app"
       db_setup: >-
         {{
         params.env_params.non_s3_setup | default(false) | bool |
@@ -377,83 +427,8 @@ pods:
         ternary('uploads_setup_file', 'uploads_setup_s3')
         }}
       uploads_backup: "uploads_backup_sync"
-      certbot: "certbot"
 pod_group_params:
-  mediawiki_custom_args:
-    nginx:
-      enable_validate_origin: true
-    mysql:
-      port: "3306"
-    fluentd:
-      port: "24224"
-  mediawiki_custom_domain:
-    public_http_port: "80"
-    public_https_port: "443"
-    private_http_port: "9080"
-    private_https_port: "9443"
-    main_domain: "{{ params.env_params.mediawiki_full_domain }}"
-    main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "{{ params.env_params.pma_full_domain }}"
-    pma_ssl: "{{ params.env_params.ssl }}"
-    adminer_domain: "{{ params.env_params.adminer_full_domain }}"
-    adminer_ssl: "{{ params.env_params.ssl }}"
-    theia_domain: "{{ params.env_params.theia_full_domain }}"
-    theia_ssl: "{{ params.env_params.ssl }}"
-    minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
-    minio_gateway_ssl: "{{ params.env_params.ssl }}"
-    filestash_domain: "{{ params.env_params.filestash_full_domain }}"
-    filestash_ssl: "{{ params.env_params.ssl }}"
-  mediawiki_custom_domain_local:
-    public_http_port: "8080"
-    public_https_port: "8443"
-    private_http_port: "9080"
-    private_https_port: "9443"
-    main_domain: "localhost"
-    main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "pma.localhost"
-    pma_ssl: "{{ params.env_params.ssl }}"
-    adminer_domain: "adminer.localhost"
-    adminer_ssl: "{{ params.env_params.ssl }}"
-    theia_domain: "theia.localhost"
-    theia_ssl: "{{ params.env_params.ssl }}"
-    minio_gateway_domain: "minio.localhost"
-    minio_gateway_ssl: "{{ params.env_params.ssl }}"
-    filestash_domain: "filestash.localhost"
-    filestash_ssl: "{{ params.env_params.ssl }}"
-  mediawiki_custom_images:
-    nginx_image: "nginx"
-    nginx_version: "1.14.2-alpine"
-    varnish_image: "varnish"
-    varnish_version: "6.4.0-1"
-    mediawiki_image: "lucasbasquerotto/image"
-    mediawiki_version: "mediawiki-20200813"
-    redis_image: "redis"
-    redis_version: "6.0.6"
-    memcached_image: "memcached"
-    memcached_version: "1.6.6"
-    pma_image: "phpmyadmin/phpmyadmin"
-    pma_version: "4.8.5"
-    adminer_image: "lucasbasquerotto/image"
-    adminer_version: "adminer-20200713-03"
-    mysql_image: "mariadb"
-    mysql_version: "10.5.3-bionic"
-    theia_image: "theiaide/theia"
-    theia_version: "1.3.0"
-    minio_gateway_image: "minio/minio"
-    minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
-    filestash_image: "machines/filestash"
-    filestash_version: "4cbeb2c"
-    toolbox_image: "lucasbasquerotto/image"
-    toolbox_version: "toolbox-20200715-02"
-    certbot_image: "certbot/certbot"
-    certbot_version: "v1.2.0"
-    awscli_image: "lucasbasquerotto/aws-cli"
-    awscli_version: "1.0.0"
-    logrotator_image: "python"
-    logrotator_version: "3.8.4-buster"
-    fluentd_image: "lucasbasquerotto/image"
-    fluentd_version: "fluentd-20200617"
-  mediawiki_custom_memory_app:
+  memory_app:
     nginx: 512mb
     varnish: 512mb
     mediawiki: 1gb
@@ -469,15 +444,15 @@ pod_group_params:
     certbot: 256mb
     s3_cli: 512mb
     fluentd: 256mb
-  mediawiki_custom_memory_db:
+  memory_db:
     mysql: 1gb
     toolbox: 512mb
     s3_cli: 512mb
     fluentd: 256mb
-  mediawiki_custom_memory_cache:
+  memory_cache:
     redis: 512mb
     memcached: 512mb
-  mediawiki_custom_memory_web:
+  memory_web:
     nginx: 512mb
     varnish: 512mb
     mediawiki: 1gb
@@ -490,17 +465,6 @@ pod_group_params:
     certbot: 256mb
     s3_cli: 512mb
     fluentd: 256mb
-  certbot:
-    main_domain: "{{ params.env_params.mediawiki_full_domain }}"
-    domains: "{{ params.env_params.certbot_domains }}"
-    email: "{{ params.env_params.certbot_email | default('') }}"
-    staging: "{{ params.env_params.certbot_staging | default(false) }}"
-    force: "{{ params.env_params.certbot_force | default(false) }}"
-  certbot_local:
-    main_domain: "localhost"
-    domains: "localhost www.localhost"
-    email: "{{ params.env_params.certbot_email | default('') }}"
-    force: "{{ params.env_params.certbot_force | default(false) }}"
   db_backup_sync:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:

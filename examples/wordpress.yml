@@ -75,7 +75,7 @@ main:
             params:
               type: "db"
             group_params:
-              custom_memory: "wp_custom_memory_db"
+              memory: "memory_db"
       - name: "web"
         key: "wp"
         can_destroy: true
@@ -98,7 +98,7 @@ main:
             params:
               type: "web"
             group_params:
-              custom_memory: "wp_custom_memory_web"
+              memory: "memory_web"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -258,6 +258,7 @@ nodes:
       - name: "wp"
         params:
           local: true
+          wp_env: "development"
           named_volumes: "{{ params.env_params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
@@ -266,13 +267,16 @@ nodes:
             }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}/
           enable_logs_setup: false
           enable_sync_setup: false
+          domains: "{{ params.env_params.local_domains | default({}) }}"
+          ports:
+            public_http_port: "8080"
+            public_https_port: "8443"
+            private_http_port: "9080"
+            private_https_port: "9443"
         group_params:
-          custom_args: "wp_custom_args_local"
-          custom_domain: "wp_custom_domain_local"
           db_setup_new: "db_setup_new_local"
           db_backup: "db_backup_no_sync"
           uploads_backup: "uploads_backup_no_sync"
-          certbot: "certbot_local"
   wp:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -313,9 +317,12 @@ nodes:
       - name: "wp"
         params:
           local: false
-        group_params:
-          custom_args: "wp_custom_args"
-          custom_domain: "wp_custom_domain"
+          domains: "{{ params.env_params.domains | default({}) }}"
+          ports:
+            public_http_port: "80"
+            public_https_port: "443"
+            private_http_port: "9080"
+            private_https_port: "9443"
 pods:
   wp:
     repo: "pod"
@@ -340,7 +347,10 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
+      main_domain: "{{ params.env_params.main_domain }}"
+      wp_env: "staging"
       app_dev: "{{ params.env_params.app_dev | default(false) }}"
+      app_repo_dir: "app-wp"
       use_ssl: "{{ params.env_params.ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
@@ -388,9 +398,63 @@ pods:
       migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
       migrate_new_domain_host: "{{ params.env_params.wp_new_domain_host | default('') }}"
       migrate_wp_rewrite_structure: "/%year%/%monthnum%/%day%/%postname%"
+      certbot:
+        main_domain: "{{ params.env_params.wp_full_domain }}"
+        domains: "{{ params.env_params.certbot_domains }}"
+        email: "{{ params.env_params.certbot_email | default('') }}"
+        staging: "{{ params.env_params.certbot_staging | default(false) }}"
+        force: "{{ params.env_params.certbot_force | default(false) }}"
+      services:
+        nginx:
+          enable_validate_origin: true
+        mysql:
+          port: "3306"
+        wordpress:
+          lang: "en_US"
+          debug: "{{ params.env_params.wp_debug | default(false) }}"
+        fluentd:
+          port: "24224"
+      images:
+        nginx_image: "nginx"
+        nginx_version: "1.14.2-alpine"
+        varnish_image: "varnish"
+        varnish_version: "6.4.0-1"
+        wordpress_image: "lucasbasquerotto/wordpress"
+        wordpress_version: "20200825"
+        redis_image: "redis"
+        redis_version: "6.0.6"
+        memcached_image: "memcached"
+        memcached_version: "1.6.6"
+        pma_image: "phpmyadmin/phpmyadmin"
+        pma_version: "4.8.5"
+        adminer_image: "lucasbasquerotto/image"
+        adminer_version: "adminer-20200713-03"
+        mysql_image: "lucasbasquerotto/wordpress"
+        mysql_version: "mysql-8.0.16-02"
+        theia_image: "theiaide/theia"
+        theia_version: "1.3.0"
+        minio_gateway_image: "minio/minio"
+        minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
+        filestash_image: "machines/filestash"
+        filestash_version: "4cbeb2c"
+        toolbox_image: "lucasbasquerotto/image"
+        toolbox_version: "toolbox-20200715-02"
+        composer_image: "lucasbasquerotto/wordpress"
+        composer_version: "composer-1.8.6"
+        certbot_image: "certbot/certbot"
+        certbot_version: "v1.2.0"
+        awscli_image: "lucasbasquerotto/aws-cli"
+        awscli_version: "1.0.0"
+        mc_image: "minio/mc"
+        mc_version: "RELEASE.2020-08-08T02-33-58Z"
+        rclone_image: "rclone/rclone"
+        rclone_version: "1.53.0"
+        logrotator_image: "python"
+        logrotator_version: "3.8.4-buster"
+        fluentd_image: "lucasbasquerotto/image"
+        fluentd_version: "fluentd-20200617"
     group_params:
-      custom_images: "wp_custom_images"
-      custom_memory: "wp_custom_memory_app"
+      memory: "memory_app"
       db_setup_new: "db_setup_new"
       db_setup: >-
         {{
@@ -404,105 +468,8 @@ pods:
         ternary('uploads_setup_file', 'uploads_setup_s3')
         }}
       uploads_backup: "uploads_backup_sync"
-      certbot: "certbot"
 pod_group_params:
-  wp_custom_args:
-    nginx:
-      enable_validate_origin: true
-    mysql:
-      port: "3306"
-    wordpress:
-      env: "staging"
-      lang: "en_US"
-      debug: "{{ params.env_params.wp_debug | default(false) }}"
-    fluentd:
-      port: "24224"
-  wp_custom_args_local:
-    nginx:
-      enable_validate_origin: true
-    mysql:
-      port: "3306"
-    wordpress:
-      app_repo_dir: "app-wp"
-      env: "development"
-      lang: "en_US"
-      debug: "{{ params.env_params.wp_debug | default(false) }}"
-    fluentd:
-      port: "24224"
-  wp_custom_domain:
-    public_http_port: "80"
-    public_https_port: "443"
-    private_http_port: "9080"
-    private_https_port: "9443"
-    main_domain: "{{ params.env_params.wp_full_domain }}"
-    main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "{{ params.env_params.pma_full_domain }}"
-    pma_ssl: "{{ params.env_params.ssl }}"
-    adminer_domain: "{{ params.env_params.adminer_full_domain }}"
-    adminer_ssl: "{{ params.env_params.ssl }}"
-    theia_domain: "{{ params.env_params.theia_full_domain }}"
-    theia_ssl: "{{ params.env_params.ssl }}"
-    minio_gateway_domain: "{{ params.env_params.minio_gateway_full_domain }}"
-    minio_gateway_ssl: "{{ params.env_params.ssl }}"
-    filestash_domain: "{{ params.env_params.filestash_full_domain }}"
-    filestash_ssl: "{{ params.env_params.ssl }}"
-  wp_custom_domain_local:
-    public_http_port: "8080"
-    public_https_port: "8443"
-    private_http_port: "9080"
-    private_https_port: "9443"
-    main_domain: "localhost"
-    main_ssl: "{{ params.env_params.ssl }}"
-    pma_domain: "pma.localhost"
-    pma_ssl: "{{ params.env_params.ssl }}"
-    adminer_domain: "adminer.localhost"
-    adminer_ssl: "{{ params.env_params.ssl }}"
-    theia_domain: "theia.localhost"
-    theia_ssl: "{{ params.env_params.ssl }}"
-    minio_gateway_domain: "minio.localhost"
-    minio_gateway_ssl: "{{ params.env_params.ssl }}"
-    filestash_domain: "filestash.localhost"
-    filestash_ssl: "{{ params.env_params.ssl }}"
-  wp_custom_images:
-    nginx_image: "nginx"
-    nginx_version: "1.14.2-alpine"
-    varnish_image: "varnish"
-    varnish_version: "6.4.0-1"
-    wordpress_image: "lucasbasquerotto/wordpress"
-    wordpress_version: "20200825"
-    redis_image: "redis"
-    redis_version: "6.0.6"
-    memcached_image: "memcached"
-    memcached_version: "1.6.6"
-    pma_image: "phpmyadmin/phpmyadmin"
-    pma_version: "4.8.5"
-    adminer_image: "lucasbasquerotto/image"
-    adminer_version: "adminer-20200713-03"
-    mysql_image: "lucasbasquerotto/wordpress"
-    mysql_version: "mysql-8.0.16-02"
-    theia_image: "theiaide/theia"
-    theia_version: "1.3.0"
-    minio_gateway_image: "minio/minio"
-    minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
-    filestash_image: "machines/filestash"
-    filestash_version: "4cbeb2c"
-    toolbox_image: "lucasbasquerotto/image"
-    toolbox_version: "toolbox-20200715-02"
-    composer_image: "lucasbasquerotto/wordpress"
-    composer_version: "composer-1.8.6"
-    certbot_image: "certbot/certbot"
-    certbot_version: "v1.2.0"
-    awscli_image: "lucasbasquerotto/aws-cli"
-    awscli_version: "1.0.0"
-    mc_image: "minio/mc"
-    mc_version: "RELEASE.2020-08-08T02-33-58Z"
-    rclone_image: "rclone/rclone"
-    rclone_version: "1.53.0"
-    logrotator_image: "python"
-    logrotator_version: "3.8.4-buster"
-    fluentd_image: "lucasbasquerotto/image"
-    fluentd_version: "fluentd-20200617"
-  wp_custom_memory_app:
+  memory_app:
     nginx: 256mb
     varnish: 256mb
     wordpress: 256mb
@@ -519,15 +486,15 @@ pod_group_params:
     fluentd: 256mb
     certbot: 256mb
     s3_cli: 256mb
-  wp_custom_memory_db:
+  memory_db:
     mysql: 1gb
     toolbox: 512mb
     fluentd: 256mb
     s3_cli: 512mb
-  wp_custom_memory_cache:
+  memory_cache:
     redis: 512mb
     memcached: 512mb
-  wp_custom_memory_web:
+  memory_web:
     nginx: 512mb
     varnish: 512mb
     wordpress: 1gb
@@ -540,17 +507,6 @@ pod_group_params:
     fluentd: 256mb
     certbot: 256mb
     s3_cli: 512mb
-  certbot:
-    main_domain: "{{ params.env_params.wp_full_domain }}"
-    domains: "{{ params.env_params.certbot_domains }}"
-    email: "{{ params.env_params.certbot_email | default('') }}"
-    staging: "{{ params.env_params.certbot_staging | default(false) }}"
-    force: "{{ params.env_params.certbot_force | default(false) }}"
-  certbot_local:
-    main_domain: "localhost"
-    domains: "localhost www.localhost"
-    email: "{{ params.env_params.certbot_email | default('') }}"
-    force: "{{ params.env_params.certbot_force | default(false) }}"
   db_backup_sync:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
