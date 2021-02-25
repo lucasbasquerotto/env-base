@@ -250,7 +250,7 @@ nodes:
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           enable_logs_setup: false
           enable_sync_setup: false
-          main_domain: "{{ params.env_params.local_main_domain | default('') }}"
+          main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
           domains: "{{ params.env_params.local_domains | default({}) }}"
           ports:
             public_http_port: "8080"
