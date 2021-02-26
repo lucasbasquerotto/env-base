@@ -30,6 +30,12 @@ main:
       - name: "app"
         key: "rproxy_local"
         local: true
+  local_hub:
+    extend_cloud: true
+    nodes:
+      - name: "app"
+        key: "rproxy_hub_local"
+        local: true
   remote:
     extend_cloud: true
     initial_services:
@@ -181,43 +187,23 @@ nodes:
       host: "localhost"
     pods:
       - name: "rproxy"
-        params:
-          local: true
-          named_volumes: "{{ params.env_params.named_volumes | default(false) }}"
-          custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
-          enable_logs_setup: false
-          enable_sync_setup: false
-          main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
-          domains: "{{ params.env_params.local_domains | default({}) }}"
-          ports:
-            public_http_port: "8080"
-            public_https_port: "8443"
-            private_http_port: "9080"
-            private_https_port: "9443"
-          rproxy_default_services:
-            - name: "rproxy"
-              domain: "{{ params.env_params.local_domains.rproxy }}"
-              location_info_list:
-                - location: "= /nginx/basic_status"
-                  data: "stub_status;"
-                - location: "/"
-                  data: "root /var/www;"
-            - name: "theia"
-              when: "{{ params.env_params.use_theia | default(false) }}"
-              domain: "{{ params.env_params.local_domains.theia | default('') }}"
-              service: "http://theia:3000"
-              upgrade: true
-              private: true
-            - name: "minio_gateway"
-              when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-              domain: "{{ params.env_params.local_domains.minio_gateway | default('') }}"
-              service: "http://minio_gateway:9000"
-              private: true
-          rproxy_custom_services: >-
-            {{
-              params.env_params.rproxy_custom_local_services
-              | default(params.env_params.rproxy_custom_services | default([]))
-            }}
+        shared_params: ["main", "local"]
+  rproxy_hub_local:
+    credentials:
+      host: "localhost"
+    pods:
+      - name: "rproxy_hub"
+        key: "rproxy"
+        shared_params: ["main", "local", "hub_item", "local_hub"]
+      - name: "rproxy_web_1"
+        key: "rproxy"
+        shared_params: ["local", "local_web", "hub_item", "local_web_1"]
+      - name: "rproxy_web_2"
+        key: "rproxy"
+        shared_params: ["local", "local_web", "hub_item", "local_web_2"]
+      - name: "rproxy_web_3"
+        key: "rproxy"
+        shared_params: ["local", "local_web", "hub_item", "local_web_3"]
   rproxy:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -232,38 +218,34 @@ nodes:
       host: "host"
     params:
       dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
-      host_users:
-        - name: "host"
-          setup_log_file: "/var/log/setup.log"
-          setup_finished_log_regex: "^Setup Finished.*$"
-          setup_success_log_last_line: "Setup Finished - Success"
-          initial_connection_timeout: 90
-          setup_finished_timeout: 300
-      cron:
-        - dest: "/var/spool/cron/crontabs/root"
-          user: "root"
-          src:
-            type: "template"
-            origin: "cloud"
-            file: "ext-cloud/files/cron/pod.tpl.sh"
-            schema: "ext-cloud/files/cron/pod.schema.yml"
-            params:
-              tasks:
-                - name: "sync"
-                  task: "sync:verify"
-                  cron: "*/1 * * * *"
-                - name: "backup"
-                  cron: "*/5 * * * *"
+    shared_params: ["remote"]
     pods:
       - name: "rproxy"
-        params:
-          local: false
-          domains: "{{ params.env_params.domains | default({}) }}"
-          ports:
-            public_http_port: "80"
-            public_https_port: "443"
-            private_http_port: "9080"
-            private_https_port: "9443"
+        shared_params: ["main"]
+node_shared_params:
+  remote:
+    host_users:
+      - name: "host"
+        setup_log_file: "/var/log/setup.log"
+        setup_finished_log_regex: "^Setup Finished.*$"
+        setup_success_log_last_line: "Setup Finished - Success"
+        initial_connection_timeout: 90
+        setup_finished_timeout: 300
+    cron:
+      - dest: "/var/spool/cron/crontabs/root"
+        user: "root"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/cron/pod.tpl.sh"
+          schema: "ext-cloud/files/cron/pod.schema.yml"
+          params:
+            tasks:
+              - name: "sync"
+                task: "sync:verify"
+                cron: "*/1 * * * *"
+              - name: "backup"
+                cron: "*/5 * * * *"
 pods:
   rproxy:
     repo: "pod"
@@ -283,15 +265,7 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
-      main_domain: "{{ params.env_params.main_domain }}"
-      use_ssl: "{{ params.env_params.ssl | default(false) }}"
-      use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
-      use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
-      use_theia: "{{ params.env_params.use_theia }}"
-      use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
       use_fluentd: "{{ params.env_params.use_fluentd }}"
-      use_certbot: "{{ params.env_params.use_certbot }}"
-      auth_file: "{{ params.env_params.auth_file }}"
       s3_cli: "{{ params.env_params.s3_cli }}"
       backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
@@ -334,32 +308,141 @@ pods:
         certbot: 256mb
         fluentd: 256mb
         s3_cli: 512mb
-      rproxy_default_services:
-        - name: "rproxy"
-          domain: "{{ params.env_params.domains.rproxy }}"
-          location_info_list:
-            - location: "= /nginx/basic_status"
-              data: "stub_status;"
-            - location: "/"
-              data: "root /var/www;"
-        - name: "theia"
-          when: "{{ params.env_params.use_theia | default(false) }}"
-          domain: "{{ params.env_params.domains.theia | default('') }}"
-          service: "http://theia:3000"
-          upgrade: true
-          private: true
-        - name: "minio_gateway"
-          when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-          domain: "{{ params.env_params.domains.minio_gateway | default('') }}"
-          service: "http://minio_gateway:9000"
-          private: true
-      rproxy_services: "{{ params.env_params.rproxy_custom_services | default([]) }}"
     transfer:
       - dest: "env/nginx/www/index.html"
         src:
           type: "template"
           origin: "cloud"
           file: "ext-cloud/demo/rproxy/sample.tpl.html"
+pod_shared_params:
+  main:
+    main_domain: "{{ params.env_params.main_domain }}"
+    domains: "{{ params.env_params.domains | default({}) }}"
+    use_ssl: "{{ params.env_params.ssl | default(false) }}"
+    use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
+    use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
+    use_theia: "{{ params.env_params.use_theia }}"
+    use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
+    use_certbot: "{{ params.env_params.use_certbot }}"
+    auth_file: "{{ params.env_params.auth_file }}"
+  local:
+    local: true
+    named_volumes: "{{ params.env_params.named_volumes | default(false) }}"
+    custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
+    enable_logs_setup: false
+    enable_sync_setup: false
+    main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
+    domains: "{{ params.env_params.local_domains | default({}) }}"
+    rproxy_services:
+      - name: "rproxy"
+        domain: "{{ params.env_params.local_domains.rproxy }}"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        domain: "{{ params.env_params.local_domains.theia | default('') }}"
+        service: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        domain: "{{ params.env_params.local_domains.minio_gateway | default('') }}"
+        service: "http://minio_gateway:9000"
+        private: true
+  hub_item:
+    shared_network: "rproxy-hub-network"
+  local_hub:
+    rproxy_services:
+      - name: "rproxy"
+        domain: "{{ params.env_params.local_domains.rproxy }}"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "rproxy_web_1"
+        domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
+        service: "http://rproxy_web_1-main-nginx"
+      - name: "rproxy_web_2"
+        domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
+        service: "http://rproxy_web_2-main-nginx"
+      - name: "rproxy_web_3"
+        domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
+        service: "http://rproxy_web_3-main-nginx"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        domain: "{{ params.env_params.local_domains.theia | default('') }}"
+        service: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        domain: "{{ params.env_params.local_domains.minio_gateway | default('') }}"
+        service: "http://minio_gateway:9000"
+        private: true
+  local_web:
+    internal: true
+    use_pod_prefix: true
+    use_pod_full_prefix: false
+  local_web_1:
+    main_domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
+    rproxy_services:
+      - name: "rproxy"
+        domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+  local_web_2:
+    main_domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
+    rproxy_services:
+      - name: "rproxy"
+        domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+  local_web_3:
+    main_domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
+    rproxy_services:
+      - name: "rproxy"
+        domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+  remote:
+    rproxy_services:
+      - name: "rproxy"
+        domain: "{{ params.env_params.domains.rproxy }}"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        domain: "{{ params.env_params.domains.theia | default('') }}"
+        service: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        domain: "{{ params.env_params.domains.minio_gateway | default('') }}"
+        service: "http://minio_gateway:9000"
+        private: true
 tasks:
   docker_compose_install:
     type: "task"
