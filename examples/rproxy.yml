@@ -194,16 +194,16 @@ nodes:
     pods:
       - name: "rproxy_hub"
         key: "rproxy"
-        shared_params: ["main", "local", "hub_item", "local_hub"]
+        shared_params: ["main", "local", "hub_item", "main_hub"]
       - name: "rproxy_web_1"
         key: "rproxy"
-        shared_params: ["local", "local_web", "hub_item", "local_web_1"]
+        shared_params: ["local", "hub_item", "hub_web", "local_web_1"]
       - name: "rproxy_web_2"
         key: "rproxy"
-        shared_params: ["local", "local_web", "hub_item", "local_web_2"]
+        shared_params: ["local", "hub_item", "hub_web", "local_web_2"]
       - name: "rproxy_web_3"
         key: "rproxy"
-        shared_params: ["local", "local_web", "hub_item", "local_web_3"]
+        shared_params: ["local", "hub_item", "hub_web", "local_web_3"]
   rproxy:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -222,6 +222,34 @@ nodes:
     pods:
       - name: "rproxy"
         shared_params: ["main"]
+  rproxy_hub:
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "dmz"
+    dns_service: "node_dns_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    params:
+      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+    shared_params: ["remote"]
+    pods:
+      - name: "rproxy_hub"
+        key: "rproxy"
+        shared_params: ["main", "hub_item", "main_hub"]
+      - name: "rproxy_web_1"
+        key: "rproxy"
+        shared_params: ["hub_item", "hub_web", "remote_web_1"]
+      - name: "rproxy_web_2"
+        key: "rproxy"
+        shared_params: ["hub_item", "hub_web", "remote_web_2"]
+      - name: "rproxy_web_3"
+        key: "rproxy"
+        shared_params: ["hub_item", "hub_web", "remote_web_3"]
 node_shared_params:
   remote:
     host_users:
@@ -325,17 +353,8 @@ pod_shared_params:
     use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
     use_certbot: "{{ params.env_params.use_certbot }}"
     auth_file: "{{ params.env_params.auth_file }}"
-  local:
-    local: true
-    named_volumes: "{{ params.env_params.named_volumes | default(false) }}"
-    custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
-    enable_logs_setup: false
-    enable_sync_setup: false
-    main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
-    domains: "{{ params.env_params.local_domains | default({}) }}"
     rproxy_services:
       - name: "rproxy"
-        domain: "{{ params.env_params.local_domains.rproxy }}"
         location_info_list:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
@@ -343,106 +362,80 @@ pod_shared_params:
             data: "root /var/www;"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
-        domain: "{{ params.env_params.local_domains.theia | default('') }}"
         service: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        domain: "{{ params.env_params.local_domains.minio_gateway | default('') }}"
         service: "http://minio_gateway:9000"
         private: true
+  local:
+    local: true
+    enable_logs_setup: false
+    enable_sync_setup: false
+    custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
+    main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
+    domains: "{{ params.env_params.local_domains | default({}) }}"
   hub_item:
     shared_network: "rproxy-hub-network"
-  local_hub:
+  main_hub:
     rproxy_services:
       - name: "rproxy"
-        domain: "{{ params.env_params.local_domains.rproxy }}"
         location_info_list:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
             data: "root /var/www;"
       - name: "rproxy_web_1"
-        domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
         service: "http://rproxy_web_1-main-nginx"
       - name: "rproxy_web_2"
-        domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
         service: "http://rproxy_web_2-main-nginx"
       - name: "rproxy_web_3"
-        domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
         service: "http://rproxy_web_3-main-nginx"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
-        domain: "{{ params.env_params.local_domains.theia | default('') }}"
         service: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        domain: "{{ params.env_params.local_domains.minio_gateway | default('') }}"
         service: "http://minio_gateway:9000"
         private: true
-  local_web:
+  hub_web:
     internal: true
     use_pod_prefix: true
     use_pod_full_prefix: false
+    rproxy_services:
+      - name: "rproxy"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
   local_web_1:
     main_domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
     domains:
       rproxy: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
-    rproxy_services:
-      - name: "rproxy"
-        domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
-        location_info_list:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
   local_web_2:
     main_domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
     domains:
       rproxy: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
-    rproxy_services:
-      - name: "rproxy"
-        domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
-        location_info_list:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
   local_web_3:
     main_domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
     domains:
       rproxy: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
-    rproxy_services:
-      - name: "rproxy"
-        domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
-        location_info_list:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
-  remote:
-    rproxy_services:
-      - name: "rproxy"
-        domain: "{{ params.env_params.domains.rproxy }}"
-        location_info_list:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
-      - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        domain: "{{ params.env_params.domains.theia | default('') }}"
-        service: "http://theia:3000"
-        upgrade: true
-        private: true
-      - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        domain: "{{ params.env_params.domains.minio_gateway | default('') }}"
-        service: "http://minio_gateway:9000"
-        private: true
+  remote_web_1:
+    main_domain: "{{ params.env_params.domains.rproxy_web_1 | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.domains.rproxy_web_1 | default('') }}"
+  remote_web_2:
+    main_domain: "{{ params.env_params.domains.rproxy_web_2 | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.domains.rproxy_web_2 | default('') }}"
+  remote_web_3:
+    main_domain: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
