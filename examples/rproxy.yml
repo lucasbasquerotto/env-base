@@ -54,6 +54,33 @@ main:
           - name: "main_upgrade"
             all_nodes: true
             task_target: "pod"
+  remote_hub:
+    extend_cloud: true
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - name: "s3_buckets"
+        can_destroy: true
+    nodes:
+      - name: "app"
+        key: "rproxy_hub"
+        can_destroy: true
+    run_stages:
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            task_target: "node"
+          - name: "main_build"
+            all_nodes: true
+            task_target: "pod"
+          - name: "main_upgrade"
+            nodes:
+              - name: "app"
+                pods: ["rproxy_hub"]
+            task_target: "pod"
+      - tasks:
+          - name: "main_upgrade"
+            all_nodes: true
+            task_target: "pod"
 services:
   s3_buckets:
     base_dir: "ext-cloud"
