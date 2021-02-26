@@ -40,8 +40,6 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-      - name: "s3_buckets"
-        can_destroy: true
     nodes:
       - name: "app"
         key: "rproxy"
@@ -58,8 +56,6 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
-      - name: "s3_buckets"
-        can_destroy: true
     nodes:
       - name: "app"
         key: "rproxy_hub"
@@ -81,19 +77,60 @@ main:
           - name: "main_upgrade"
             all_nodes: true
             task_target: "pod"
+  remote_external_hub:
+    extend_cloud: true
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+    nodes:
+      - name: "app"
+        key: "rproxy_external_hub"
+        can_destroy: true
+        node_dependencies:
+          rproxy_web_1:
+            type: "node"
+            host: "web1"
+          rproxy_web_2:
+            type: "node"
+            host: "web2"
+          rproxy_web_3:
+            type: "node"
+            host: "web3"
+      - name: "web1"
+        key: "rproxy_web"
+        can_destroy: true
+        pods:
+          rproxy:
+            shared_params: ["remote_web_1"]
+      - name: "web2"
+        key: "rproxy_web"
+        can_destroy: true
+        pods:
+          rproxy:
+            shared_params: ["remote_web_2"]
+      - name: "web3"
+        key: "rproxy_web"
+        can_destroy: true
+        pods:
+          rproxy:
+            shared_params: ["remote_web_3"]
+    run_stages:
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            task_target: "node"
+          - name: "main_build"
+            all_nodes: true
+            task_target: "pod"
+          - name: "main_upgrade"
+            nodes:
+              - name: "app"
+                pods: ["rproxy_hub"]
+            task_target: "pod"
+      - tasks:
+          - name: "main_upgrade"
+            all_nodes: true
+            task_target: "pod"
 services:
-  s3_buckets:
-    base_dir: "ext-cloud"
-    namespace: "ext_s3"
-    task: "tasks/s3/main.s3.yml"
-    schema: "tasks/s3/schema.s3.yml"
-    validator: "tasks/s3/validator.s3.yml"
-    credentials:
-      s3: "s3"
-    params:
-      list:
-        - bucket: "{{ params.env_params.backup_bucket_name }}"
-          permission: "private"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
@@ -130,8 +167,8 @@ services:
     params:
       tags:
         - "auto"
-        - "web"
-        - "dmz"
+        - "rproxy-web"
+        - "rproxy-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -162,17 +199,17 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "web"
-          tags: ["web"]
+        - name: "rproxy-web"
+          tags: ["rproxy-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["dmz"]
+                tags: ["rproxy-dmz"]
             - ports: "443"
               sources:
-                tags: ["dmz"]
-        - name: "dmz"
-          tags: ["dmz"]
+                tags: ["rproxy-dmz"]
+        - name: "rproxy-dmz"
+          tags: ["rproxy-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -255,7 +292,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "dmz"
+          - "rproxy-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
@@ -277,6 +314,40 @@ nodes:
       - name: "rproxy_web_3"
         key: "rproxy"
         shared_params: ["hub_item", "hub_web", "remote_web_3"]
+  rproxy_external_hub:
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "rproxy-dmz"
+    dns_service: "node_dns_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    params:
+      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+    shared_params: ["remote"]
+    pods:
+      - name: "rproxy"
+        shared_params: ["main", "main_external_hub"]
+  rproxy_web:
+    service:
+      name: "{{ params.env_params.node_service }}"
+      params:
+        tags:
+          - "auto"
+          - "rproxy-web"
+    dns_service: "node_dns_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    shared_params: ["remote"]
+    pods:
+      - name: "rproxy"
+        shared_params: ["external_hub_web"]
 node_shared_params:
   remote:
     host_users:
@@ -428,6 +499,38 @@ pod_shared_params:
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
         service: "http://minio_gateway:9000"
         private: true
+  main_external_hub:
+    rproxy_services:
+      - name: "rproxy"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "rproxy_web_1"
+      - name: "rproxy_web_1_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        upgrade: true
+        private: true
+      - name: "rproxy_web_2"
+      - name: "rproxy_web_2_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        upgrade: true
+        private: true
+      - name: "rproxy_web_3"
+      - name: "rproxy_web_3_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        upgrade: true
+        private: true
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        service: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        service: "http://minio_gateway:9000"
+        private: true
   hub_web:
     internal: true
     use_pod_prefix: true
@@ -439,6 +542,19 @@ pod_shared_params:
             data: "stub_status;"
           - location: "/"
             data: "root /var/www;"
+  external_hub_web:
+    rproxy_services:
+      - name: "rproxy"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        service: "http://theia:3000"
+        upgrade: true
+        private: true
   local_web_1:
     main_domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
     domains:
@@ -455,14 +571,17 @@ pod_shared_params:
     main_domain: "{{ params.env_params.domains.rproxy_web_1 | default('') }}"
     domains:
       rproxy: "{{ params.env_params.domains.rproxy_web_1 | default('') }}"
+      theia: "{{ params.env_params.domains.rproxy_web_1_theia | default('') }}"
   remote_web_2:
     main_domain: "{{ params.env_params.domains.rproxy_web_2 | default('') }}"
     domains:
       rproxy: "{{ params.env_params.domains.rproxy_web_2 | default('') }}"
+      theia: "{{ params.env_params.domains.rproxy_web_2_theia | default('') }}"
   remote_web_3:
     main_domain: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
     domains:
       rproxy: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
+      theia: "{{ params.env_params.domains.rproxy_web_3_theia | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
