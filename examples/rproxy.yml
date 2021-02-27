@@ -41,6 +41,8 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
+      - name: "s3_buckets"
+        can_destroy: true
     nodes:
       - name: "app"
         key: "rproxy"
@@ -57,6 +59,8 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
+      - name: "s3_buckets"
+        can_destroy: true
     nodes:
       - name: "app"
         key: "rproxy_hub"
@@ -82,6 +86,8 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.vpn_service }}"
+      - name: "s3_buckets"
+        can_destroy: true
     nodes:
       - name: "app"
         key: "rproxy_external_hub"
@@ -151,6 +157,18 @@ main:
             all_nodes: true
             task_target: "pod"
 services:
+  s3_buckets:
+    base_dir: "ext-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/main.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
+    credentials:
+      s3: "s3"
+    params:
+      list:
+        - bucket: "{{ params.env_params.backup_bucket_name }}"
+          permission: "private"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
