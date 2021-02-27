@@ -90,12 +90,33 @@ main:
           rproxy_web_1:
             type: "node"
             host: "web1"
+            protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
+            port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
+          rproxy_web_1_private:
+            type: "node"
+            host: "web1"
+            protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
+            port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
           rproxy_web_2:
             type: "node"
             host: "web2"
+            protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
+            port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
+          rproxy_web_2_private:
+            type: "node"
+            host: "web2"
+            protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
+            port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
           rproxy_web_3:
             type: "node"
             host: "web3"
+            protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
+            port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
+          rproxy_web_3_private:
+            type: "node"
+            host: "web3"
+            protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
+            port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
       - name: "web1"
         key: "rproxy_web"
         can_destroy: true
@@ -175,9 +196,11 @@ services:
             - ports: "9080"
               sources:
                 addresses: "{{ params.env_params.private_ips }}"
+                tags: ["rproxy-dmz"]
             - ports: "9443"
               sources:
                 addresses: "{{ params.env_params.private_ips }}"
+                tags: ["rproxy-dmz"]
         - name: "auto"
           tags: ["auto"]
           inbound_rules:
@@ -509,22 +532,25 @@ pod_shared_params:
       - name: "rproxy_web_1"
         proxy: true
       - name: "rproxy_web_1_theia"
-        proxy: true
         when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_1_private"
+        proxy: true
         upgrade: true
         private: true
       - name: "rproxy_web_2"
         proxy: true
       - name: "rproxy_web_2_theia"
-        proxy: true
         when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_2_private"
+        proxy: true
         upgrade: true
         private: true
       - name: "rproxy_web_3"
         proxy: true
       - name: "rproxy_web_3_theia"
-        proxy: true
         when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_3_private"
+        proxy: true
         upgrade: true
         private: true
       - name: "theia"
