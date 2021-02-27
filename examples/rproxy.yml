@@ -4,6 +4,7 @@ migration: ""
 container: ""
 meta:
   ignore_validators: false
+  skip_local_node_preparation: false
   skip_local_pod_preparation: false
   template_no_empty_lines: true
 cloud:
@@ -85,7 +86,7 @@ main:
       - name: "app"
         key: "rproxy_external_hub"
         can_destroy: true
-        node_dependencies:
+        dependencies:
           rproxy_web_1:
             type: "node"
             host: "web1"
@@ -122,9 +123,7 @@ main:
             all_nodes: true
             task_target: "pod"
           - name: "main_upgrade"
-            nodes:
-              - name: "app"
-                pods: ["rproxy_hub"]
+            nodes: ["app"]
             task_target: "pod"
       - tasks:
           - name: "main_upgrade"
@@ -460,12 +459,12 @@ pod_shared_params:
             data: "root /var/www;"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
-        service: "http://theia:3000"
+        endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        service: "http://minio_gateway:9000"
+        endpoint: "http://minio_gateway:9000"
         private: true
   local:
     local: true
@@ -485,19 +484,19 @@ pod_shared_params:
           - location: "/"
             data: "root /var/www;"
       - name: "rproxy_web_1"
-        service: "http://rproxy_web_1-main-nginx"
+        endpoint: "http://rproxy_web_1-main-nginx"
       - name: "rproxy_web_2"
-        service: "http://rproxy_web_2-main-nginx"
+        endpoint: "http://rproxy_web_2-main-nginx"
       - name: "rproxy_web_3"
-        service: "http://rproxy_web_3-main-nginx"
+        endpoint: "http://rproxy_web_3-main-nginx"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
-        service: "http://theia:3000"
+        endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        service: "http://minio_gateway:9000"
+        endpoint: "http://minio_gateway:9000"
         private: true
   main_external_hub:
     rproxy_services:
@@ -508,28 +507,34 @@ pod_shared_params:
           - location: "/"
             data: "root /var/www;"
       - name: "rproxy_web_1"
+        proxy: true
       - name: "rproxy_web_1_theia"
+        proxy: true
         when: "{{ params.env_params.use_theia | default(false) }}"
         upgrade: true
         private: true
       - name: "rproxy_web_2"
+        proxy: true
       - name: "rproxy_web_2_theia"
+        proxy: true
         when: "{{ params.env_params.use_theia | default(false) }}"
         upgrade: true
         private: true
       - name: "rproxy_web_3"
+        proxy: true
       - name: "rproxy_web_3_theia"
+        proxy: true
         when: "{{ params.env_params.use_theia | default(false) }}"
         upgrade: true
         private: true
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
-        service: "http://theia:3000"
+        endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        service: "http://minio_gateway:9000"
+        endpoint: "http://minio_gateway:9000"
         private: true
   hub_web:
     internal: true
@@ -552,7 +557,7 @@ pod_shared_params:
             data: "root /var/www;"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
-        service: "http://theia:3000"
+        endpoint: "http://theia:3000"
         upgrade: true
         private: true
   local_web_1:
