@@ -438,9 +438,9 @@ pods:
       backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name }}"
       backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
       enable_logs_backup: true
-      enable_logs_setup: true
+      enable_logs_setup: false
       enable_sync_backup: true
-      enable_sync_setup: true
+      enable_sync_setup: false
       enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
       certbot:
         email: "{{ params.env_params.certbot_email | default('') }}"
