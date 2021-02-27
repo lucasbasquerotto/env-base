@@ -314,7 +314,7 @@ nodes:
       params:
         tags:
           - "auto"
-          - "dmz"
+          - "rproxy-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
