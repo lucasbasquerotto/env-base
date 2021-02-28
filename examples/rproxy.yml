@@ -74,12 +74,6 @@ main:
             all_nodes: true
             task_target: "pod"
           - name: "main_upgrade"
-            nodes:
-              - name: "app"
-                pods: ["rproxy_hub"]
-            task_target: "pod"
-      - tasks:
-          - name: "main_upgrade"
             all_nodes: true
             task_target: "pod"
   remote_external_hub:
