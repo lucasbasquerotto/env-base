@@ -183,7 +183,10 @@ main:
     extend_cloud: true
     nodes:
       - name: "app"
-        key: "rproxy_replicas_hub"
+        key: "rproxy_external_hub"
+        pods:
+          rproxy:
+            shared_params: ["main_replicas_hub"]
         dependencies:
           replica:
             type: "node"
@@ -202,6 +205,9 @@ main:
       - name: "replica"
         key: "rproxy_web"
         amount: 3
+        pods:
+          rproxy:
+            shared_params: ["remote_replica"]
 services:
   local_node:
     namespace: "ext_node"
@@ -750,6 +756,7 @@ pod_shared_params:
     main_domain: "{{ params.env_params.domains.rproxy_replica | default('') }}"
     domains:
       rproxy: "{{ params.env_params.domains.rproxy_replica | default('') }}"
+      theia: "{{ params.env_params.domains.rproxy_replica_theia | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
