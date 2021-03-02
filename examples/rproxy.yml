@@ -37,6 +37,27 @@ main:
       - name: "app"
         key: "rproxy_hub_local"
         local: true
+  local_replicas:
+    extend_cloud: true
+    nodes:
+      - name: "app"
+        key: "rproxy_replicas_hub_local"
+        local: true
+        dependencies:
+          replica:
+            type: "url"
+            host:
+              - "http://rproxy_replica_1-main-nginx"
+              - "http://rproxy_replica_2-main-nginx"
+              - "http://rproxy_replica_3-main-nginx"
+            limit: -1
+            required_amount: 1
+      - name: "node_replica_1"
+        key: "rproxy_replica_1_local"
+      - name: "node_replica_2"
+        key: "rproxy_replica_2_local"
+      - name: "node_replica_3"
+        key: "rproxy_replica_3_local"
   remote:
     extend_cloud: true
     initial_services:
@@ -151,6 +172,10 @@ main:
             all_nodes: true
             task_target: "pod"
 services:
+  local_node:
+    namespace: "ext_node"
+    task: "tasks/services/node/local.main.node.yml"
+    schema: "tasks/services/node/local.schema.node.yml"
   s3_buckets:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
@@ -302,6 +327,40 @@ nodes:
       - name: "rproxy_web_3"
         key: "rproxy"
         shared_params: ["local", "hub_item", "hub_web", "local_web_3"]
+  rproxy_replicas_hub_local:
+    credentials:
+      host: "localhost"
+    pods:
+      - name: "rproxy_replicas_hub"
+        key: "rproxy"
+        shared_params: ["main", "local", "hub_item", "main_replicas_hub"]
+  rproxy_replica_1_local:
+    service: "local_node"
+    base_dir: "/var/cloud"
+    credentials:
+      host: "localhost"
+    pods:
+      - name: "rproxy_replica_1"
+        key: "rproxy"
+        shared_params: ["local", "hub_item", "hub_web", "local_replica"]
+  rproxy_replica_2_local:
+    service: "local_node"
+    base_dir: "/var/cloud"
+    credentials:
+      host: "localhost"
+    pods:
+      - name: "rproxy_replica_2"
+        key: "rproxy"
+        shared_params: ["local", "hub_item", "hub_web", "local_replica"]
+  rproxy_replica_3_local:
+    service: "local_node"
+    base_dir: "/var/cloud"
+    credentials:
+      host: "localhost"
+    pods:
+      - name: "rproxy_replica_3"
+        key: "rproxy"
+        shared_params: ["local", "hub_item", "hub_web", "local_replica"]
   rproxy:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -625,6 +684,32 @@ pod_shared_params:
     domains:
       rproxy: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
       theia: "{{ params.env_params.domains.rproxy_web_3_theia | default('') }}"
+  main_replicas_hub:
+    rproxy_services:
+      - name: "rproxy"
+        location_info_list:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "rproxy_replica"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+  local_replica:
+    main_domain: "{{ params.env_params.local_domains.replica | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.local_domains.replica | default('') }}"
+  remote_replica:
+    main_domain: "{{ params.env_params.domains.replica | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.domains.replica | default('') }}"
 tasks:
   docker_compose_install:
     type: "task"
