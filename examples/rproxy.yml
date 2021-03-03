@@ -24,7 +24,7 @@ main:
   cloud:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
   local:
     extend_cloud: true
     nodes:
@@ -69,7 +69,7 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -87,7 +87,7 @@ main:
   remote_hub:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -108,7 +108,7 @@ main:
   remote_external_hub:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -182,7 +182,7 @@ main:
   remote_replicas:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:

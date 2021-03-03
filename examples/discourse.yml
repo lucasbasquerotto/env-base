@@ -21,7 +21,7 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
     nodes:
       - name: "app"
@@ -49,7 +49,7 @@ main:
   multicontainer:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
     nodes:
       - name: "app"
@@ -87,7 +87,7 @@ main:
   nodes:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.vpn_service }}"
+      - "{{ params.env_params.cloud_service }}"
       - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
     nodes:
       - name: "web"
