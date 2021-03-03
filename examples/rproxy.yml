@@ -666,6 +666,7 @@ pod_shared_params:
         proxy: true
         upgrade: true
         private: true
+        use_basic_auth: false
       - name: "rproxy_web_2"
         proxy: true
       - name: "rproxy_web_2_theia"
@@ -674,6 +675,7 @@ pod_shared_params:
         proxy: true
         upgrade: true
         private: true
+        use_basic_auth: false
       - name: "rproxy_web_3"
         proxy: true
       - name: "rproxy_web_3_theia"
@@ -682,6 +684,7 @@ pod_shared_params:
         proxy: true
         upgrade: true
         private: true
+        use_basic_auth: false
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
@@ -703,6 +706,7 @@ pod_shared_params:
           - location: "/"
             data: "root /var/www;"
   external_hub_web:
+    use_theia: "{{ params.env_params.use_theia }}"
     rproxy_services:
       - name: "rproxy"
         location_info_list:
@@ -760,15 +764,18 @@ pod_shared_params:
         proxy: true
         upgrade: true
         private: true
+        use_basic_auth: false
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: false
       - name: "minio_gateway"
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
+        use_basic_auth: false
   local_replica:
     main_domain: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
     domains:
