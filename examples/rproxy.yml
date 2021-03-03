@@ -208,6 +208,21 @@ main:
         pods:
           rproxy:
             shared_params: ["remote_replica"]
+    run_stages:
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            task_target: "node"
+          - name: "main_build"
+            all_nodes: true
+            task_target: "pod"
+          - name: "main_upgrade"
+            nodes: ["app"]
+            task_target: "pod"
+      - tasks:
+          - name: "main_upgrade"
+            all_nodes: true
+            task_target: "pod"
 services:
   local_node:
     namespace: "ext_node"
