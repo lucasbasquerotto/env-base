@@ -738,6 +738,7 @@ pod_shared_params:
             data: "root /var/www;"
   external_hub_web:
     use_theia: "{{ params.env_params.use_theia }}"
+    auth_file: "{{ params.env_params.auth_file }}"
     rproxy_services:
       - name: "rproxy"
         locations:
