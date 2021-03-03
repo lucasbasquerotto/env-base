@@ -22,7 +22,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.cloud_service }}"
-      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
+      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "app"
         key: "discourse"
@@ -50,7 +50,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.cloud_service }}"
-      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
+      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "app"
         key: "discourse"
@@ -88,7 +88,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.env_params.cloud_service }}"
-      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 's3_no_bucket') }}"
+      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "web"
         key: "discourse"
@@ -173,7 +173,7 @@ main:
             nodes: ["web"]
             task_target: "pod"
 services:
-  s3_no_bucket:
+  skip:
     list: true
     services: []
   s3_buckets:

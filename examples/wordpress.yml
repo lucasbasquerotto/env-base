@@ -115,6 +115,9 @@ main:
             nodes: ["web"]
             task_target: "pod"
 services:
+  skip:
+    list: true
+    services: []
   s3_buckets:
     base_dir: "ext-cloud"
     namespace: "ext_s3"

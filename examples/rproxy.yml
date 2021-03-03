@@ -230,6 +230,9 @@ main:
             all_nodes: true
             task_target: "pod"
 services:
+  skip:
+    list: true
+    services: []
   local_node:
     namespace: "ext_node"
     task: "tasks/services/node/local.main.node.yml"
@@ -362,6 +365,34 @@ services:
           node: "host"
         contents:
           host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+  linode:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/linode/linode.main.node.yml"
+    schema: "tasks/node/linode/linode.schema.node.yml"
+    validator: "tasks/node/linode/linode.validator.node.yml"
+    credentials:
+      node: "linode"
+    params:
+      image: "ubuntu-18-04-x64"
+      region: "ams3"
+      type: "s-2vcpu-2gb"
+    contents:
+      authorized_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+      user_data:
+        type: "template"
+        origin: "cloud"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        params:
+          user_directories: ["/var/cloud"]
+          install_docker: true
+          install_podman: false
+          install_packages: false
+        credentials:
+          node: "host"
+        contents:
+          host_ssh_public_keys: ""
 nodes:
   rproxy_local:
     credentials:
@@ -604,7 +635,7 @@ pod_shared_params:
     auth_file: "{{ params.env_params.auth_file }}"
     rproxy_services:
       - name: "rproxy"
-        location_info_list:
+        locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
@@ -630,7 +661,7 @@ pod_shared_params:
   main_hub:
     rproxy_services:
       - name: "rproxy"
-        location_info_list:
+        locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
@@ -653,7 +684,7 @@ pod_shared_params:
   main_external_hub:
     rproxy_services:
       - name: "rproxy"
-        location_info_list:
+        locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
@@ -700,7 +731,7 @@ pod_shared_params:
     use_pod_full_prefix: false
     rproxy_services:
       - name: "rproxy"
-        location_info_list:
+        locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
@@ -709,7 +740,7 @@ pod_shared_params:
     use_theia: "{{ params.env_params.use_theia }}"
     rproxy_services:
       - name: "rproxy"
-        location_info_list:
+        locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
@@ -749,7 +780,7 @@ pod_shared_params:
   main_replicas_hub:
     rproxy_services:
       - name: "rproxy"
-        location_info_list:
+        locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
