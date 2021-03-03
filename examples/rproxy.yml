@@ -188,6 +188,7 @@ main:
     nodes:
       - name: "app"
         key: "rproxy_external_hub"
+        can_destroy: true
         pods:
           rproxy:
             shared_params: ["main_replicas_hub"]
@@ -208,6 +209,7 @@ main:
             required_amount: 1
       - name: "replica"
         key: "rproxy_web"
+        can_destroy: true
         amount: 3
         pods:
           rproxy:
