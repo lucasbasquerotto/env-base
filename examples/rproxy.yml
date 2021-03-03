@@ -181,6 +181,10 @@ main:
             task_target: "pod"
   remote_replicas:
     extend_cloud: true
+    initial_services:
+      - "{{ params.env_params.vpn_service }}"
+      - name: "s3_buckets"
+        can_destroy: true
     nodes:
       - name: "app"
         key: "rproxy_external_hub"
