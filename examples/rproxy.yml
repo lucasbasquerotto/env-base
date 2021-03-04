@@ -399,7 +399,10 @@ nodes:
       host: "localhost"
     pods:
       - name: "rproxy"
-        shared_params: ["main", "local"]
+        shared_params:
+          - "main"
+          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "local"
   rproxy_hub_local:
     credentials:
       host: "localhost"
@@ -570,6 +573,7 @@ pods:
       backup_bucket: "s3"
       backup_replica_bucket: "s3_replica"
     params:
+      rproxy_type: "{{ params.env_params.rproxy_type | default('nginx') }}"
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
@@ -635,6 +639,7 @@ pod_shared_params:
     use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
     use_certbot: "{{ params.env_params.use_certbot }}"
     auth_file: "{{ params.env_params.auth_file }}"
+  main_nginx:
     rproxy_services:
       - name: "rproxy"
         locations:
@@ -651,6 +656,19 @@ pod_shared_params:
         when: "{{ params.env_params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
+  main_haproxy:
+    rproxy_services:
+      - name: "rproxy"
+        endpoint: "http://nginx"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        # private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        # private: true
   local:
     local: true
     enable_logs_setup: false
