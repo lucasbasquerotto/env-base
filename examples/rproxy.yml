@@ -408,7 +408,12 @@ nodes:
     pods:
       - name: "rproxy_hub"
         key: "rproxy"
-        shared_params: ["main", "local", "hub_item", "main_hub"]
+        shared_params:
+          - "main"
+          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "local"
+          - "hub_item"
+          - "main_hub"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["local", "hub_item", "hub_web", "local_web_1"]
@@ -424,7 +429,12 @@ nodes:
     pods:
       - name: "rproxy_replicas_hub"
         key: "rproxy"
-        shared_params: ["main", "local", "hub_item", "main_replicas_hub"]
+        shared_params:
+          - "main"
+          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "local"
+          - "hub_item"
+          - "main_replicas_hub"
   rproxy_replica_1_local:
     service: "local_node"
     base_dir: "/var/cloud"
@@ -469,7 +479,10 @@ nodes:
     shared_params: ["remote"]
     pods:
       - name: "rproxy"
-        shared_params: ["main"]
+        shared_params:
+          - "main"
+          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "local"
   rproxy_hub:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -488,7 +501,11 @@ nodes:
     pods:
       - name: "rproxy_hub"
         key: "rproxy"
-        shared_params: ["main", "hub_item", "main_hub"]
+        shared_params:
+          - "main"
+          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "hub_item"
+          - "main_hub"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["hub_item", "hub_web", "remote_web_1"]
@@ -515,7 +532,10 @@ nodes:
     shared_params: ["remote"]
     pods:
       - name: "rproxy"
-        shared_params: ["main", "main_external_hub"]
+        shared_params:
+          - "main"
+          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_external_hub"]
   rproxy_web:
     service:
       name: "{{ params.env_params.node_service }}"
