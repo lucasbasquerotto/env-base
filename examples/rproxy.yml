@@ -535,7 +535,7 @@ nodes:
         shared_params:
           - "main"
           - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
-          - "main_external_hub"]
+          - "main_external_hub"
   rproxy_web:
     service:
       name: "{{ params.env_params.node_service }}"
