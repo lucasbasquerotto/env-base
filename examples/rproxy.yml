@@ -482,7 +482,6 @@ nodes:
         shared_params:
           - "main"
           - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
-          - "local"
   rproxy_hub:
     service:
       name: "{{ params.env_params.node_service }}"
