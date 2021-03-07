@@ -374,11 +374,10 @@ services:
     credentials:
       node: "linode"
     params:
-      image: "ubuntu-18-04-x64"
-      region: "ams3"
-      type: "s-2vcpu-2gb"
+      image: "linode/ubuntu18.04"
+      region: "us-east"
+      type: "g6-standard-1"
     contents:
-      authorized_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
       user_data:
         type: "template"
         origin: "cloud"
@@ -392,7 +391,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: ""
+          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
 nodes:
   rproxy_local:
     credentials:
