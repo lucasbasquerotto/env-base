@@ -590,6 +590,8 @@ pods:
       minio_gateway: "minio_gateway"
       backup_bucket: "s3"
       backup_replica_bucket: "s3_replica"
+    contents:
+      auth_content: "{{ params.env_params.auth_content | default('') }}"
     params:
       rproxy_type: "{{ params.env_params.rproxy_type | default('nginx') }}"
       orchestration: "docker_compose"
@@ -623,7 +625,7 @@ pods:
         minio_gateway_image: "minio/minio"
         minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
         toolbox_image: "lucasbasquerotto/image"
-        toolbox_version: "toolbox-20200715-02"
+        toolbox_version: "toolbox-20210309-02"
         certbot_image: "certbot/certbot"
         certbot_version: "v1.2.0"
         awscli_image: "lucasbasquerotto/aws-cli"
@@ -676,17 +678,17 @@ pod_shared_params:
         private: true
   main_haproxy:
     rproxy_services:
-      - name: "rproxy"
-        endpoint: "http://nginx"
+      # - name: "rproxy"
+      #   endpoint: "http://nginx"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
-        # private: true
-      - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        endpoint: "http://minio_gateway:9000"
-        # private: true
+        private: true
+      # - name: "minio_gateway"
+      #   when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+      #   endpoint: "http://minio_gateway:9000"
+      #   private: true
   local:
     local: true
     enable_logs_setup: false
