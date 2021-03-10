@@ -615,7 +615,7 @@ pods:
       services:
         haproxy:
           conf:
-            ssl: "{{ params.env_params.use_ssl | default(false) }}"
+            ssl: "{{ params.env_params.ssl | default(false) }}"
             webservice_endpoint: "http://nginx"
             basic_auth_data_content: "auth_content"
         fluentd:
