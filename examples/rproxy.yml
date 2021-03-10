@@ -685,6 +685,13 @@ pod_shared_params:
     rproxy_services:
       - name: "rproxy"
         endpoint: "http://nginx"
+        frontend_data: |-
+          acl is_rate_limit_path_rproxy    path /
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+        locations:
+          - location: "path_beg /"
+            data: "timeout queue 5s"
+            server_args: "check maxconn 3"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
