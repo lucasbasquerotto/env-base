@@ -613,6 +613,11 @@ pods:
         staging: "{{ params.env_params.certbot_staging | default(false) }}"
         force: "{{ params.env_params.certbot_force | default(false) }}"
       services:
+        haproxy:
+          conf:
+            ssl: "{{ params.env_params.use_ssl | default(false) }}"
+            webservice_endpoint: "http://nginx"
+            basic_auth_data_content: "auth_content"
         fluentd:
           port: "24224"
       images:
@@ -678,17 +683,18 @@ pod_shared_params:
         private: true
   main_haproxy:
     rproxy_services:
-      # - name: "rproxy"
-      #   endpoint: "http://nginx"
+      - name: "rproxy"
+        endpoint: "http://nginx"
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
-      # - name: "minio_gateway"
-      #   when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-      #   endpoint: "http://minio_gateway:9000"
-      #   private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
   local:
     local: true
     enable_logs_setup: false
