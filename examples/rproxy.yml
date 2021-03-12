@@ -191,7 +191,7 @@ main:
         can_destroy: true
         pods:
           rproxy:
-            shared_params: ["main_replicas_hub"]
+            shared_params: ["main_replicas_hub_{{ params.env_params.rproxy_type | default('nginx') }}"]
         dependencies:
           replica:
             type: "node"
@@ -410,10 +410,9 @@ nodes:
         key: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
           - "local"
           - "hub_item"
-          - "main_hub"
+          - "main_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["local", "hub_item", "hub_web", "local_web_1"]
@@ -431,10 +430,9 @@ nodes:
         key: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
           - "local"
           - "hub_item"
-          - "main_replicas_hub"
+          - "main_replicas_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
   rproxy_replica_1_local:
     service: "local_node"
     base_dir: "/var/cloud"
@@ -502,9 +500,8 @@ nodes:
         key: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
           - "hub_item"
-          - "main_hub"
+          - "main_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["hub_item", "hub_web", "remote_web_1"]
@@ -533,8 +530,7 @@ nodes:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
-          - "main_external_hub"
+          - "main_external_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
   rproxy_web:
     service:
       name: "{{ params.env_params.node_service }}"
@@ -665,44 +661,6 @@ pod_shared_params:
     use_certbot: "{{ params.env_params.use_certbot }}"
     block_ips: "{{ params.env_params.block_ips }}"
     auth_file: "{{ params.env_params.auth_file }}"
-  main_nginx:
-    rproxy_services:
-      - name: "rproxy"
-        locations:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
-      - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        endpoint: "http://theia:3000"
-        upgrade: true
-        private: true
-      - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        endpoint: "http://minio_gateway:9000"
-        private: true
-  main_haproxy:
-    rproxy_services:
-      - name: "rproxy"
-        endpoint: "http://nginx"
-        frontend_data: |-
-          acl is_rate_limit_path_rproxy    path /
-          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
-        locations:
-          - location: "path_beg /"
-            data: "timeout queue 5s"
-            server_args: "check maxconn 3"
-      - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        endpoint: "http://theia:3000"
-        upgrade: true
-        private: true
-      - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        endpoint: "http://minio_gateway:9000"
-        private: true
-        use_basic_auth: false
   local:
     local: true
     enable_logs_setup: false
@@ -712,73 +670,6 @@ pod_shared_params:
     domains: "{{ params.env_params.local_domains | default({}) }}"
   hub_item:
     shared_network: "rproxy-hub-network"
-  main_hub:
-    rproxy_services:
-      - name: "rproxy"
-        locations:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
-      - name: "rproxy_web_1"
-        endpoint: "http://rproxy_web_1-main-nginx"
-      - name: "rproxy_web_2"
-        endpoint: "http://rproxy_web_2-main-nginx"
-      - name: "rproxy_web_3"
-        endpoint: "http://rproxy_web_3-main-nginx"
-      - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        endpoint: "http://theia:3000"
-        upgrade: true
-        private: true
-      - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        endpoint: "http://minio_gateway:9000"
-        private: true
-  main_external_hub:
-    rproxy_services:
-      - name: "rproxy"
-        locations:
-          - location: "= /nginx/basic_status"
-            data: "stub_status;"
-          - location: "/"
-            data: "root /var/www;"
-      - name: "rproxy_web_1"
-        proxy: true
-      - name: "rproxy_web_1_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        dependency_name: "rproxy_web_1_private"
-        proxy: true
-        upgrade: true
-        private: true
-        use_basic_auth: false
-      - name: "rproxy_web_2"
-        proxy: true
-      - name: "rproxy_web_2_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        dependency_name: "rproxy_web_2_private"
-        proxy: true
-        upgrade: true
-        private: true
-        use_basic_auth: false
-      - name: "rproxy_web_3"
-        proxy: true
-      - name: "rproxy_web_3_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        dependency_name: "rproxy_web_3_private"
-        proxy: true
-        upgrade: true
-        private: true
-        use_basic_auth: false
-      - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
-        endpoint: "http://theia:3000"
-        upgrade: true
-        private: true
-      - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
-        endpoint: "http://minio_gateway:9000"
-        private: true
   hub_web:
     internal: true
     use_pod_prefix: true
@@ -832,7 +723,198 @@ pod_shared_params:
     domains:
       rproxy: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
       theia: "{{ params.env_params.domains.rproxy_web_3_theia | default('') }}"
-  main_replicas_hub:
+  local_replica:
+    main_domain: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
+  remote_replica:
+    main_domain: "{{ params.env_params.domains.rproxy_replica | default('') }}"
+    domains:
+      rproxy: "{{ params.env_params.domains.rproxy_replica | default('') }}"
+      theia: "{{ params.env_params.domains.rproxy_replica_theia | default('') }}"
+  main_nginx:
+    rproxy_services:
+      - name: "rproxy"
+        locations:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+  main_haproxy:
+    rproxy_services:
+      - name: "rproxy"
+        endpoint: "http://nginx"
+        frontend_data: |-
+          acl is_rate_limit_path_rproxy    path /
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+        locations:
+          - location: "path_beg /"
+            data: "timeout queue 5s"
+            server_args: "check maxconn 3"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
+  main_hub_nginx:
+    rproxy_services:
+      - name: "rproxy"
+        locations:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "rproxy_web_1"
+        endpoint: "http://rproxy_web_1-main-nginx"
+      - name: "rproxy_web_2"
+        endpoint: "http://rproxy_web_2-main-nginx"
+      - name: "rproxy_web_3"
+        endpoint: "http://rproxy_web_3-main-nginx"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
+  main_hub_haproxy:
+    rproxy_services:
+      - name: "rproxy"
+        endpoint: "http://nginx"
+        frontend_data: |-
+          acl is_rate_limit_path_rproxy    path /
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+        locations:
+          - location: "path_beg /"
+            data: "timeout queue 5s"
+            server_args: "check maxconn 3"
+      - name: "rproxy_web_1"
+        endpoint: "http://rproxy_web_1-main-nginx"
+      - name: "rproxy_web_2"
+        endpoint: "http://rproxy_web_2-main-nginx"
+      - name: "rproxy_web_3"
+        endpoint: "http://rproxy_web_3-main-nginx"
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
+  main_external_hub_nginx:
+    rproxy_services:
+      - name: "rproxy"
+        locations:
+          - location: "= /nginx/basic_status"
+            data: "stub_status;"
+          - location: "/"
+            data: "root /var/www;"
+      - name: "rproxy_web_1"
+        proxy: true
+      - name: "rproxy_web_1_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_1_private"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "rproxy_web_2"
+        proxy: true
+      - name: "rproxy_web_2_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_2_private"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "rproxy_web_3"
+        proxy: true
+      - name: "rproxy_web_3_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_3_private"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
+  main_external_hub_haproxy:
+    rproxy_services:
+      - name: "rproxy"
+        endpoint: "http://nginx"
+        frontend_data: |-
+          acl is_rate_limit_path_rproxy    path /
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+        locations:
+          - location: "path_beg /"
+            data: "timeout queue 5s"
+            server_args: "check maxconn 3"
+      - name: "rproxy_web_1"
+        proxy: true
+      - name: "rproxy_web_1_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_1_private"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "rproxy_web_2"
+        proxy: true
+      - name: "rproxy_web_2_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_2_private"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "rproxy_web_3"
+        proxy: true
+      - name: "rproxy_web_3_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "rproxy_web_3_private"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
+  main_replicas_hub_nginx:
     rproxy_services:
       - name: "rproxy"
         locations:
@@ -862,15 +944,39 @@ pod_shared_params:
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
-  local_replica:
-    main_domain: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
-    domains:
-      rproxy: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
-  remote_replica:
-    main_domain: "{{ params.env_params.domains.rproxy_replica | default('') }}"
-    domains:
-      rproxy: "{{ params.env_params.domains.rproxy_replica | default('') }}"
-      theia: "{{ params.env_params.domains.rproxy_replica_theia | default('') }}"
+  main_replicas_hub_haproxy:
+    rproxy_services:
+      - name: "rproxy"
+        endpoint: "http://nginx"
+        frontend_data: |-
+          acl is_rate_limit_path_rproxy    path /
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+        locations:
+          - location: "path_beg /"
+            data: "timeout queue 5s"
+            server_args: "check maxconn 3"
+      - name: "rproxy_replica"
+        dependency_name: "replica"
+        proxy: true
+      - name: "rproxy_replica_theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        dependency_name: "replica_private"
+        upstream_data: "least_conn;"
+        proxy: true
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "theia"
+        when: "{{ params.env_params.use_theia | default(false) }}"
+        endpoint: "http://theia:3000"
+        upgrade: true
+        private: true
+        use_basic_auth: false
+      - name: "minio_gateway"
+        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        endpoint: "http://minio_gateway:9000"
+        private: true
+        use_basic_auth: false
 tasks:
   docker_compose_install:
     type: "task"
