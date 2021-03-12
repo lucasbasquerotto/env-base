@@ -674,6 +674,7 @@ pod_shared_params:
     internal: true
     use_pod_prefix: true
     use_pod_full_prefix: false
+    rproxy_type: "nginx"
     rproxy_services:
       - name: "rproxy"
         locations:
@@ -682,6 +683,7 @@ pod_shared_params:
           - location: "/"
             data: "root /var/www;"
   external_hub_web:
+    rproxy_type: "nginx"
     use_theia: "{{ params.env_params.use_theia }}"
     auth_file: "{{ params.env_params.auth_file }}"
     rproxy_services:
@@ -762,10 +764,10 @@ pod_shared_params:
             server_args: "check maxconn 3"
       - name: "private"
         frontend_data: |-
-          stats enable
-          stats uri /stats
-          stats refresh 10s
-          stats admin if { always_true }
+          stats enable if is_domain_private
+          stats uri /stats if is_domain_private
+          stats refresh 60s if is_domain_private
+          stats admin if is_domain_private
         private: true
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
@@ -812,6 +814,13 @@ pod_shared_params:
           - location: "path_beg /"
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
+      - name: "private"
+        frontend_data: |-
+          stats enable if is_domain_private
+          stats uri /stats if is_domain_private
+          stats refresh 60s if is_domain_private
+          stats admin if is_domain_private
+        private: true
       - name: "rproxy_web_1"
         endpoint: "http://rproxy_web_1-main-nginx"
       - name: "rproxy_web_2"
@@ -884,6 +893,13 @@ pod_shared_params:
           - location: "path_beg /"
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
+      - name: "private"
+        frontend_data: |-
+          stats enable if is_domain_private
+          stats uri /stats if is_domain_private
+          stats refresh 60s if is_domain_private
+          stats admin if is_domain_private
+        private: true
       - name: "rproxy_web_1"
         proxy: true
       - name: "rproxy_web_1_theia"
@@ -962,6 +978,13 @@ pod_shared_params:
           - location: "path_beg /"
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
+      - name: "private"
+        frontend_data: |-
+          stats enable if is_domain_private
+          stats uri /stats if is_domain_private
+          stats refresh 60s if is_domain_private
+          stats admin if is_domain_private
+        private: true
       - name: "rproxy_replica"
         dependency_name: "replica"
         proxy: true
