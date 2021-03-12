@@ -693,6 +693,13 @@ pod_shared_params:
           - location: "path_beg /"
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
+      - name: "private"
+        frontend_data: |-
+          stats enable
+          stats uri /stats
+          stats refresh 10s
+          stats admin if { always_true }
+        private: true
       - name: "theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
