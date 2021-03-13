@@ -118,31 +118,37 @@ main:
         dependencies:
           rproxy_web_1:
             type: "node"
+            node_ip_type: "ipv4"
             host: "web1"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
           rproxy_web_1_private:
             type: "node"
+            node_ip_type: "ipv4"
             host: "web1"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
           rproxy_web_2:
             type: "node"
+            node_ip_type: "ipv4"
             host: "web2"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
           rproxy_web_2_private:
             type: "node"
+            node_ip_type: "ipv4"
             host: "web2"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
           rproxy_web_3:
             type: "node"
+            node_ip_type: "ipv4"
             host: "web3"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
           rproxy_web_3_private:
             type: "node"
+            node_ip_type: "ipv4"
             host: "web3"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
@@ -191,10 +197,14 @@ main:
         can_destroy: true
         pods:
           rproxy:
-            shared_params: ["main_replicas_hub_{{ params.env_params.rproxy_type | default('nginx') }}"]
+            shared_params:
+              [
+                "main_replicas_hub_{{ params.env_params.rproxy_type | default('nginx') }}",
+              ]
         dependencies:
           replica:
             type: "node"
+            node_ip_type: "ipv4"
             host: "replica"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(443, 80) }}"
@@ -202,6 +212,7 @@ main:
             required_amount: 1
           replica_private:
             type: "node"
+            node_ip_type: "ipv4"
             host: "replica"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
