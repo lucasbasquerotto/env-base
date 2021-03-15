@@ -115,6 +115,11 @@ main:
       - name: "app"
         key: "rproxy_external_hub"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-dmz"
         dependencies:
           rproxy_web_1:
             type: "node"
@@ -155,18 +160,33 @@ main:
       - name: "web1"
         key: "rproxy_web"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-web"
         pods:
           rproxy:
             shared_params: ["remote_web_1"]
       - name: "web2"
         key: "rproxy_web"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-web"
         pods:
           rproxy:
             shared_params: ["remote_web_2"]
       - name: "web3"
         key: "rproxy_web"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-web"
         pods:
           rproxy:
             shared_params: ["remote_web_3"]
@@ -195,6 +215,11 @@ main:
       - name: "app"
         key: "rproxy_external_hub"
         can_destroy: true
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-dmz"
         pods:
           rproxy:
             shared_params:
@@ -222,6 +247,11 @@ main:
         key: "rproxy_web"
         can_destroy: true
         amount: 3
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-web"
         pods:
           rproxy:
             shared_params: ["remote_replica"]
