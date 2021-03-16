@@ -376,6 +376,8 @@ pods:
       block_ips: "{{ params.env_params.block_ips }}"
       auth_file: "{{ params.env_params.auth_file }}"
       s3_cli: "{{ params.env_params.s3_cli }}"
+      define_s3_backup_lifecycle: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
+      s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
       backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
       uploads_bucket_name: "{{ params.env_params.uploads_bucket_name }}"
@@ -450,6 +452,24 @@ pods:
         ternary('uploads_setup_file', 'uploads_setup_s3')
         }}
       uploads_backup: "uploads_backup_sync"
+    transfer:
+      - dest: "env/{{ params.env_params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
+        when: "{{ params.env_params.define_s3_backup_lifecycle | default(false) | bool }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/s3/s3_lifecycle.json.j2"
+          schema: "ext-cloud/files/s3/s3_lifecycle.schema.yml"
+          params:
+            rules:
+              - name: "logs-expiration"
+                filter_prefix: "logs/"
+                expiration_days: 30
+                older_versions_expiration_days: 180
+              - name: "db-expiration"
+                filter_prefix: "db/"
+                expiration_days: 15
+                older_versions_expiration_days: 90
 pod_group_params:
   memory_app:
     nginx: 512mb

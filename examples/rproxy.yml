@@ -687,6 +687,32 @@ pods:
         fluentd: 256mb
         s3_cli: 512mb
     transfer:
+      - dest: "env/{{ params.env_params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
+        when: "{{ params.env_params.define_s3_backup_lifecycle | default(false) | bool }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/s3/s3_lifecycle.json.j2"
+          schema: "ext-cloud/files/s3/s3_lifecycle.schema.yml"
+          params:
+            rules:
+              - name: "old-pictures"
+                filter_prefix: "old/"
+                expiration_days: 180
+              - name: "temp-uploads"
+                filter_prefix: "temp/"
+                expiration_days: 7
+              - name: "removing-all-old-versions"
+                filter_prefix: "users-uploads/"
+                older_versions_expiration_days: 365
+              - name: "not-to-be-included"
+                filter_prefix: "wrong/"
+                when: false
+              - name: "disabled-rule"
+                filter_prefix: "disabled/"
+                enabled: false
+              - name: "removing-all-delete-markers"
+                remove_delete_markers: true
       - dest: "env/nginx/www/index.html"
         src:
           type: "template"
@@ -704,6 +730,8 @@ pod_shared_params:
     use_certbot: "{{ params.env_params.use_certbot }}"
     block_ips: "{{ params.env_params.block_ips }}"
     auth_file: "{{ params.env_params.auth_file }}"
+    define_s3_backup_lifecycle: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
+    s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
   local:
     local: true
     enable_logs_setup: false
