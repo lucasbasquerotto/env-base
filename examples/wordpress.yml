@@ -473,7 +473,7 @@ pods:
         awscli_image: "lucasbasquerotto/aws-cli"
         awscli_version: "1.0.0"
         mc_image: "minio/mc"
-        mc_version: "RELEASE.2020-08-08T02-33-58Z"
+        mc_version: "RELEASE.2021-03-12T03-36-59Z"
         rclone_image: "rclone/rclone"
         rclone_version: "1.53.0"
         logrotator_image: "python"
