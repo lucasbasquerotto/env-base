@@ -1032,7 +1032,6 @@ pod_shared_params:
       - name: "rproxy_replica_theia"
         when: "{{ params.env_params.use_theia | default(false) }}"
         dependency_name: "replica_private"
-        upstream_data: "least_conn;"
         proxy: true
         upgrade: true
         private: true
