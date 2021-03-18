@@ -599,6 +599,7 @@ node_shared_params:
         setup_finished_timeout: 300
     cron:
       - dest: "/var/spool/cron/crontabs/root"
+        when: "{{ params.env_params.define_cron | default(false) }}"
         user: "root"
         src:
           type: "template"
@@ -700,33 +701,6 @@ pods:
         fluentd: 256mb
         s3_cli: 512mb
     transfer:
-      - dest: "env/cron/cron-file"
-        when: "{{ params.env_params.define_cron | default(false) }}"
-        src:
-          type: "template"
-          origin: "cloud"
-          file: "ext-cloud/files/cron/pod.tpl.sh"
-          schema: "ext-cloud/files/cron/pod.schema.yml"
-          params:
-            tasks:
-              - name: "create_actions_main"
-                task: "shared:create_actions:main"
-                cron: "*/1 * * * *"
-              - name: "create_actions_log"
-                task: "shared:create_actions:log"
-                cron: "*/5 * * * *"
-              - name: "create_actions_frequent"
-                task: "shared:create_actions block_ips"
-                cron: "*/15 * * * *"
-              - name: "create_actions_full_log"
-                task: "shared:create_actions logrotate log_summary"
-                cron: "* */1 * * *"
-              - name: "create_actions_backup"
-                task: "shared:create_actions backup"
-                cron: "*/5 * * * *"
-              - name: "create_actions_replicate_s3"
-                task: "shared:create_actions replicate_s3"
-                cron: "*/10 * * * *"
       - dest: "env/{{ params.env_params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
         when: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
         src:
@@ -774,9 +748,6 @@ pod_shared_params:
     auth_file: "{{ params.env_params.auth_file }}"
     define_s3_backup_lifecycle: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
     s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
-    define_cron: "{{ params.env_params.define_cron | default(false) }}"
-    cron_src: "env/cron/cron-file"
-    cron_dest: "/var/spool/cron/crontabs/root"
   local:
     local: true
     enable_logs_setup: false
