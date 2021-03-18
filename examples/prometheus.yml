@@ -311,34 +311,6 @@ nodes:
           setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 90
           setup_finished_timeout: 300
-      cron:
-        - dest: "/var/spool/cron/crontabs/root"
-          user: "root"
-          src:
-            type: "template"
-            origin: "cloud"
-            file: "ext-cloud/files/cron/pod.tpl.sh"
-            schema: "ext-cloud/files/cron/pod.schema.yml"
-            params:
-              tasks:
-                - name: "create_actions_main"
-                  task: "shared:create_actions:main"
-                  cron: "*/1 * * * *"
-                - name: "create_actions_log"
-                  task: "shared:create_actions:log"
-                  cron: "*/5 * * * *"
-                - name: "create_actions_frequent"
-                  task: "shared:create_actions block_ips"
-                  cron: "*/15 * * * *"
-                - name: "create_actions_full_log"
-                  task: "shared:create_actions logrotate log_summary"
-                  cron: "* */1 * * *"
-                - name: "create_actions_backup"
-                  task: "shared:create_actions backup"
-                  cron: "*/5 * * * *"
-                - name: "create_actions_replicate_s3"
-                  task: "shared:create_actions replicate_s3"
-                  cron: "*/10 * * * *"
     pods:
       - name: "prometheus"
         params:
@@ -386,6 +358,9 @@ pods:
       s3_cli: "{{ params.env_params.s3_cli }}"
       define_s3_backup_lifecycle: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
+      define_cron: "{{ params.env_params.define_cron | default(false) }}"
+      cron_src: "env/cron/cron-file"
+      cron_dest: "/var/spool/cron/crontabs/root"
       backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
       backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name }}"
@@ -447,6 +422,33 @@ pods:
         }}
       db_backup: "db_backup_sync"
     transfer:
+      - dest: "env/cron/cron-file"
+        when: "{{ params.env_params.define_cron | default(false) }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/cron/pod.tpl.sh"
+          schema: "ext-cloud/files/cron/pod.schema.yml"
+          params:
+            tasks:
+              - name: "create_actions_main"
+                task: "shared:create_actions:main"
+                cron: "*/1 * * * *"
+              - name: "create_actions_log"
+                task: "shared:create_actions:log"
+                cron: "*/5 * * * *"
+              - name: "create_actions_frequent"
+                task: "shared:create_actions block_ips"
+                cron: "*/15 * * * *"
+              - name: "create_actions_full_log"
+                task: "shared:create_actions logrotate log_summary"
+                cron: "* */1 * * *"
+              - name: "create_actions_backup"
+                task: "shared:create_actions backup"
+                cron: "*/5 * * * *"
+              - name: "create_actions_replicate_s3"
+                task: "shared:create_actions replicate_s3"
+                cron: "*/10 * * * *"
       - dest: "env/{{ params.env_params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
         when: "{{ params.env_params.define_s3_backup_lifecycle | default(false) | bool }}"
         src:
