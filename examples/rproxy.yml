@@ -723,10 +723,11 @@ pods:
                 when: false
               - name: "disabled-rule"
                 filter_prefix: "disabled/"
-                expiration_days: 0
+                expiration_days: 1
                 enabled: false
               - name: "removing-all-delete-markers"
                 remove_delete_markers: true
+                when: false
       - dest: "env/nginx/www/index.html"
         src:
           type: "template"
