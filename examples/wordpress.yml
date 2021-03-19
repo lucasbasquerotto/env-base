@@ -465,6 +465,8 @@ pods:
         mc_image: "minio/mc"
         mc_version: "RELEASE.2021-03-12T03-36-59Z"
         rclone_image: "rclone/rclone"
+        rclone_version: "1.54.0"
+        rclone_image: "rclone/rclone"
         rclone_version: "1.53.0"
         logrotator_image: "python"
         logrotator_version: "3.8.4-buster"

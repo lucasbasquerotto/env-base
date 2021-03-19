@@ -410,6 +410,8 @@ pods:
         awscli_version: "1.0.0"
         mc_image: "minio/mc"
         mc_version: "RELEASE.2021-03-12T03-36-59Z"
+        rclone_image: "rclone/rclone"
+        rclone_version: "1.54.0"
         logrotator_image: "python"
         logrotator_version: "3.8.4-buster"
         fluentd_image: "lucasbasquerotto/image"
