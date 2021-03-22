@@ -393,19 +393,8 @@ services:
       size_id: "s-2vcpu-2gb"
     contents:
       user_data:
-        type: "template"
-        origin: "cloud"
-        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
-        params:
-          user_directories: ["/var/cloud"]
-          install_docker: true
-          install_podman: false
-          install_packages: false
-        credentials:
-          node: "host"
-        contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+        type: "env"
+        name: "user_data_ubuntu"
   linode:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -420,19 +409,8 @@ services:
       type: "g6-standard-1"
     contents:
       user_data:
-        type: "template"
-        origin: "cloud"
-        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
-        params:
-          user_directories: ["/var/cloud"]
-          install_docker: true
-          install_podman: false
-          install_packages: false
-        credentials:
-          node: "host"
-        contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+        type: "env"
+        name: "user_data_ubuntu"
 nodes:
   rproxy_local:
     credentials:
@@ -1112,6 +1090,21 @@ tasks:
     type: "shell"
     root: true
     cmd: "./run upgrade"
+contents:
+  user_data_ubuntu:
+    type: "template"
+    origin: "cloud"
+    file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+    schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+    params:
+      user_directories: ["/var/cloud"]
+      install_docker: true
+      install_podman: false
+      install_packages: true
+    credentials:
+      node: "host"
+    contents:
+      host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
