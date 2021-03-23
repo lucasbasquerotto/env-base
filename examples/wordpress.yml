@@ -293,8 +293,8 @@ nodes:
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
           migrate_new_domain_host: >-
-            {{ params.env_params.ssl | bool | ternary('https', 'http')
-            }}://localhost:{{ params.env_params.ssl | bool | ternary(8443, 8080) }}/
+            {{ params.env_params.use_ssl | bool | ternary('https', 'http')
+            }}://localhost:{{ params.env_params.use_ssl | bool | ternary(8443, 8080) }}/
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
@@ -367,7 +367,7 @@ pods:
       wp_env: "staging"
       app_dev: "{{ params.env_params.app_dev | default(false) }}"
       app_repo_dir: "app-wp"
-      use_ssl: "{{ params.env_params.ssl | default(false) }}"
+      use_ssl: "{{ params.env_params.use_ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
       use_composer: "{{ params.env_params.use_composer | default(false) }}"
@@ -381,6 +381,7 @@ pods:
       use_filestash: "{{ params.env_params.use_filestash | default(false) }}"
       use_fluentd: "{{ params.env_params.use_fluentd | default(false) }}"
       use_certbot: "{{ params.env_params.use_certbot | default(false) }}"
+      use_private_path: "{{ params.env_params.use_private_path | default(false) }}"
       block_ips: "{{ params.env_params.block_ips | default(false) }}"
       auth_file: "{{ params.env_params.auth_file | default('') }}"
       s3_cli: "{{ params.env_params.s3_cli | default('') }}"
