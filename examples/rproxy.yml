@@ -24,7 +24,7 @@ main:
   cloud:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
   local:
     extend_cloud: true
     nodes:
@@ -69,7 +69,7 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -87,7 +87,7 @@ main:
   remote_hub:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -108,7 +108,7 @@ main:
   remote_external_hub:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -208,7 +208,7 @@ main:
   remote_replicas:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -288,7 +288,7 @@ services:
       s3: "s3"
     params:
       list:
-        - bucket: "{{ params.env_params.backup_bucket_name }}"
+        - bucket: "{{ params.env_params.backup_bucket_name | default('') }}"
           permission: "private"
   node_dns_service:
     base_dir: "ext-cloud"
@@ -312,9 +312,9 @@ services:
         params.env_params.dns_provider | default('')
       }}.validator.dns.yml
     credentials:
-      dns: "{{ params.env_params.dns_provider }}"
+      dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.main_domain }}"
+      zone: "{{ params.env_params.main_domain | default('') }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -334,11 +334,11 @@ services:
           inbound_rules:
             - ports: "9080"
               sources:
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
                 tags: ["rproxy-dmz"]
             - ports: "9443"
               sources:
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
                 tags: ["rproxy-dmz"]
         - name: "auto"
           tags: ["auto"]
@@ -346,7 +346,7 @@ services:
             - ports: "22"
               sources:
                 tags: ["main"]
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -481,7 +481,7 @@ nodes:
         shared_params: ["local", "hub_item", "hub_web", "local_replica"]
   rproxy:
     service:
-      name: "{{ params.env_params.node_service }}"
+      name: "{{ params.env_params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -501,7 +501,7 @@ nodes:
           - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
   rproxy_hub:
     service:
-      name: "{{ params.env_params.node_service }}"
+      name: "{{ params.env_params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -532,7 +532,7 @@ nodes:
         shared_params: ["hub_item", "hub_web", "remote_web_3"]
   rproxy_external_hub:
     service:
-      name: "{{ params.env_params.node_service }}"
+      name: "{{ params.env_params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -552,7 +552,7 @@ nodes:
           - "main_external_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
   rproxy_web:
     service:
-      name: "{{ params.env_params.node_service }}"
+      name: "{{ params.env_params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -626,16 +626,16 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
-      use_fluentd: "{{ params.env_params.use_fluentd }}"
-      s3_cli: "{{ params.env_params.s3_cli }}"
-      backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
+      use_fluentd: "{{ params.env_params.use_fluentd | default(false) }}"
+      s3_cli: "{{ params.env_params.s3_cli | default('') }}"
+      backup_bucket_name: "{{ params.env_params.backup_bucket_name | default('') }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
-      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name }}"
+      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name | default('') }}"
       backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
-      enable_logs_backup: true
-      enable_logs_setup: false
-      enable_sync_backup: true
-      enable_sync_setup: false
+      enable_logs_backup: "{{ params.env_params.enable_logs_backup | default(false) }}"
+      enable_logs_setup: "{{ params.env_params.enable_logs_setup | default(false) }}"
+      enable_sync_backup: "{{ params.env_params.enable_sync_backup | default(false) }}"
+      enable_sync_setup: "{{ params.env_params.enable_sync_setup | default(false) }}"
       enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
       certbot:
         email: "{{ params.env_params.certbot_email | default('') }}"
@@ -716,7 +716,7 @@ pods:
           file: "ext-cloud/demo/rproxy/sample.tpl.html"
 pod_shared_params:
   main:
-    main_domain: "{{ params.env_params.main_domain }}"
+    main_domain: "{{ params.env_params.main_domain | default('') }}"
     domains: "{{ params.env_params.domains | default({}) }}"
     use_ssl: "{{ params.env_params.ssl | default(false) }}"
     use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"

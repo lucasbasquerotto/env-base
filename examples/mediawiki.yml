@@ -23,7 +23,7 @@ main:
   cloud:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
   local:
     extend_cloud: true
     nodes:
@@ -33,7 +33,7 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -51,7 +51,7 @@ main:
   nodes:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
+      - "{{ params.env_params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -118,9 +118,9 @@ services:
       s3: "s3"
     params:
       list:
-        - bucket: "{{ params.env_params.backup_bucket_name }}"
+        - bucket: "{{ params.env_params.backup_bucket_name | default('') }}"
           permission: "private"
-        - bucket: "{{ params.env_params.uploads_bucket_name }}"
+        - bucket: "{{ params.env_params.uploads_bucket_name | default('') }}"
           permission: "public-read"
   node_dns_service:
     base_dir: "ext-cloud"
@@ -144,9 +144,9 @@ services:
         params.env_params.dns_provider | default('')
       }}.validator.dns.yml
     credentials:
-      dns: "{{ params.env_params.dns_provider }}"
+      dns: "{{ params.env_params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.main_domain }}"
+      zone: "{{ params.env_params.main_domain | default('') }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -167,17 +167,17 @@ services:
           inbound_rules:
             - ports: "9080"
               sources:
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
             - ports: "9443"
               sources:
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
         - name: "auto"
           tags: ["auto"]
           inbound_rules:
             - ports: "22"
               sources:
                 tags: ["main"]
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.env_params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -272,7 +272,7 @@ nodes:
           uploads_backup: "uploads_backup_no_sync"
   mediawiki:
     service:
-      name: "{{ params.env_params.node_service }}"
+      name: "{{ params.env_params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -324,49 +324,50 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
-      main_domain: "{{ params.env_params.main_domain }}"
+      main_domain: "{{ params.env_params.main_domain | default('') }}"
       use_ssl: "{{ params.env_params.ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
-      use_varnish: "{{ params.env_params.use_varnish }}"
-      use_redis: "{{ params.env_params.use_redis }}"
-      use_memcached: "{{ params.env_params.use_memcached }}"
-      use_pma: "{{ params.env_params.use_pma }}"
-      use_adminer: "{{ params.env_params.use_adminer }}"
-      use_theia: "{{ params.env_params.use_theia }}"
-      use_minio_gateway: "{{ params.env_params.use_minio_gateway }}"
-      use_filestash: "{{ params.env_params.use_filestash }}"
-      use_fluentd: "{{ params.env_params.use_fluentd }}"
-      use_certbot: "{{ params.env_params.use_certbot }}"
-      block_ips: "{{ params.env_params.block_ips }}"
-      auth_file: "{{ params.env_params.auth_file }}"
-      mediawiki: "{{ params.env_params.mediawiki }}"
-      s3_cli: "{{ params.env_params.s3_cli }}"
+      use_varnish: "{{ params.env_params.use_varnish | default(false) }}"
+      use_redis: "{{ params.env_params.use_redis | default(false) }}"
+      use_memcached: "{{ params.env_params.use_memcached | default(false) }}"
+      use_pma: "{{ params.env_params.use_pma | default(false) }}"
+      use_adminer: "{{ params.env_params.use_adminer | default(false) }}"
+      use_theia: "{{ params.env_params.use_theia | default(false) }}"
+      use_minio_gateway: "{{ params.env_params.use_minio_gateway | default(false) }}"
+      use_filestash: "{{ params.env_params.use_filestash | default(false) }}"
+      use_s3: "{{ params.env_params.use_s3 | default(false) }}"
+      use_fluentd: "{{ params.env_params.use_fluentd | default(false) }}"
+      use_certbot: "{{ params.env_params.use_certbot | default(false) }}"
+      block_ips: "{{ params.env_params.block_ips | default(false) }}"
+      auth_file: "{{ params.env_params.auth_file | default('') }}"
+      mediawiki: "{{ params.env_params.mediawiki | default({}) }}"
+      s3_cli: "{{ params.env_params.s3_cli | default('') }}"
       define_s3_backup_lifecycle: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
       define_cron: "{{ params.env_params.define_cron | default(false) }}"
       include_cron_watch: "{{ params.env_params.include_cron_watch | default(false) }}"
       cron_src: "env/cron/cron-file"
       cron_dest: "/var/spool/cron/crontabs/root"
-      backup_bucket_name: "{{ params.env_params.backup_bucket_name }}"
+      backup_bucket_name: "{{ params.env_params.backup_bucket_name | default('') }}"
       backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
-      uploads_bucket_name: "{{ params.env_params.uploads_bucket_name }}"
+      uploads_bucket_name: "{{ params.env_params.uploads_bucket_name | default('') }}"
       uploads_bucket_path: "{{ params.env_params.uploads_bucket_path | default('') }}"
-      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name }}"
+      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name | default('') }}"
       backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
-      uploads_replica_bucket_name: "{{ params.env_params.uploads_replica_bucket_name }}"
+      uploads_replica_bucket_name: "{{ params.env_params.uploads_replica_bucket_name | default('') }}"
       uploads_replica_bucket_path: "{{ params.env_params.uploads_replica_bucket_path | default('') }}"
-      restore_db: "{{ params.env_params.restore_db }}"
-      db_gui_root_user: "{{ params.env_params.db_gui_root_user }}"
-      use_s3_storage: "{{ params.env_params.use_s3_storage }}"
-      enable_db_backup: true
-      enable_db_setup: true
-      enable_logs_backup: true
-      enable_logs_setup: true
-      enable_sync_backup: true
-      enable_sync_setup: true
-      enable_uploads_backup: true
-      enable_uploads_setup: true
+      restore_db: "{{ params.env_params.restore_db | default(false) }}"
+      db_gui_root_user: "{{ params.env_params.db_gui_root_user | default(false) }}"
+      use_s3_storage: "{{ params.env_params.use_s3_storage | default(false) }}"
+      enable_db_backup: "{{ params.env_params.enable_db_backup | default(false) }}"
+      enable_db_setup: "{{ params.env_params.enable_db_setup | default(false) }}"
+      enable_logs_backup: "{{ params.env_params.enable_logs_backup | default(false) }}"
+      enable_logs_setup: "{{ params.env_params.enable_logs_setup | default(false) }}"
+      enable_sync_backup: "{{ params.env_params.enable_sync_backup | default(false) }}"
+      enable_sync_setup: "{{ params.env_params.enable_sync_setup | default(false) }}"
+      enable_uploads_backup: "{{ params.env_params.enable_uploads_backup | default(false) }}"
+      enable_uploads_setup: "{{ params.env_params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.env_params.enable_uploads_replica | default(false) }}"
       certbot:
