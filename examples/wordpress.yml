@@ -353,11 +353,11 @@ pods:
     credentials:
       wordpress: "wordpress"
       mysql: "mysql"
-      minio_gateway: "minio_gateway"
-      backup_bucket: "s3"
-      uploads_bucket: "s3"
-      backup_replica_bucket: "s3_replica"
-      uploads_replica_bucket: "s3_replica"
+      minio_gateway: "{{ params.env_params.use_s3 | default(false) | bool | ternary('minio_gateway', '') }}"
+      backup_bucket: "{{ params.env_params.use_s3 | default(false) | bool | ternary('s3', '') }}"
+      uploads_bucket: "{{ params.env_params.use_s3 | default(false) | bool | ternary('s3', '') }}"
+      backup_replica_bucket: "{{ params.env_params.use_s3 | default(false) | bool | ternary('s3_replica', '') }}"
+      uploads_replica_bucket: "{{ params.env_params.use_s3 | default(false) | bool | ternary('s3_replica', '') }}"
     params:
       type: "app"
       orchestration: "docker_compose"
