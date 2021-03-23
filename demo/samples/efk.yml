@@ -6,7 +6,7 @@ env:
     version: "master"
   repo_dir: "env-base"
   file: "examples/efk.yml"
-env_params:
+params:
   private_ips: []
   cloud_name: "digital_ocean"
   domain: "lucasbasquerotto.com"
@@ -44,7 +44,7 @@ env_params:
   backup_replica_bucket_name: "lucasbasquerotto-efk-replica-backup"
   snapshot_name: "snapshot-20200813-230131"
   db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/efk/db/20200813_230132.zip?raw=true"
-  named_volumes: "{{ params.named_volumes | default(false) }}"
+  named_volumes: "{{ project_named_volumes | default(false) }}"
   local_custom_ssl:
     main_domain: "localhost"
     fullchain: "{{ params.env_dir }}/ssl/bundle.crt"

@@ -1,4 +1,4 @@
-name: "{{ params.name | default('repos') }}"
+name: "{{ project_name | default('repos') }}"
 ctxs: ["repos_ctx"]
 container: ""
 main:

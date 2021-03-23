@@ -4,10 +4,10 @@ schemas:
     type: "dict"
     lax: true
     props:
-      env_params:
+      params:
         non_empty: true
-        schema: "env_params"
-  env_params:
+        schema: "params"
+  params:
     type: "dict"
     lax: true
     props:

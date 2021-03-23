@@ -6,7 +6,7 @@ env:
     version: "master"
   repo_dir: "env-base"
   file: "examples/wordpress.yml"
-env_params:
+params:
   cloud_name: "digital_ocean"
   domain: "lucasbasquerotto.com"
   main_dns_name: "godaddy"
@@ -66,7 +66,7 @@ env_params:
   uploads_bucket_name: "lucasbasquerotto-wp-uploads"
   backup_replica_bucket_name: "lucasbasquerotto-wp-replica-backup"
   uploads_replica_bucket_name: "lucasbasquerotto-wp-replica-uploads"
-  named_volumes: "{{ params.named_volumes | default(false) }}"
+  named_volumes: "{{ project_named_volumes | default(false) }}"
   local_custom_ssl:
     main_domain: "localhost"
     fullchain: "{{ params.env_dir }}/ssl/bundle.crt"

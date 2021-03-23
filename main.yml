@@ -1,5 +1,5 @@
-name: "{{ params.name }}"
-ctxs: "{{ params.ctxs }}"
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
 meta:
   template_no_empty_lines: true
 main:
@@ -36,7 +36,7 @@ main:
       ctl
       [ctl]
     initial_services:
-      - "{{ params.env_params.vpn_service | default('') }}"
+      - "{{ params.vpn_service | default('') }}"
     nodes:
       - name: "ctl"
         key: "remote"
@@ -58,17 +58,17 @@ main:
         hosts:
           ctl:
             - name: "ctl-external-host"
-              ip: "{{ params.env_params.external_ip | default('') }}"
-              ipv4: "{{ params.env_params.external_ipv4 | default('') }}"
-              ipv6: "{{ params.env_params.external_ipv6 | default('') }}"
-              private_ip: "{{ params.env_params.external_private_ip | default('') }}"
+              ip: "{{ params.external_ip | default('') }}"
+              ipv4: "{{ params.external_ipv4 | default('') }}"
+              ipv6: "{{ params.external_ipv6 | default('') }}"
+              private_ip: "{{ params.external_private_ip | default('') }}"
             - name: "test-external-host"
               ip: "1.1.1.1"
               ipv4: "2.2.2.2"
               ipv6: "::2"
               private_ip: "3.3.3.3"
     initial_services:
-      - "{{ params.env_params.vpn_service | default('') }}"
+      - "{{ params.vpn_service | default('') }}"
     nodes:
       - name: "ctl"
         key: "remote"
@@ -91,7 +91,7 @@ services:
           inbound_rules:
             - ports: "22"
               sources:
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -133,12 +133,12 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
 nodes:
   local:
     pods: ["main"]
   remote:
-    service: "{{ params.env_params.node_service | default('') }}"
+    service: "{{ params.node_service | default('') }}"
     base_dir: "/var/cloud"
     root: true
     credentials:
@@ -189,5 +189,5 @@ repos:
     src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
 credentials:
-  host: "{{ params.credentials.host | default({}) }}"
-  digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
+  host: "{{ credentials.host | default({}) }}"
+  digital_ocean: "{{ credentials.digital_ocean | default({}) }}"

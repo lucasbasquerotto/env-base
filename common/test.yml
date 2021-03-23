@@ -1,8 +1,8 @@
-name: "{{ params.name | default('test') }}"
-ctxs: "{{ params.ctxs | default([]) }}"
+name: "{{ project_name | default('test') }}"
+ctxs: "{{ project_ctxs | default([]) }}"
 migration: ""
 container: ""
-original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.schema.yml"
+original_env_schema: "{{ env.repo_dir }}/test/schemas/original_env.schema.yml"
 meta:
   lax: true
   ignore_validators: false
@@ -199,12 +199,12 @@ main:
           - dest: "tmp/test/ef1.yml"
             src:
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/file1.yml"
           - dest: "tmp/test/etpl1.yml"
             src:
               type: "template"
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/template1.yml"
               params:
                 value1: "env_base_1_1"
                 value2: "env_base_1_2"
@@ -212,7 +212,7 @@ main:
             src:
               type: "template"
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/template2.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/template2.yml"
               params:
                 value1: "env_base_2_1"
                 value2: "env_base_2_2"
@@ -254,12 +254,12 @@ main:
           - dest: "tmp/test/ef2.yml"
             src:
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/file2.yml"
           - dest: "tmp/test/etpl1.yml"
             src:
               type: "template"
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/template1.yml"
               params:
                 value1: "ext_cloud_1"
                 value2: "ext_cloud_2"
@@ -297,7 +297,7 @@ main:
             src:
               type: "template"
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/template2.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/template2.yml"
               params:
                 value1: "pod_1"
                 value2: "pod_2"
@@ -311,11 +311,11 @@ main:
           - dest: "tmp/test/ef1.yml"
             src:
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/file1.yml"
           - dest: "tmp/test/ef2.yml"
             src:
               origin: "env"
-              file: "{{ params.env.repo_dir }}/test/extra-repos/file2.yml"
+              file: "{{ env.repo_dir }}/test/extra-repos/file2.yml"
         links:
           - repo: "env_base"
             src: "common/test.yml"
@@ -573,9 +573,9 @@ main:
       type: "template"
       file: "files/hosts.tpl.ini"
       schema: "files/hosts.schema.yml"
-    initial_services: "{{ params.env_params.node_initial_services | default([]) }}"
-    nodes: "{{ params.env_params.nodes | default([]) }}"
-    original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.node.schema.yml"
+    initial_services: "{{ params.node_initial_services | default([]) }}"
+    nodes: "{{ params.nodes | default([]) }}"
+    original_env_schema: "{{ env.repo_dir }}/test/schemas/original_env.node.schema.yml"
   nodes_run_stages:
     repo: "cloud"
     ext_repos:
@@ -589,7 +589,7 @@ main:
       type: "template"
       file: "files/hosts.tpl.ini"
       schema: "files/hosts.schema.yml"
-    initial_services: "{{ params.env_params.node_initial_services | default([]) }}"
+    initial_services: "{{ params.node_initial_services | default([]) }}"
     nodes:
       - name: "app"
         key: "digital_ocean_simple_node"
@@ -675,8 +675,8 @@ main:
       [main]
       localhost ansible_connection=local
       [host]
-    initial_services: "{{ params.env_params.services | default([]) }}"
-    original_env_schema: "{{ params.env.repo_dir }}/test/schemas/original_env.services.schema.yml"
+    initial_services: "{{ params.services | default([]) }}"
+    original_env_schema: "{{ env.repo_dir }}/test/schemas/original_env.services.schema.yml"
 services:
   digital_ocean_vpn:
     base_dir: "ext-cloud"
@@ -696,17 +696,17 @@ services:
           inbound_rules:
             - ports: "9080"
               sources:
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
             - ports: "9443"
               sources:
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
         - name: "auto"
           tags: ["auto"]
           inbound_rules:
             - ports: "22"
               sources:
                 tags: ["main", "auto"]
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -734,34 +734,34 @@ services:
     namespace: "ext_dns"
     task: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.main.dns.yml
     schema: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.schema.dns.yml
     validator: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.validator.dns.yml
     credentials:
-      dns: "{{ params.env_params.dns_provider | default('') }}"
+      dns: "{{ params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.domain | default('') }}"
+      zone: "{{ params.domain | default('') }}"
       dns_type: "A"
       list:
         - record: "dev"
-          value: "{{ params.env_params.dns_records | default([]) }}"
+          value: "{{ params.dns_records | default([]) }}"
         - record: "dev-2"
-          value: "{{ params.env_params.dns_records | default([]) }}"
+          value: "{{ params.dns_records | default([]) }}"
         - record: "dev-3"
-          value: "{{ params.env_params.dns_records | default([]) }}"
+          value: "{{ params.dns_records | default([]) }}"
   service_s3:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
@@ -771,7 +771,7 @@ services:
     credentials:
       s3: "s3"
     params:
-      bucket: "{{ params.env_params.s3_bucket | default('') }}"
+      bucket: "{{ params.s3_bucket | default('') }}"
       permission: "public-read"
   digital_ocean_node_service:
     base_dir: "ext-cloud"
@@ -802,7 +802,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
   linode_node_service:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -821,16 +821,16 @@ services:
         - "auto"
         - "dmz"
     contents:
-      authorized_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+      authorized_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.main.dns.yml"
-    schema: "tasks/dns/{{ params.env_params.dns_provider | default('') }}.schema.dns.yml"
+    task: "tasks/dns/{{ params.dns_provider | default('') }}.main.dns.yml"
+    schema: "tasks/dns/{{ params.dns_provider | default('') }}.schema.dns.yml"
     credentials:
-      dns: "{{ params.env_params.dns_provider | default('') }}"
+      dns: "{{ params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.domain | default('') }}"
+      zone: "{{ params.domain | default('') }}"
   service_simple_node_local:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -855,7 +855,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
     params:
       prop1: "test value 1"
       user_datas:
@@ -1453,12 +1453,12 @@ nodes:
       - dest: "env-transfer/content.node.env_file.yml"
         src:
           origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+          file: "{{ env.repo_dir }}/test/extra-repos/file1.yml"
       - dest: "env-transfer/content.node.env_template.yml"
         src:
           type: "template"
           origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+          file: "{{ env.repo_dir }}/test/extra-repos/template1.yml"
           params:
             value1: "transfer node env content template value 1"
             value2: "transfer node env content template value 2"
@@ -1470,8 +1470,8 @@ nodes:
         src:
           type: "template"
           origin: "env"
-          file: "{{ params.env.repo_dir }}/test/files/template.content.tpl.yml"
-          schema: "{{ params.env.repo_dir }}/test/files/template.content.schema.yml"
+          file: "{{ env.repo_dir }}/test/files/template.content.tpl.yml"
+          schema: "{{ env.repo_dir }}/test/files/template.content.schema.yml"
           credentials:
             cred1: "node_cred_content_1"
             cred2: "node_cred_content_2"
@@ -1574,7 +1574,7 @@ pods:
     root: true
     fast_prepare: true
     params:
-      env_files_dir: "{{ params.env.repo_dir }}/test/files"
+      env_files_dir: "{{ env.repo_dir }}/test/files"
       test_schema:
         - 123
         - { p1: [{ p1: [456, { p1: 111 }] }, 012, { p1: 123 }] }
@@ -1609,12 +1609,12 @@ pods:
       - dest: "env-transfer/content.env_file.yml"
         src:
           origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/file1.yml"
+          file: "{{ env.repo_dir }}/test/extra-repos/file1.yml"
       - dest: "env-transfer/content.env_template.yml"
         src:
           type: "template"
           origin: "env"
-          file: "{{ params.env.repo_dir }}/test/extra-repos/template1.yml"
+          file: "{{ env.repo_dir }}/test/extra-repos/template1.yml"
           params:
             value1: "transfer content template value 1"
             value2: "transfer content template value 2"
@@ -1651,7 +1651,7 @@ pods:
           credentials:
             node: "host"
           contents:
-            host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+            host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
       - dest: "env-transfer/content-type-env.str.txt"
         src:
           type: "env"
@@ -1743,10 +1743,10 @@ pods:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
     params:
       custom_dir: "ext-pod"
-      env_files_dir: "{{ params.env.repo_dir }}/test/files"
+      env_files_dir: "{{ env.repo_dir }}/test/files"
       test_schema:
         - 123
         - { p1: [{ p1: [456, { p1: 111 }] }, 012, { p1: 123 }] }
@@ -1788,9 +1788,9 @@ tasks:
     type: "task"
     target_origin: "env"
     root: true
-    file: "{{ params.env.repo_dir }}/test/run-tasks/task.yml"
-    schema: "{{ params.env.repo_dir }}/test/run-tasks/task.schema.yml"
-    validator: "{{ params.env.repo_dir }}/test/run-tasks/task.validator.yml"
+    file: "{{ env.repo_dir }}/test/run-tasks/task.yml"
+    schema: "{{ env.repo_dir }}/test/run-tasks/task.schema.yml"
+    validator: "{{ env.repo_dir }}/test/run-tasks/task.validator.yml"
     credentials:
       prop1: "test_task_prop1_env"
       prop2: "test_task_prop2"
@@ -1919,7 +1919,7 @@ contents:
   user_data_file_env:
     type: "file"
     origin: "env"
-    file: "{{ params.env.repo_dir }}/test/files/user-data.sh"
+    file: "{{ env.repo_dir }}/test/files/user-data.sh"
   user_data_tpl:
     type: "template"
     file: "ext-cloud/test/services/node/files/user-data.tpl.sh"
@@ -1933,7 +1933,7 @@ contents:
   user_data_tpl_env:
     type: "template"
     origin: "env"
-    file: "{{ params.env.repo_dir }}/test/files/user-data.tpl.sh"
+    file: "{{ env.repo_dir }}/test/files/user-data.tpl.sh"
     params:
       prop1: "value_double_env_1"
     group_params:
@@ -1968,7 +1968,7 @@ contents:
   tpl_overridden:
     type: "template"
     origin: "env"
-    file: "{{ params.env.repo_dir }}/test/files/dynamic.tpl.yml"
+    file: "{{ env.repo_dir }}/test/files/dynamic.tpl.yml"
     params:
       param_bottom: "value bottom"
       param_overridden_middle: "value overridden middle (bottom)"
@@ -2065,8 +2065,8 @@ credentials:
     host_pass: "123456"
   localhost:
     host_user: "root"
-  root: "{{ params.credentials.root | default({}) }}"
-  host: "{{ params.credentials.host | default({}) }}"
+  root: "{{ credentials.root | default({}) }}"
+  host: "{{ credentials.host | default({}) }}"
   my_credential_1_1: "my_secret_1_1"
   my_credential_1_2: "my_secret_1_2"
   my_credential_2_1: "my_secret_2_1"
@@ -2100,10 +2100,10 @@ credentials:
   my_credential_overridden_middle: "my secret overridden middle"
   my_credential_bottom: "my secret bottom"
   my_wrong_credential: "my wrong secret"
-  digital_ocean: "{{ params.credentials.digital_ocean | default({}) }}"
-  s3: "{{ params.credentials.s3 | default({}) }}"
-  godaddy: "{{ params.credentials.godaddy | default({}) }}"
-  cloudflare: "{{ params.credentials.cloudflare | default({}) }}"
+  digital_ocean: "{{ credentials.digital_ocean | default({}) }}"
+  s3: "{{ credentials.s3 | default({}) }}"
+  godaddy: "{{ credentials.godaddy | default({}) }}"
+  cloudflare: "{{ credentials.cloudflare | default({}) }}"
   node_service_local_credential: { test_token: "1234556" }
   test_task_prop1_cloud: "value1_credential_cloud"
   test_task_prop1_env: "value1_credential_env"

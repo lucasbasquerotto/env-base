@@ -1,5 +1,5 @@
-name: "{{ params.name }}"
-ctxs: "{{ params.ctxs }}"
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
 migration: ""
 container: ""
 meta:
@@ -24,7 +24,7 @@ main:
   cloud:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service | default('skip') }}"
+      - "{{ params.cloud_service | default('skip') }}"
   local:
     extend_cloud: true
     nodes:
@@ -69,7 +69,7 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service | default('skip') }}"
+      - "{{ params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -87,7 +87,7 @@ main:
   remote_hub:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service | default('skip') }}"
+      - "{{ params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -108,7 +108,7 @@ main:
   remote_external_hub:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service | default('skip') }}"
+      - "{{ params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -208,7 +208,7 @@ main:
   remote_replicas:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service | default('skip') }}"
+      - "{{ params.cloud_service | default('skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -224,7 +224,7 @@ main:
           rproxy:
             shared_params:
               [
-                "main_replicas_hub_{{ params.env_params.rproxy_type | default('nginx') }}",
+                "main_replicas_hub_{{ params.rproxy_type | default('nginx') }}",
               ]
         dependencies:
           replica:
@@ -288,33 +288,33 @@ services:
       s3: "s3"
     params:
       list:
-        - bucket: "{{ params.env_params.backup_bucket_name | default('') }}"
+        - bucket: "{{ params.backup_bucket_name | default('') }}"
           permission: "private"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.main.dns.yml
     schema: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.schema.dns.yml
     validator: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.validator.dns.yml
     credentials:
-      dns: "{{ params.env_params.dns_provider | default('') }}"
+      dns: "{{ params.dns_provider | default('') }}"
     params:
-      zone: "{{ params.env_params.main_domain | default('') }}"
+      zone: "{{ params.main_domain | default('') }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -334,11 +334,11 @@ services:
           inbound_rules:
             - ports: "9080"
               sources:
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
                 tags: ["rproxy-dmz"]
             - ports: "9443"
               sources:
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
                 tags: ["rproxy-dmz"]
         - name: "auto"
           tags: ["auto"]
@@ -346,7 +346,7 @@ services:
             - ports: "22"
               sources:
                 tags: ["main"]
-                addresses: "{{ params.env_params.private_ips | default([]) }}"
+                addresses: "{{ params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -419,7 +419,7 @@ nodes:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_{{ params.rproxy_type | default('nginx') }}"
           - "local"
   rproxy_hub_local:
     credentials:
@@ -431,7 +431,7 @@ nodes:
           - "main"
           - "local"
           - "hub_item"
-          - "main_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_hub_{{ params.rproxy_type | default('nginx') }}"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["local", "hub_item", "hub_web", "local_web_1"]
@@ -451,7 +451,7 @@ nodes:
           - "main"
           - "local"
           - "hub_item"
-          - "main_replicas_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_replicas_hub_{{ params.rproxy_type | default('nginx') }}"
   rproxy_replica_1_local:
     service: "local_node"
     base_dir: "/var/cloud"
@@ -481,7 +481,7 @@ nodes:
         shared_params: ["local", "hub_item", "hub_web", "local_replica"]
   rproxy:
     service:
-      name: "{{ params.env_params.node_service | default('skip') }}"
+      name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -492,16 +492,16 @@ nodes:
     credentials:
       host: "host"
     params:
-      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+      dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
     shared_params: ["remote"]
     pods:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_{{ params.rproxy_type | default('nginx') }}"
   rproxy_hub:
     service:
-      name: "{{ params.env_params.node_service | default('skip') }}"
+      name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -512,7 +512,7 @@ nodes:
     credentials:
       host: "host"
     params:
-      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+      dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
     shared_params: ["remote"]
     pods:
       - name: "rproxy_hub"
@@ -520,7 +520,7 @@ nodes:
         shared_params:
           - "main"
           - "hub_item"
-          - "main_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_hub_{{ params.rproxy_type | default('nginx') }}"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["hub_item", "hub_web", "remote_web_1"]
@@ -532,7 +532,7 @@ nodes:
         shared_params: ["hub_item", "hub_web", "remote_web_3"]
   rproxy_external_hub:
     service:
-      name: "{{ params.env_params.node_service | default('skip') }}"
+      name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -543,16 +543,16 @@ nodes:
     credentials:
       host: "host"
     params:
-      dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+      dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
     shared_params: ["remote"]
     pods:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_external_hub_{{ params.env_params.rproxy_type | default('nginx') }}"
+          - "main_external_hub_{{ params.rproxy_type | default('nginx') }}"
   rproxy_web:
     service:
-      name: "{{ params.env_params.node_service | default('skip') }}"
+      name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
@@ -577,7 +577,7 @@ node_shared_params:
         setup_finished_timeout: 300
     cron:
       - dest: "/var/spool/cron/crontabs/root"
-        when: "{{ params.env_params.define_cron | default(false) }}"
+        when: "{{ params.define_cron | default(false) }}"
         user: "root"
         src:
           type: "template"
@@ -620,32 +620,32 @@ pods:
       backup_bucket: "s3"
       backup_replica_bucket: "s3_replica"
     contents:
-      auth_content: "{{ params.env_params.auth_content | default('') }}"
+      auth_content: "{{ params.auth_content | default('') }}"
     params:
-      rproxy_type: "{{ params.env_params.rproxy_type | default('nginx') }}"
+      rproxy_type: "{{ params.rproxy_type | default('nginx') }}"
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
-      custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
-      meta: "{{ params.env_params.pod_meta | default({}) }}"
-      use_fluentd: "{{ params.env_params.use_fluentd | default(false) }}"
-      s3_cli: "{{ params.env_params.s3_cli | default('') }}"
-      backup_bucket_name: "{{ params.env_params.backup_bucket_name | default('') }}"
-      backup_bucket_path: "{{ params.env_params.backup_bucket_path | default('') }}"
-      backup_replica_bucket_name: "{{ params.env_params.backup_replica_bucket_name | default('') }}"
-      backup_replica_bucket_path: "{{ params.env_params.backup_replica_bucket_path | default('') }}"
-      enable_logs_backup: "{{ params.env_params.enable_logs_backup | default(false) }}"
-      enable_logs_setup: "{{ params.env_params.enable_logs_setup | default(false) }}"
-      enable_sync_backup: "{{ params.env_params.enable_sync_backup | default(false) }}"
-      enable_sync_setup: "{{ params.env_params.enable_sync_setup | default(false) }}"
-      enable_backup_replica: "{{ params.env_params.enable_backup_replica | default(false) }}"
+      custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
+      meta: "{{ params.pod_meta | default({}) }}"
+      use_fluentd: "{{ params.use_fluentd | default(false) }}"
+      s3_cli: "{{ params.s3_cli | default('') }}"
+      backup_bucket_name: "{{ params.backup_bucket_name | default('') }}"
+      backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
+      backup_replica_bucket_name: "{{ params.backup_replica_bucket_name | default('') }}"
+      backup_replica_bucket_path: "{{ params.backup_replica_bucket_path | default('') }}"
+      enable_logs_backup: "{{ params.enable_logs_backup | default(false) }}"
+      enable_logs_setup: "{{ params.enable_logs_setup | default(false) }}"
+      enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
+      enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
+      enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       certbot:
-        email: "{{ params.env_params.certbot_email | default('') }}"
-        staging: "{{ params.env_params.certbot_staging | default(false) }}"
-        force: "{{ params.env_params.certbot_force | default(false) }}"
+        email: "{{ params.certbot_email | default('') }}"
+        staging: "{{ params.certbot_staging | default(false) }}"
+        force: "{{ params.certbot_force | default(false) }}"
       services:
         haproxy:
           conf:
-            ssl: "{{ params.env_params.use_ssl | default(false) }}"
+            ssl: "{{ params.use_ssl | default(false) }}"
             webservice_endpoint: "http://nginx"
             basic_auth_data_content: "auth_content"
         fluentd:
@@ -682,8 +682,8 @@ pods:
         fluentd: 256mb
         s3_cli: 512mb
     transfer:
-      - dest: "env/{{ params.env_params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
-        when: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
+      - dest: "env/{{ params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
+        when: "{{ params.define_s3_backup_lifecycle | default(false) }}"
         src:
           type: "template"
           origin: "cloud"
@@ -717,26 +717,26 @@ pods:
           file: "ext-cloud/demo/rproxy/sample.tpl.html"
 pod_shared_params:
   main:
-    main_domain: "{{ params.env_params.main_domain | default('') }}"
-    domains: "{{ params.env_params.domains | default({}) }}"
-    use_ssl: "{{ params.env_params.use_ssl | default(false) }}"
-    use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
-    use_pod_full_prefix: "{{ params.env_params.use_pod_full_prefix | default(false) }}"
-    use_theia: "{{ params.env_params.use_theia | default(false) }}"
-    use_minio_gateway: "{{ params.env_params.use_minio_gateway | default(false) }}"
-    use_certbot: "{{ params.env_params.use_certbot | default(false) }}"
-    use_private_path: "{{ params.env_params.use_private_path | default(false) }}"
-    block_ips: "{{ params.env_params.block_ips | default(false) }}"
-    auth_file: "{{ params.env_params.auth_file | default('') }}"
-    define_s3_backup_lifecycle: "{{ params.env_params.define_s3_backup_lifecycle | default(false) }}"
+    main_domain: "{{ params.main_domain | default('') }}"
+    domains: "{{ params.domains | default({}) }}"
+    use_ssl: "{{ params.use_ssl | default(false) }}"
+    use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
+    use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
+    use_theia: "{{ params.use_theia | default(false) }}"
+    use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
+    use_certbot: "{{ params.use_certbot | default(false) }}"
+    use_private_path: "{{ params.use_private_path | default(false) }}"
+    block_ips: "{{ params.block_ips | default(false) }}"
+    auth_file: "{{ params.auth_file | default('') }}"
+    define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
     s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
   local:
     local: true
     enable_logs_setup: false
     enable_sync_setup: false
-    custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
-    main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
-    domains: "{{ params.env_params.local_domains | default({}) }}"
+    custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
+    main_domain: "{{ params.local_main_domain | default('localhost') }}"
+    domains: "{{ params.local_domains | default({}) }}"
   hub_item:
     shared_network: "rproxy-hub-network"
   hub_web:
@@ -753,8 +753,8 @@ pod_shared_params:
             data: "root /var/www;"
   external_hub_web:
     rproxy_type: "nginx"
-    use_theia: "{{ params.env_params.use_theia | default(false) }}"
-    auth_file: "{{ params.env_params.auth_file | default('') }}"
+    use_theia: "{{ params.use_theia | default(false) }}"
+    auth_file: "{{ params.auth_file | default('') }}"
     rproxy_services:
       - name: "rproxy"
         locations:
@@ -763,46 +763,46 @@ pod_shared_params:
           - location: "/"
             data: "root /var/www;"
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
   local_web_1:
-    main_domain: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
+    main_domain: "{{ params.local_domains.rproxy_web_1 | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.local_domains.rproxy_web_1 | default('') }}"
+      rproxy: "{{ params.local_domains.rproxy_web_1 | default('') }}"
   local_web_2:
-    main_domain: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
+    main_domain: "{{ params.local_domains.rproxy_web_2 | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.local_domains.rproxy_web_2 | default('') }}"
+      rproxy: "{{ params.local_domains.rproxy_web_2 | default('') }}"
   local_web_3:
-    main_domain: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
+    main_domain: "{{ params.local_domains.rproxy_web_3 | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.local_domains.rproxy_web_3 | default('') }}"
+      rproxy: "{{ params.local_domains.rproxy_web_3 | default('') }}"
   remote_web_1:
-    main_domain: "{{ params.env_params.domains.rproxy_web_1 | default('') }}"
+    main_domain: "{{ params.domains.rproxy_web_1 | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.domains.rproxy_web_1 | default('') }}"
-      theia: "{{ params.env_params.domains.rproxy_web_1_theia | default('') }}"
+      rproxy: "{{ params.domains.rproxy_web_1 | default('') }}"
+      theia: "{{ params.domains.rproxy_web_1_theia | default('') }}"
   remote_web_2:
-    main_domain: "{{ params.env_params.domains.rproxy_web_2 | default('') }}"
+    main_domain: "{{ params.domains.rproxy_web_2 | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.domains.rproxy_web_2 | default('') }}"
-      theia: "{{ params.env_params.domains.rproxy_web_2_theia | default('') }}"
+      rproxy: "{{ params.domains.rproxy_web_2 | default('') }}"
+      theia: "{{ params.domains.rproxy_web_2_theia | default('') }}"
   remote_web_3:
-    main_domain: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
+    main_domain: "{{ params.domains.rproxy_web_3 | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.domains.rproxy_web_3 | default('') }}"
-      theia: "{{ params.env_params.domains.rproxy_web_3_theia | default('') }}"
+      rproxy: "{{ params.domains.rproxy_web_3 | default('') }}"
+      theia: "{{ params.domains.rproxy_web_3_theia | default('') }}"
   local_replica:
-    main_domain: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
+    main_domain: "{{ params.local_domains.rproxy_replica | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.local_domains.rproxy_replica | default('') }}"
+      rproxy: "{{ params.local_domains.rproxy_replica | default('') }}"
   remote_replica:
-    main_domain: "{{ params.env_params.domains.rproxy_replica | default('') }}"
+    main_domain: "{{ params.domains.rproxy_replica | default('') }}"
     domains:
-      rproxy: "{{ params.env_params.domains.rproxy_replica | default('') }}"
-      theia: "{{ params.env_params.domains.rproxy_replica_theia | default('') }}"
+      rproxy: "{{ params.domains.rproxy_replica | default('') }}"
+      theia: "{{ params.domains.rproxy_replica_theia | default('') }}"
   main_nginx:
     rproxy_services:
       - name: "rproxy"
@@ -812,12 +812,12 @@ pod_shared_params:
           - location: "/"
             data: "root /var/www;"
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
   main_haproxy:
@@ -832,7 +832,7 @@ pod_shared_params:
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
       - name: "private"
-        when: "{{ params.env_params.use_private_path | default(false) }}"
+        when: "{{ params.use_private_path | default(false) }}"
         frontend_data: |-
           stats enable if is_domain_private
           stats uri /stats if is_domain_private
@@ -840,12 +840,12 @@ pod_shared_params:
           stats admin if is_domain_private
         private: true
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -864,12 +864,12 @@ pod_shared_params:
       - name: "rproxy_web_3"
         endpoint: "http://rproxy_web_3-main-nginx"
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -885,7 +885,7 @@ pod_shared_params:
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
       - name: "private"
-        when: "{{ params.env_params.use_private_path | default(false) }}"
+        when: "{{ params.use_private_path | default(false) }}"
         frontend_data: |-
           stats enable if is_domain_private
           stats uri /stats if is_domain_private
@@ -899,12 +899,12 @@ pod_shared_params:
       - name: "rproxy_web_3"
         endpoint: "http://rproxy_web_3-main-nginx"
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -919,7 +919,7 @@ pod_shared_params:
       - name: "rproxy_web_1"
         proxy: true
       - name: "rproxy_web_1_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "rproxy_web_1_private"
         proxy: true
         upgrade: true
@@ -928,7 +928,7 @@ pod_shared_params:
       - name: "rproxy_web_2"
         proxy: true
       - name: "rproxy_web_2_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "rproxy_web_2_private"
         proxy: true
         upgrade: true
@@ -937,19 +937,19 @@ pod_shared_params:
       - name: "rproxy_web_3"
         proxy: true
       - name: "rproxy_web_3_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "rproxy_web_3_private"
         proxy: true
         upgrade: true
         private: true
         use_basic_auth: false
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -965,7 +965,7 @@ pod_shared_params:
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
       - name: "private"
-        when: "{{ params.env_params.use_private_path | default(false) }}"
+        when: "{{ params.use_private_path | default(false) }}"
         frontend_data: |-
           stats enable if is_domain_private
           stats uri /stats if is_domain_private
@@ -975,7 +975,7 @@ pod_shared_params:
       - name: "rproxy_web_1"
         proxy: true
       - name: "rproxy_web_1_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "rproxy_web_1_private"
         proxy: true
         upgrade: true
@@ -984,7 +984,7 @@ pod_shared_params:
       - name: "rproxy_web_2"
         proxy: true
       - name: "rproxy_web_2_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "rproxy_web_2_private"
         proxy: true
         upgrade: true
@@ -993,19 +993,19 @@ pod_shared_params:
       - name: "rproxy_web_3"
         proxy: true
       - name: "rproxy_web_3_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "rproxy_web_3_private"
         proxy: true
         upgrade: true
         private: true
         use_basic_auth: false
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -1021,7 +1021,7 @@ pod_shared_params:
         dependency_name: "replica"
         proxy: true
       - name: "rproxy_replica_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "replica_private"
         upstream_data: "least_conn;"
         proxy: true
@@ -1029,13 +1029,13 @@ pod_shared_params:
         private: true
         use_basic_auth: false
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
         use_basic_auth: false
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -1051,7 +1051,7 @@ pod_shared_params:
             data: "timeout queue 5s"
             server_args: "check maxconn 3"
       - name: "private"
-        when: "{{ params.env_params.use_private_path | default(false) }}"
+        when: "{{ params.use_private_path | default(false) }}"
         frontend_data: |-
           stats enable if is_domain_private
           stats uri /stats if is_domain_private
@@ -1062,20 +1062,20 @@ pod_shared_params:
         dependency_name: "replica"
         proxy: true
       - name: "rproxy_replica_theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         dependency_name: "replica_private"
         proxy: true
         upgrade: true
         private: true
         use_basic_auth: false
       - name: "theia"
-        when: "{{ params.env_params.use_theia | default(false) }}"
+        when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
         use_basic_auth: false
       - name: "minio_gateway"
-        when: "{{ params.env_params.use_minio_gateway | default(false) }}"
+        when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
         use_basic_auth: false
@@ -1110,7 +1110,7 @@ contents:
     credentials:
       node: "host"
     contents:
-      host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+      host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -1124,4 +1124,4 @@ repos:
   ext_pod:
     src: "https://github.com/lucasbasquerotto/ext-pod.git"
     version: "master"
-credentials: "{{ params.credentials }}"
+credentials: "{{ credentials }}"

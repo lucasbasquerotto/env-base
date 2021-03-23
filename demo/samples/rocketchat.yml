@@ -6,7 +6,7 @@ env:
     version: "master"
   repo_dir: "env-base"
   file: "examples/rocketchat.yml"
-env_params:
+params:
   cloud_name: "digital_ocean"
   domain: "lucasbasquerotto.com"
   main_dns_name: "godaddy"
@@ -53,7 +53,7 @@ env_params:
   backup_replica_bucket_name: "lucasbasquerotto-rocketchat-replica-backup"
   uploads_replica_bucket_name: "lucasbasquerotto-rocketchat-replica-uploads"
   use_bot: true
-  named_volumes: "{{ params.named_volumes | default(false) }}"
+  named_volumes: "{{ project_named_volumes | default(false) }}"
   local_custom_ssl:
     main_domain: "localhost"
     fullchain: "{{ params.env_dir }}/ssl/bundle.crt"

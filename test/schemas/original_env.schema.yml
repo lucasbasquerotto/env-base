@@ -15,9 +15,9 @@ schemas:
       env:
         non_empty: true
         schema: "env_base"
-      env_params:
+      params:
         non_empty: true
-        schema: "env_params"
+        schema: "params"
       credentials:
         non_empty: true
         schema: "credentials"
@@ -43,7 +43,7 @@ schemas:
         type: "str"
       ssh_file:
         type: "str"
-  env_params:
+  params:
     type: "dict"
     props:
       domain:

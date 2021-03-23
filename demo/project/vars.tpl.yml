@@ -1,5 +1,5 @@
 dev: "true"
-env_params:
+params:
   env_dir: common
 init:
   container: $CLOUD_IMAGE

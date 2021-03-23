@@ -1,5 +1,5 @@
-name: "{{ params.name }}"
-ctxs: "{{ params.ctxs }}"
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
 meta:
   template_no_empty_lines: true
   skip_local_node_preparation: false
@@ -21,21 +21,21 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
-      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+      - "{{ params.cloud_service }}"
+      - "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "app"
         key: "discourse"
         can_destroy: true
         params:
-          dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+          dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
         pods:
           discourse:
             transfer:
               - dest: "containers/app.yml"
                 src: >-
                   {{
-                    params.env_params.discourse_app_container_content
+                    params.discourse_app_container_content
                     | default({ 'type': 'env', 'name': 'discourse_app_container' })
                   }}
     run_stages:
@@ -49,27 +49,27 @@ main:
   multicontainer:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
-      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+      - "{{ params.cloud_service }}"
+      - "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "app"
         key: "discourse"
         can_destroy: true
         params:
-          dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+          dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
         pods:
           discourse:
             transfer:
               - dest: "containers/web.yml"
                 src: >-
                   {{
-                    params.env_params.discourse_web_internal_container_content
+                    params.discourse_web_internal_container_content
                     | default({ 'type': 'env', 'name': 'discourse_web_internal_container' })
                   }}
               - dest: "containers/db.yml"
                 src: >-
                   {{
-                    params.env_params.discourse_db_internal_container_content
+                    params.discourse_db_internal_container_content
                     | default({ 'type': 'env', 'name': 'discourse_db_internal_container' })
                   }}
     run_stages:
@@ -87,8 +87,8 @@ main:
   nodes:
     extend_cloud: true
     initial_services:
-      - "{{ params.env_params.cloud_service }}"
-      - "{{ params.env_params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+      - "{{ params.cloud_service }}"
+      - "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "web"
         key: "discourse"
@@ -110,14 +110,14 @@ main:
               - "auto"
               - "discourse-web"
               - "discourse-dmz"
-          dns_service_params_list: "{{ params.env_params.dns_service_params_list | default([]) }}"
+          dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
         pods:
           discourse:
             transfer:
               - dest: "containers/web.yml"
                 src: >-
                   {{
-                    params.env_params.discourse_web_container_content
+                    params.discourse_web_container_content
                     | default({ 'type': 'env', 'name': 'discourse_web_container' })
                   }}
       - name: "redis"
@@ -134,7 +134,7 @@ main:
               - dest: "containers/redis.yml"
                 src: >-
                   {{
-                    params.env_params.discourse_redis_container_content
+                    params.discourse_redis_container_content
                     | default({ 'type': 'env', 'name': 'discourse_redis_container' })
                   }}
       - name: "db"
@@ -151,7 +151,7 @@ main:
               - dest: "containers/db.yml"
                 src: >-
                   {{
-                    params.env_params.discourse_db_container_content
+                    params.discourse_db_container_content
                     | default({ 'type': 'env', 'name': 'discourse_db_container' })
                   }}
     run_stages:
@@ -186,35 +186,35 @@ services:
       s3: "discourse_s3"
     params:
       list:
-        - bucket: "{{ params.env_params.discourse.backup_bucket_name | default('') }}"
+        - bucket: "{{ params.discourse.backup_bucket_name | default('') }}"
           permission: "private"
-        - bucket: "{{ params.env_params.discourse.uploads_bucket_name | default('') }}"
+        - bucket: "{{ params.discourse.uploads_bucket_name | default('') }}"
           permission: "public-read"
   node_dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.main.dns.yml
     schema: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.schema.dns.yml
     validator: >-
       tasks/dns/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}/{{
-        params.env_params.dns_provider | default('')
+        params.dns_provider | default('')
       }}.validator.dns.yml
     credentials:
-      dns: "{{ params.env_params.dns_provider }}"
+      dns: "{{ params.dns_provider }}"
     params:
-      zone: "{{ params.env_params.main_domain }}"
+      zone: "{{ params.main_domain }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -237,7 +237,7 @@ services:
             - ports: "22"
               sources:
                 tags: ["main"]
-                addresses: "{{ params.env_params.private_ips }}"
+                addresses: "{{ params.private_ips }}"
           outbound_rules:
             - protocol: "tcp"
               ports: "1-65535"
@@ -308,7 +308,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
   linode:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -335,7 +335,7 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
   linode:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -362,11 +362,11 @@ services:
         credentials:
           node: "host"
         contents:
-          host_ssh_public_keys: "{{ params.env_params.host_ssh_public_keys_content | default('') }}"
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
 nodes:
   discourse:
     service:
-      name: "{{ params.env_params.node_service }}"
+      name: "{{ params.node_service }}"
       params:
         tags:
           - "auto"
@@ -469,7 +469,7 @@ contents:
       discourse_smtp: "discourse_smtp"
       discourse_s3: "discourse_s3"
 content_shared_params:
-  discourse_params: "{{ params.env_params.discourse | default({}) }}"
+  discourse_params: "{{ params.discourse | default({}) }}"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -480,4 +480,4 @@ repos:
   discourse_docker:
     src: "https://github.com/discourse/discourse_docker.git"
     version: "master"
-credentials: "{{ params.credentials | default({}) }}"
+credentials: "{{ credentials | default({}) }}"

@@ -6,7 +6,7 @@ env:
     version: "master"
   repo_dir: "env-base"
   file: "examples/mediawiki.yml"
-env_params:
+params:
   cloud_name: "digital_ocean"
   domain: "lucasbasquerotto.com"
   main_dns_name: "godaddy"
@@ -68,7 +68,7 @@ env_params:
     lang: "en"
     authentication_token_version: "1"
     upload_path: ""
-  named_volumes: "{{ params.named_volumes | default(false) }}"
+  named_volumes: "{{ project_named_volumes | default(false) }}"
   local_custom_ssl:
     main_domain: "localhost"
     fullchain: "{{ params.env_dir }}/ssl/bundle.crt"
