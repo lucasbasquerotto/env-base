@@ -293,8 +293,8 @@ nodes:
           custom_ssl: "{{ params.env_params.local_custom_ssl | default({}) }}"
           migrate_old_domain_host: "{{ params.env_params.wp_old_domain_host | default('') }}"
           migrate_new_domain_host: >-
-            {{ params.env_params.use_ssl | bool | ternary('https', 'http')
-            }}://localhost:{{ params.env_params.use_ssl | bool | ternary(8443, 8080) }}/
+            {{ params.env_params.use_ssl | default(false) | bool | ternary('https', 'http')
+            }}://localhost:{{ params.env_params.use_ssl | default(false) | bool | ternary(8443, 8080) }}/
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.env_params.local_main_domain | default('localhost') }}"
@@ -363,6 +363,7 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
+      meta: "{{ params.env_params.pod_meta | default({}) }}"
       main_domain: "{{ params.env_params.main_domain | default('') }}"
       wp_env: "staging"
       app_dev: "{{ params.env_params.app_dev | default(false) }}"
@@ -468,8 +469,6 @@ pods:
         mc_version: "RELEASE.2021-03-12T03-36-59Z"
         rclone_image: "rclone/rclone"
         rclone_version: "1.54.0"
-        rclone_image: "rclone/rclone"
-        rclone_version: "1.53.0"
         logrotator_image: "python"
         logrotator_version: "3.8.4-buster"
         fluentd_image: "lucasbasquerotto/image"
@@ -605,11 +604,11 @@ pod_group_params:
     restore_s3_sync: true
     restore_remote_bucket_path_dir: "db"
   db_setup_new:
-    title: "{{ params.env_params.wp_title }}"
+    title: "{{ params.env_params.wp_title | default('') }}"
     restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
     remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
   db_setup_new_local:
-    title: "{{ params.env_params.wp_title }}"
+    title: "{{ params.env_params.wp_title | default('') }}"
     restore_seed: "{{ params.env_params.wp_restore_seed | default(false) }}"
     remote_seed_data: "https://gist.githubusercontent.com/lucasbasquerotto/667447640482369d0c6b093ee7200c96/raw/9d9d446b9f1017aa4bc12628aea954f1f10f020c/wordpress-theme-unit-test-data.xml"
   uploads_backup_sync:

@@ -317,6 +317,7 @@ pods:
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.env_params.pod_custom_dir_sync | default(false) }}"
+      meta: "{{ params.env_params.pod_meta | default({}) }}"
       main_domain: "{{ params.env_params.main_domain | default('') }}"
       use_ssl: "{{ params.env_params.use_ssl | default(false) }}"
       use_pod_prefix: "{{ params.env_params.use_pod_prefix | default(false) }}"
