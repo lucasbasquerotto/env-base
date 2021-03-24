@@ -457,7 +457,7 @@ pods:
             tasks:
               - name: "watch"
                 when: "{{ params.include_cron_watch | default(false) }}"
-                task: "shared:watch"
+                task: "unique:action:watch"
                 cron: "*/1 * * * *"
               - name: "pending"
                 when: "{{ not (params.include_cron_watch | default(false) | bool) }}"
