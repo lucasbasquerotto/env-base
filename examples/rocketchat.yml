@@ -335,7 +335,7 @@ pods:
         dir: "ext-pod"
     credentials:
       rocketchat: "rocketchat"
-      hubot: "hubot"
+      hubot: "{{ params.use_bot | default(false) | bool | ternary('hubot', '') }}"
       minio_gateway: "{{ params.use_s3 | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       uploads_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
