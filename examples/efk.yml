@@ -27,6 +27,8 @@ main:
   s3_replica_buckets:
     extend_cloud: true
     initial_services:
+      - name: "s3_buckets"
+        can_destroy: true
       - name: "s3_replica_buckets"
         can_destroy: true
   local:
