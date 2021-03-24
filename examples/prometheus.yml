@@ -435,40 +435,28 @@ pods:
           params:
             tasks:
               - name: "watch"
-                when: "{{ params.include_cron_watch | default(false) | bool }}"
+                when: "{{ params.include_cron_watch | default(false) }}"
                 task: "shared:watch"
                 cron: "*/1 * * * *"
-              - name: "exec_general_actions"
-                task: "action:exec:general_actions"
-                cron: >-
-                  {{
-                    (params.include_cron_watch | default(false) | bool)
-                    | ternary('0 */1 * * *', '*/5 * * * *')
-                  }}
-              - name: "exec_backup_actions"
-                task: "action:exec:backup_actions"
-                cron: >-
-                  {{
-                    (params.include_cron_watch | default(false) | bool)
-                    | ternary('0 */1 * * *', '*/5 * * * *')
-                  }}
-              - name: "create_actions_main"
-                task: "shared:create_actions:main"
+              - name: "pending"
+                when: "{{ not (params.include_cron_watch | default(false) | bool) }}"
+                task: "unique:action:pending"
+                cron: "*/1 * * * *"
+              - name: "log"
+                task: "custom:unique:log"
                 cron: "*/5 * * * *"
-              - name: "create_actions_log"
-                task: "shared:create_actions:log"
-                cron: "*/5 * * * *"
-              - name: "create_actions_frequent"
-                task: "shared:create_actions block_ips"
+              - name: "block_ips"
+                when: "{{ params.block_ips | default(false) }}"
+                task: "unique:action:block_ips"
                 cron: "*/15 * * * *"
-              - name: "create_actions_full_log"
-                task: "shared:create_actions logrotate log_summary"
+              - name: "full_log"
+                task: "unique:all logrotate log_summary"
                 cron: "* */1 * * *"
-              - name: "create_actions_backup"
-                task: "shared:create_actions backup"
+              - name: "backup"
+                task: "unique:action:backup"
                 cron: "0 */6 * * *"
-              - name: "create_actions_replicate_s3"
-                task: "shared:create_actions replicate_s3"
+              - name: "replicate_s3"
+                task: "unique:action:replicate_s3"
                 cron: "3 */1 * * *"
       - dest: "env/{{ params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
         when: "{{ params.define_s3_backup_lifecycle | default(false) | bool }}"
