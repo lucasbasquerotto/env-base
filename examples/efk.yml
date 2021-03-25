@@ -279,11 +279,6 @@ nodes:
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
           domains: "{{ params.local_domains | default({}) }}"
-          ports:
-            public_http_port: "8080"
-            public_https_port: "8443"
-            private_http_port: "9080"
-            private_https_port: "9443"
   efk:
     service:
       name: "{{ params.node_service | default('skip') }}"
@@ -310,11 +305,6 @@ nodes:
         params:
           local: false
           domains: "{{ params.domains | default({}) }}"
-          ports:
-            public_http_port: "80"
-            public_https_port: "443"
-            private_http_port: "9080"
-            private_https_port: "9443"
 pods:
   efk:
     repo: "pod"
@@ -328,9 +318,9 @@ pods:
         dir: "ext-pod"
     credentials:
       efk: "efk"
-      minio_gateway: "{{ params.use_s3 | default(false) | bool | ternary('minio_gateway', '') }}"
+      minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
-      backup_replica_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3_replica', '') }}"
+      backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
     params:
       type: "app"
       orchestration: "docker_compose"
