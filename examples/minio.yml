@@ -310,7 +310,7 @@ pods:
       services:
         fluentd:
           port: "24224"
-          output_plugin: "{{ params.fluentd_output_plugin | default('elasticsearch') }}"
+          output_plugin: "{{ params.fluentd_output_plugin | default('') }}"
       images:
         nginx_image: "nginx"
         nginx_version: "1.14.2-alpine"
