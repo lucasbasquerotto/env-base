@@ -546,30 +546,30 @@ pod_group_params:
     is_compressed_file: true
   db_setup_restore_file:
     restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
+    restore_remote_file: "{{ params.db_setup_restore_remote_file | default('') }}"
     is_compressed_file: true
-    db_file_name: "{{ credentials.mediawiki.db.name }}.sql"
+    db_file_name: "{{ params.db_setup_restore_file.db_file_name | default(credentials.mediawiki.db.name + '.sql') }}"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    is_compressed_file: true
-    restore_bucket_path_dir: "20210203"
-    compressed_file_name: "my_wiki.20210203.002503.95010316.zip"
+    restore_bucket_path_dir: "{{ params.db_setup_restore_s3.restore_bucket_path_dir | default('db') }}"
+    is_compressed_file: "{{ params.db_setup_restore_s3.is_compressed_file | default(false) }}"
+    compressed_file_name: "{{ params.db_setup_restore_s3.compressed_file_name | default('') }}"
   uploads_backup_sync:
-    backup_bucket_sync_dir: "uploads"
+    backup_bucket_sync_dir: "[[ ]]"
   uploads_backup_no_sync:
     is_compressed_file: true
   uploads_setup_file:
     restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
+    restore_remote_file: "{{ params.uploads_setup_restore_remote_file | default('') }}"
     is_compressed_file: true
     restore_compressed_inner_dir: "uploads"
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    is_compressed_file: true
-    restore_bucket_path_dir: "20210203"
-    compressed_file_name: "uploads.20210203.004110.30597840.zip"
+    restore_bucket_path_dir: "{{ params.uploads_setup_s3.restore_bucket_path_dir | default('[[ ]]') }}"
+    is_compressed_file: "{{ params.uploads_setup_s3.is_compressed_file | default(false) }}"
+    compressed_file_name: "{{ params.uploads_setup_s3.compressed_file_name | default('') }}"
     restore_compressed_inner_dir: "uploads"
 tasks:
   docker_compose_install:

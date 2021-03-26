@@ -602,7 +602,7 @@ pod_group_params:
     restore_use_s3: false
     is_compressed_file: true
     restore_remote_file: "{{ params.db_setup_restore_remote_file | default('') }}"
-    db_file_name: "{{ credentials.wordpress.db.name }}.sql"
+    db_file_name: "{{ params.db_setup_restore_file.db_file_name | default(credentials.wordpress.db.name + '.sql') }}"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
@@ -614,7 +614,7 @@ pod_group_params:
     restore_seed: "{{ params.wp_restore_seed | default(false) }}"
     remote_seed_data: "{{ params.wp_remote_seed_data | default('') }}"
   uploads_backup_sync:
-    backup_bucket_sync_dir: "uploads"
+    backup_bucket_sync_dir: "[[ ]]"
   uploads_backup_no_sync:
     is_compressed_file: true
   uploads_setup_file:
@@ -625,7 +625,7 @@ pod_group_params:
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_bucket_path_dir: "uploads"
+    restore_bucket_path_dir: "[[ ]]"
 tasks:
   docker_compose_install:
     type: "task"

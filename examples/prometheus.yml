@@ -519,7 +519,7 @@ pod_group_params:
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_remote_bucket_path_dir: "db"
+    restore_bucket_path_dir: "db"
 tasks:
   docker_compose_install:
     type: "task"

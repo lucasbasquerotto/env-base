@@ -544,8 +544,9 @@ pod_group_params:
     restore_use_s3: true
     restore_s3_sync: true
     is_compressed_file: "{{ params.db_setup_restore_s3.is_compressed_file | default(false) }}"
-    restore_bucket_path_dir: "{{ params.db_setup_restore_s3.restore_bucket_path_dir | default('') }}"
+    restore_bucket_path_dir: "{{ params.db_setup_restore_s3.restore_bucket_path_dir | default('db') }}"
     compressed_file_name: "{{ params.db_setup_restore_s3.compressed_file_name | default('') }}"
+    restore_compressed_inner_dir: "{{ credentials.rocketchat.db.name | default('') }}"
   uploads_backup_sync:
     backup_bucket_sync_dir: "[[ ]]"
   uploads_backup_no_sync:
@@ -558,7 +559,10 @@ pod_group_params:
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_remote_bucket_path_dir: "[[ ]]"
+    is_compressed_file: "{{ params.uploads_setup_s3.is_compressed_file | default(false) }}"
+    restore_bucket_path_dir: "{{ params.uploads_setup_s3.restore_bucket_path_dir | default('[[ ]]') }}"
+    compressed_file_name: "{{ params.uploads_setup_s3.compressed_file_name | default('') }}"
+    restore_compressed_inner_dir: "uploads"
 tasks:
   docker_compose_install:
     type: "task"
