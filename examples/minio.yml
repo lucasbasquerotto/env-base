@@ -303,12 +303,6 @@ pods:
       enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
       enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
-      db_backup:
-        backup_bucket_sync_dir: "uploads"
-      db_setup:
-        restore_use_s3: true
-        restore_s3_sync: true
-        restore_bucket_path_dir: "20210325"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
@@ -317,8 +311,6 @@ pods:
         fluentd:
           port: "24224"
           output_plugin: "{{ params.fluentd_output_plugin | default('elasticsearch') }}"
-        kibana:
-          port: "5601"
       images:
         nginx_image: "nginx"
         nginx_version: "1.14.2-alpine"
@@ -398,9 +390,9 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
-    fluentd: 256mb
     s3_cli: 512mb
+    fluentd: 256mb
+    certbot: 256mb
 tasks:
   docker_compose_install:
     type: "task"
