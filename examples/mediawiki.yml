@@ -289,8 +289,16 @@ nodes:
             private_http_port: "9080"
             private_https_port: "9443"
         group_params:
-          db_backup: "db_backup_no_sync"
-          uploads_backup: "uploads_backup_no_sync"
+          db_backup: >-
+            {{
+              params.local_db_backup_sync | default(false) | bool
+              | ternary('db_backup_sync', 'db_backup_no_sync')
+            }}
+          uploads_backup: >-
+            {{
+              params.local_uploads_backup_sync | default(false) | bool
+              | ternary('uploads_backup_sync', 'uploads_backup_no_sync')
+            }}
   mediawiki:
     service:
       name: "{{ params.node_service | default('skip') }}"

@@ -289,8 +289,16 @@ nodes:
             private_http_port: "9080"
             private_https_port: "9443"
         group_params:
-          db_backup: "db_backup_no_sync"
-          uploads_backup: "uploads_backup_no_sync"
+          db_backup: >-
+            {{
+              params.local_db_backup_sync | default(false) | bool
+              | ternary('db_backup_sync', 'db_backup_no_sync')
+            }}
+          uploads_backup: >-
+            {{
+              params.local_uploads_backup_sync | default(false) | bool
+              | ternary('uploads_backup_sync', 'uploads_backup_no_sync')
+            }}
   rocketchat:
     service:
       name: "{{ params.node_service | default('skip') }}"
@@ -363,6 +371,7 @@ pods:
       block_ips: "{{ params.block_ips | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
+      rocketchat_block_default_settings: "{{ params.rocketchat_block_default_settings | default('') }}"
       define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
       define_cron: "{{ params.define_cron | default(false) }}"
@@ -395,6 +404,9 @@ pods:
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
       services:
+        nginx:
+          conf:
+            client_max_body_size: "{{ params.upload_max_size | default('5M') }}"
         mongo:
           host: "mongo"
           port: "27017"
@@ -435,14 +447,14 @@ pods:
       memory: "memory_app"
       db_setup: >-
         {{
-        params.non_s3_setup | default(false) | bool |
-        ternary('db_setup_restore_file', 'db_setup_restore_s3')
+          params.non_s3_setup | default(false) | bool |
+          ternary('db_setup_restore_file', 'db_setup_restore_s3')
         }}
       db_backup: "db_backup_sync"
       uploads_setup: >-
         {{
-        params.non_s3_setup | default(false) | bool |
-        ternary('uploads_setup_file', 'uploads_setup_s3')
+          params.non_s3_setup | default(false) | bool |
+          ternary('uploads_setup_file', 'uploads_setup_s3')
         }}
       uploads_backup: "uploads_backup_sync"
     transfer:
@@ -535,26 +547,28 @@ pod_group_params:
     is_compressed_file: true
   db_setup_restore_file:
     restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200612_221938.zip?raw=true"
     is_compressed_file: true
-    restore_compressed_inner_dir: "{{ credentials.rocketchat.db.name }}"
+    restore_remote_file: "{{ params.db_setup_restore_remote_file | default('') }}"
+    restore_compressed_inner_dir: "{{ credentials.rocketchat.db.name | default('') }}"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_remote_bucket_path_dir: "db"
+    is_compressed_file: "{{ params.db_setup_restore_s3.is_compressed_file | default(false) }}"
+    restore_bucket_path_dir: "{{ params.db_setup_restore_s3.restore_bucket_path_dir | default('') }}"
+    compressed_file_name: "{{ params.db_setup_restore_s3.compressed_file_name | default('') }}"
   uploads_backup_sync:
-    backup_bucket_sync_dir: "uploads"
+    backup_bucket_sync_dir: "[[ ]]"
   uploads_backup_no_sync:
     is_compressed_file: true
   uploads_setup_file:
     restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200612_221938.zip?raw=true"
     is_compressed_file: true
+    restore_remote_file: "{{ params.uploads_setup_restore_remote_file | default('') }}"
     restore_compressed_inner_dir: "uploads"
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_remote_bucket_path_dir: "uploads"
+    restore_remote_bucket_path_dir: "[[ ]]"
 tasks:
   docker_compose_install:
     type: "task"
