@@ -35,7 +35,7 @@ main:
     extend_cloud: true
     nodes:
       - name: "app"
-        key: "mediawiki_local"
+        key: "minio_local"
         local: true
   remote:
     extend_cloud: true
@@ -45,7 +45,7 @@ main:
         can_destroy: true
     nodes:
       - name: "app"
-        key: "mediawiki"
+        key: "minio"
         can_destroy: true
     run_stages:
       - tasks:
@@ -54,62 +54,6 @@ main:
             task_target: "node"
           - name: "main_upgrade"
             all_nodes: true
-            task_target: "pod"
-  nodes:
-    extend_cloud: true
-    initial_services:
-      - "{{ params.cloud_service | default('skip') }}"
-      - name: "s3_buckets"
-        can_destroy: true
-    nodes:
-      - name: "db"
-        key: "mediawiki"
-        can_destroy: true
-        params:
-          service_params:
-            tags:
-              - "auto"
-              - "mediawiki-mysql"
-        pods:
-          mediawiki:
-            params:
-              type: "db"
-            group_params:
-              memory: "memory_db"
-      - name: "web"
-        key: "mediawiki"
-        can_destroy: true
-        dependencies:
-          mysql:
-            type: "node"
-            host: "db"
-            port: "3306"
-        params:
-          service_params:
-            tags:
-              - "auto"
-              - "mediawiki-web"
-              - "mediawiki-dmz"
-        pods:
-          mediawiki:
-            params:
-              type: "web"
-            group_params:
-              memory: "memory_web"
-    run_stages:
-      - tasks:
-          - name: "docker_compose_install"
-            all_nodes: true
-            task_target: "node"
-          - name: "main_build"
-            all_nodes: true
-            task_target: "pod"
-          - name: "main_upgrade"
-            nodes: ["db"]
-            task_target: "pod"
-      - tasks:
-          - name: "main_upgrade"
-            nodes: ["web"]
             task_target: "pod"
 services:
   skip:
@@ -127,8 +71,6 @@ services:
       list:
         - bucket: "{{ params.backup_bucket_name | default('') }}"
           permission: "private"
-        - bucket: "{{ params.uploads_bucket_name | default('') }}"
-          permission: "public-read"
   s3_replica_buckets:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
@@ -140,8 +82,6 @@ services:
     params:
       list:
         - bucket: "{{ params.backup_replica_bucket_name | default('') }}"
-          permission: "private"
-        - bucket: "{{ params.uploads_replica_bucket_name | default('') }}"
           permission: "private"
   node_dns_service:
     base_dir: "ext-cloud"
@@ -179,9 +119,9 @@ services:
     params:
       tags:
         - "auto"
-        - "mediawiki-mysql"
-        - "mediawiki-web"
-        - "mediawiki-dmz"
+        - "minio"
+        - "minio-web"
+        - "minio-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -212,23 +152,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "mediawiki-mysql"
-          tags: ["mediawiki-mysql"]
+        - name: "minio"
+          tags: ["minio"]
           inbound_rules:
-            - ports: "3306"
+            - ports: "9000"
               sources:
-                tags: ["mediawiki-web"]
-        - name: "mediawiki-web"
-          tags: ["mediawiki-web"]
+                tags: ["auto", "minio-web"]
+        - name: "minio-web"
+          tags: ["minio-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["mediawiki-dmz"]
+                tags: ["minio-dmz"]
             - ports: "443"
               sources:
-                tags: ["mediawiki-dmz"]
-        - name: "mediawiki-dmz"
-          tags: ["mediawiki-dmz"]
+                tags: ["minio-dmz"]
+        - name: "minio-dmz"
+          tags: ["minio-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -270,11 +210,11 @@ services:
         type: "env"
         name: "user_data_ubuntu"
 nodes:
-  mediawiki_local:
+  minio_local:
     credentials:
       host: "localhost"
     pods:
-      - name: "mediawiki"
+      - name: "minio"
         params:
           local: true
           named_volumes: "{{ params.named_volumes | default(false) }}"
@@ -283,24 +223,13 @@ nodes:
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
           domains: "{{ params.local_domains | default({}) }}"
-        group_params:
-          db_backup: >-
-            {{
-              params.local_db_backup_sync | default(false) | bool
-              | ternary('db_backup_sync', 'db_backup_no_sync')
-            }}
-          uploads_backup: >-
-            {{
-              params.local_uploads_backup_sync | default(false) | bool
-              | ternary('uploads_backup_sync', 'uploads_backup_no_sync')
-            }}
-  mediawiki:
+  minio:
     service:
       name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
-          - "mediawiki-dmz"
+          - "minio-dmz"
     dns_service: "node_dns_service"
     base_dir: "/var/cloud"
     root: true
@@ -316,28 +245,26 @@ nodes:
           initial_connection_timeout: 90
           setup_finished_timeout: 300
     pods:
-      - name: "mediawiki"
+      - name: "minio"
         params:
           local: false
           domains: "{{ params.domains | default({}) }}"
 pods:
-  mediawiki:
+  minio:
     repo: "pod"
+    root: "yes"
+    ctx: "ext-pod/minio/minio.ctx.yml"
+    schema: "ext-pod/minio/minio.schema.yml"
+    validator: "ext-pod/minio/minio.validator.yml"
+    fast_prepare: "true"
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"
-    root: true
-    ctx: "ext-pod/mediawiki/mediawiki.ctx.yml"
-    schema: "ext-pod/mediawiki/mediawiki.schema.yml"
-    validator: "ext-pod/mediawiki/mediawiki.validator.yml"
-    fast_prepare: "true"
     credentials:
-      mediawiki: "mediawiki"
+      minio: "minio"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
-      uploads_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
-      uploads_replica_bucket: "{{ params.enable_uploads_replica | default(false) | bool | ternary('s3_replica', '') }}"
     params:
       type: "app"
       orchestration: "docker_compose"
@@ -345,24 +272,19 @@ pods:
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       meta: "{{ params.pod_meta | default({}) }}"
       main_domain: "{{ params.main_domain | default('') }}"
+      minio_amount: "{{ params.minio_amount | default(0) }}"
+      minio_data_amount: "{{ params.minio_data_amount | default(0) }}"
+      minio_include_healthcheck: "{{ params.minio_include_healthcheck | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
-      use_varnish: "{{ params.use_varnish | default(false) }}"
-      use_redis: "{{ params.use_redis | default(false) }}"
-      use_memcached: "{{ params.use_memcached | default(false) }}"
-      use_pma: "{{ params.use_pma | default(false) }}"
-      use_adminer: "{{ params.use_adminer | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
-      use_filestash: "{{ params.use_filestash | default(false) }}"
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
-      block_ips: "{{ params.block_ips | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
-      mediawiki: "{{ params.mediawiki | default({}) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
       define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
@@ -372,57 +294,40 @@ pods:
       cron_dest: "/var/spool/cron/crontabs/root"
       backup_bucket_name: "{{ params.backup_bucket_name | default('') }}"
       backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
-      uploads_bucket_name: "{{ params.uploads_bucket_name | default('') }}"
-      uploads_bucket_path: "{{ params.uploads_bucket_path | default('') }}"
       backup_replica_bucket_name: "{{ params.backup_replica_bucket_name | default('') }}"
       backup_replica_bucket_path: "{{ params.backup_replica_bucket_path | default('') }}"
-      uploads_replica_bucket_name: "{{ params.uploads_replica_bucket_name | default('') }}"
-      uploads_replica_bucket_path: "{{ params.uploads_replica_bucket_path | default('') }}"
-      restore_db: "{{ params.restore_db | default(false) }}"
-      db_gui_root_user: "{{ params.db_gui_root_user | default(false) }}"
-      use_s3_storage: "{{ params.use_s3_storage | default(false) }}"
       enable_db_backup: "{{ params.enable_db_backup | default(false) }}"
       enable_db_setup: "{{ params.enable_db_setup | default(false) }}"
       enable_logs_backup: "{{ params.enable_logs_backup | default(false) }}"
       enable_logs_setup: "{{ params.enable_logs_setup | default(false) }}"
       enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
       enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
-      enable_uploads_backup: "{{ params.enable_uploads_backup | default(false) }}"
-      enable_uploads_setup: "{{ params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
-      enable_uploads_replica: "{{ params.enable_uploads_replica | default(false) }}"
+      db_backup:
+        backup_bucket_sync_dir: "uploads"
+      db_setup:
+        restore_use_s3: true
+        restore_s3_sync: true
+        restore_bucket_path_dir: "20210325"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
       services:
-        mysql:
-          port: "3306"
         fluentd:
           port: "24224"
+          output_plugin: "{{ params.fluentd_output_plugin | default('elasticsearch') }}"
+        kibana:
+          port: "5601"
       images:
         nginx_image: "nginx"
         nginx_version: "1.14.2-alpine"
-        varnish_image: "varnish"
-        varnish_version: "6.4.0-1"
-        mediawiki_image: "lucasbasquerotto/image"
-        mediawiki_version: "mediawiki-20200813"
-        redis_image: "redis"
-        redis_version: "6.0.6"
-        memcached_image: "memcached"
-        memcached_version: "1.6.6"
-        pma_image: "phpmyadmin/phpmyadmin"
-        pma_version: "4.8.5"
-        adminer_image: "lucasbasquerotto/image"
-        adminer_version: "adminer-20200713-03"
-        mysql_image: "mariadb"
-        mysql_version: "10.5.3-bionic"
+        minio_image: "minio/minio"
+        minio_version: "RELEASE.2021-03-17T02-33-02Z"
         theia_image: "theiaide/theia"
         theia_version: "1.3.0"
         minio_gateway_image: "minio/minio"
         minio_gateway_version: "RELEASE.2020-07-02T00-15-09Z"
-        filestash_image: "machines/filestash"
-        filestash_version: "4cbeb2c"
         toolbox_image: "lucasbasquerotto/image"
         toolbox_version: "toolbox-20200715-02"
         certbot_image: "certbot/certbot"
@@ -439,18 +344,6 @@ pods:
         fluentd_version: "fluentd-20200617"
     group_params:
       memory: "memory_app"
-      db_setup: >-
-        {{
-        params.non_s3_setup | default(false) | bool |
-        ternary('db_setup_restore_file', 'db_setup_restore_s3')
-        }}
-      db_backup: "db_backup_no_sync"
-      uploads_setup: >-
-        {{
-        params.non_s3_setup | default(false) | bool |
-        ternary('uploads_setup_file', 'uploads_setup_s3')
-        }}
-      uploads_backup: "uploads_backup_sync"
     transfer:
       - dest: "env/cron/cron-file"
         when: "{{ params.define_cron | default(false) }}"
@@ -498,79 +391,16 @@ pods:
                 filter_prefix: "logs/"
                 expiration_days: 30
                 older_versions_expiration_days: 180
-              - name: "db-expiration"
-                filter_prefix: "db/"
-                expiration_days: 15
-                older_versions_expiration_days: 90
 pod_group_params:
   memory_app:
     nginx: 512mb
-    varnish: 512mb
-    mediawiki: 1gb
-    redis: 512mb
-    memcached: 512mb
-    pma: 512mb
-    adminer: 512mb
-    mysql: 1gb
+    minio: 512mb
     theia: 512mb
     minio_gateway: 512mb
-    filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_cli: 512mb
     fluentd: 256mb
-  memory_db:
-    mysql: 1gb
-    toolbox: 512mb
     s3_cli: 512mb
-    fluentd: 256mb
-  memory_cache:
-    redis: 512mb
-    memcached: 512mb
-  memory_web:
-    nginx: 512mb
-    varnish: 512mb
-    mediawiki: 1gb
-    pma: 512mb
-    adminer: 512mb
-    theia: 512mb
-    minio_gateway: 512mb
-    filestash: 512mb
-    toolbox: 512mb
-    certbot: 256mb
-    s3_cli: 512mb
-    fluentd: 256mb
-  db_backup_sync:
-    backup_bucket_sync_dir: "db"
-  db_backup_no_sync:
-    is_compressed_file: true
-  db_setup_restore_file:
-    restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
-    is_compressed_file: true
-    db_file_name: "{{ credentials.mediawiki.db.name }}.sql"
-  db_setup_restore_s3:
-    restore_use_s3: true
-    restore_s3_sync: true
-    is_compressed_file: true
-    restore_bucket_path_dir: "20210203"
-    compressed_file_name: "my_wiki.20210203.002503.95010316.zip"
-  uploads_backup_sync:
-    backup_bucket_sync_dir: "uploads"
-  uploads_backup_no_sync:
-    is_compressed_file: true
-  uploads_setup_file:
-    restore_use_s3: false
-    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
-    is_compressed_file: true
-    restore_compressed_inner_dir: "uploads"
-  uploads_setup_s3:
-    restore_use_s3: true
-    restore_s3_sync: true
-    is_compressed_file: true
-    restore_bucket_path_dir: "20210203"
-    compressed_file_name: "uploads.20210203.004110.30597840.zip"
-    restore_compressed_inner_dir: "uploads"
 tasks:
   docker_compose_install:
     type: "task"

@@ -641,9 +641,9 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
-      minio_gateway: "{{ params.use_s3 | default(false) | bool | ternary('minio_gateway', '') }}"
+      minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
-      backup_replica_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3_replica', '') }}"
+      backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
     contents:
       auth_content: "{{ params.auth_content | default('') }}"
     params:
