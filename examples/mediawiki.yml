@@ -378,7 +378,7 @@ pods:
       backup_replica_bucket_path: "{{ params.backup_replica_bucket_path | default('') }}"
       uploads_replica_bucket_name: "{{ params.uploads_replica_bucket_name | default('') }}"
       uploads_replica_bucket_path: "{{ params.uploads_replica_bucket_path | default('') }}"
-      restore_db: "{{ params.restore_db | default(false) }}"
+      uploads_cdn_path: "{{ params.uploads_cdn_path | default('') }}"
       db_gui_root_user: "{{ params.db_gui_root_user | default(false) }}"
       use_s3_storage: "{{ params.use_s3_storage | default(false) }}"
       enable_db_backup: "{{ params.enable_db_backup | default(false) }}"
@@ -441,14 +441,14 @@ pods:
       memory: "memory_app"
       db_setup: >-
         {{
-        params.non_s3_setup | default(false) | bool |
-        ternary('db_setup_restore_file', 'db_setup_restore_s3')
+          params.non_s3_setup | default(false) | bool |
+          ternary('db_setup_restore_file', 'db_setup_restore_s3')
         }}
       db_backup: "db_backup_no_sync"
       uploads_setup: >-
         {{
-        params.non_s3_setup | default(false) | bool |
-        ternary('uploads_setup_file', 'uploads_setup_s3')
+          params.non_s3_setup | default(false) | bool |
+          ternary('uploads_setup_file', 'uploads_setup_s3')
         }}
       uploads_backup: "uploads_backup_sync"
     transfer:
