@@ -406,7 +406,7 @@ pods:
         varnish_image: "varnish"
         varnish_version: "6.4.0-1"
         mediawiki_image: "lucasbasquerotto/image"
-        mediawiki_version: "mediawiki-20200813"
+        mediawiki_version: "mediawiki-20210331"
         redis_image: "redis"
         redis_version: "6.0.6"
         memcached_image: "memcached"
