@@ -309,6 +309,7 @@ nodes:
       - name: "wp"
         params:
           local: true
+          local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
           wp_env: "development"
           named_volumes: "{{ params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
