@@ -457,7 +457,7 @@ pods:
         varnish_image: "varnish"
         varnish_version: "6.4.0-1"
         wordpress_image: "lucasbasquerotto/wordpress"
-        wordpress_version: "20200825"
+        wordpress_version: "20210401-02"
         redis_image: "redis"
         redis_version: "6.0.6"
         memcached_image: "memcached"
@@ -477,7 +477,7 @@ pods:
         toolbox_image: "lucasbasquerotto/image"
         toolbox_version: "toolbox-20200715-02"
         composer_image: "lucasbasquerotto/wordpress"
-        composer_version: "composer-1.8.6"
+        composer_version: "composer-2.0.11"
         certbot_image: "certbot/certbot"
         certbot_version: "v1.2.0"
         awscli_image: "lucasbasquerotto/aws-cli"
@@ -560,7 +560,7 @@ pod_group_params:
   memory_app:
     nginx: 256mb
     varnish: 256mb
-    wordpress: 256mb
+    wordpress: 512mb
     redis: 256mb
     memcached: 256mb
     pma: 256mb
