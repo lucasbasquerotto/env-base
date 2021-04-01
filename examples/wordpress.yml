@@ -457,7 +457,7 @@ pods:
         varnish_image: "varnish"
         varnish_version: "6.4.0-1"
         wordpress_image: "lucasbasquerotto/wordpress"
-        wordpress_version: "20210401-02"
+        wordpress_version: "20210401-04"
         redis_image: "redis"
         redis_version: "6.0.6"
         memcached_image: "memcached"
