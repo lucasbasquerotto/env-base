@@ -21,7 +21,8 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.cloud_service }}"
+      - "{{ params.cloud_service | default('skip') }}"
+      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
       - "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
     nodes:
       - name: "app"
@@ -190,7 +191,13 @@ services:
           permission: "private"
         - bucket: "{{ params.discourse.uploads_bucket_name | default('') }}"
           permission: "public-read"
-  node_dns_service:
+  dns_main_service:
+    list: true
+    services:
+      - name: "dns_base_service"
+        params:
+          list: "{{ params.dns_main_service_params_list | default([]) }}"
+  dns_base_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: >-
@@ -336,33 +343,6 @@ services:
           node: "host"
         contents:
           host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
-  linode:
-    base_dir: "ext-cloud"
-    namespace: "ext_node"
-    task: "tasks/node/linode/linode.main.node.yml"
-    schema: "tasks/node/linode/linode.schema.node.yml"
-    validator: "tasks/node/linode/linode.validator.node.yml"
-    credentials:
-      node: "linode"
-    params:
-      image: "linode/ubuntu18.04"
-      region: "us-east"
-      type: "g6-standard-1"
-    contents:
-      user_data:
-        type: "template"
-        origin: "cloud"
-        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
-        params:
-          user_directories: ["/var/cloud"]
-          install_docker: true
-          install_podman: false
-          install_packages: false
-        credentials:
-          node: "host"
-        contents:
-          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
 nodes:
   discourse:
     service:
@@ -371,7 +351,7 @@ nodes:
         tags:
           - "auto"
           - "discourse-dmz"
-    dns_service: "node_dns_service"
+    dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
     credentials:

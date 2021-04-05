@@ -25,6 +25,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service | default('skip') }}"
+      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
   s3_replica_buckets:
     extend_cloud: true
     initial_services:
@@ -77,6 +78,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service | default('skip') }}"
+      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -95,6 +97,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service | default('skip') }}"
+      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -116,6 +119,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service | default('skip') }}"
+      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -216,6 +220,7 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service | default('skip') }}"
+      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -309,7 +314,13 @@ services:
           permission: "private"
         - bucket: "{{ params.uploads_replica_bucket_name | default('') }}"
           permission: "private"
-  node_dns_service:
+  dns_main_service:
+    list: true
+    services:
+      - name: "dns_base_service"
+        params:
+          list: "{{ params.dns_main_service_params_list | default([]) }}"
+  dns_base_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
     task: >-
@@ -505,7 +516,7 @@ nodes:
         tags:
           - "auto"
           - "rproxy-dmz"
-    dns_service: "node_dns_service"
+    dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
     credentials:
@@ -525,7 +536,7 @@ nodes:
         tags:
           - "auto"
           - "rproxy-dmz"
-    dns_service: "node_dns_service"
+    dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
     credentials:
@@ -556,7 +567,7 @@ nodes:
         tags:
           - "auto"
           - "rproxy-dmz"
-    dns_service: "node_dns_service"
+    dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
     credentials:
@@ -576,7 +587,7 @@ nodes:
         tags:
           - "auto"
           - "rproxy-web"
-    dns_service: "node_dns_service"
+    dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
     credentials:
