@@ -422,7 +422,7 @@ pods:
         memcached_image: "memcached"
         memcached_version: "1.6.6"
         pma_image: "phpmyadmin/phpmyadmin"
-        pma_version: "4.8.5"
+        pma_version: "5.1.0"
         adminer_image: "lucasbasquerotto/image"
         adminer_version: "adminer-20200713-03"
         mysql_image: "mariadb"
