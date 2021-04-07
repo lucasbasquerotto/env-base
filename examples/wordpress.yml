@@ -396,6 +396,7 @@ pods:
       wp_env: "staging"
       app_dev: "{{ params.app_dev | default(false) }}"
       app_repo_dir: "app-wp"
+      use_secrets: "{{ params.use_secrets | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
