@@ -475,7 +475,7 @@ pods:
         pma_image: "phpmyadmin/phpmyadmin"
         pma_version: "5.1.0"
         adminer_image: "lucasbasquerotto/image"
-        adminer_version: "adminer-20200713-03"
+        adminer_version: "adminer-20210408"
         mysql_image: "lucasbasquerotto/wordpress"
         mysql_version: "mysql-8.0.16-02"
         theia_image: "theiaide/theia"
