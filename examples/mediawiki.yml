@@ -115,6 +115,16 @@ main:
             type: "node"
             host: "db"
             port: "3306"
+          memcached:
+            type: "node"
+            host: "cache"
+            port: "11211"
+            when: >-
+              {{
+                (params.use_redis | default(false) | bool)
+                or
+                (params.use_memcached | default(false) | bool)
+              }}
         params:
           service_params:
             tags:
