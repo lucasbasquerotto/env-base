@@ -314,6 +314,8 @@ pods:
       enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
       enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
+      db_setup_sync:
+        restore_bucket_path_dir: "db"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
