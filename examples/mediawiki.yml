@@ -135,10 +135,12 @@ main:
           - name: "main_build"
             all_nodes: true
             task_target: "pod"
-          - name: "main_upgrade"
+          - name: "main_upgrade_db"
+            key: "main_upgrade"
             nodes: ["db"]
             task_target: "pod"
-          - name: "main_upgrade"
+          - name: "main_upgrade_cache"
+            key: "main_upgrade"
             nodes: ["cache"]
             task_target: "pod"
             when: >-
