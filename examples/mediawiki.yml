@@ -138,6 +138,15 @@ main:
           - name: "main_upgrade"
             nodes: ["db"]
             task_target: "pod"
+          - name: "main_upgrade"
+            nodes: ["cache"]
+            task_target: "pod"
+            when: >-
+              {{
+                (params.use_redis | default(false) | bool)
+                or
+                (params.use_memcached | default(false) | bool)
+              }}
       - tasks:
           - name: "main_upgrade"
             nodes: ["web"]
