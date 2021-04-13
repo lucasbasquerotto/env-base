@@ -79,6 +79,34 @@ main:
               type: "db"
             group_params:
               memory: "memory_db"
+      - name: "cache"
+        key: "mediawiki"
+        can_destroy: true
+        when: >-
+          {{
+            (params.use_redis | default(false) | bool)
+            or
+            (params.use_memcached | default(false) | bool)
+          }}
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - >-
+                {{
+                  params.use_redis | default(false) | bool
+                  | ternary(
+                    'mediawiki-redis',
+                    params.use_memcached | default(false) | bool
+                    | ternary('mediawiki-memcached', 'auto')
+                  )
+                }}
+        pods:
+          mediawiki:
+            params:
+              type: "cache"
+            group_params:
+              memory: "memory_cache"
       - name: "web"
         key: "mediawiki"
         can_destroy: true
@@ -189,6 +217,8 @@ services:
       tags:
         - "auto"
         - "mediawiki-mysql"
+        - "mediawiki-redis"
+        - "mediawiki-memcached"
         - "mediawiki-web"
         - "mediawiki-dmz"
       firewalls:
@@ -225,6 +255,18 @@ services:
           tags: ["mediawiki-mysql"]
           inbound_rules:
             - ports: "3306"
+              sources:
+                tags: ["mediawiki-web"]
+        - name: "mediawiki-redis"
+          tags: ["mediawiki-redis"]
+          inbound_rules:
+            - ports: "6379"
+              sources:
+                tags: ["mediawiki-web"]
+        - name: "mediawiki-memcached"
+          tags: ["mediawiki-memcached"]
+          inbound_rules:
+            - ports: "11211"
               sources:
                 tags: ["mediawiki-web"]
         - name: "mediawiki-web"
@@ -533,14 +575,17 @@ pod_group_params:
     certbot: 256mb
     s3_cli: 512mb
     fluentd: 256mb
+  memory_cache:
+    redis: 512mb
+    memcached: 512mb
+    toolbox: 512mb
+    s3_cli: 512mb
+    fluentd: 256mb
   memory_db:
     mysql: 1gb
     toolbox: 512mb
     s3_cli: 512mb
     fluentd: 256mb
-  memory_cache:
-    redis: 512mb
-    memcached: 512mb
   memory_web:
     nginx: 512mb
     varnish: 512mb

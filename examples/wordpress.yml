@@ -86,6 +86,34 @@ main:
               type: "db"
             group_params:
               memory: "memory_db"
+      - name: "cache"
+        key: "wp"
+        can_destroy: true
+        when: >-
+          {{
+            (params.use_redis | default(false) | bool)
+            or
+            (params.use_memcached | default(false) | bool)
+          }}
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - >-
+                {{
+                  params.use_redis | default(false) | bool
+                  | ternary(
+                    'wp-redis',
+                    params.use_memcached | default(false) | bool
+                    | ternary('wp-memcached', 'auto')
+                  )
+                }}
+        pods:
+          wp:
+            params:
+              type: "cache"
+            group_params:
+              memory: "memory_cache"
       - name: "web"
         key: "wp"
         can_destroy: true
@@ -596,6 +624,9 @@ pod_group_params:
   memory_cache:
     redis: 512mb
     memcached: 512mb
+    toolbox: 512mb
+    fluentd: 256mb
+    s3_cli: 512mb
   memory_web:
     nginx: 512mb
     varnish: 512mb
