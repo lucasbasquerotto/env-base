@@ -386,7 +386,7 @@ pods:
       services:
         fluentd:
           port: "24224"
-          output_plugin: "{{ params.fluentd_output_plugin | default('elasticsearch') }}"
+          output_plugin: "{{ params.fluentd_output_plugin | default('file') }}"
         elasticsearch:
           port: "9200"
           java_opts: "-Xms700m -Xmx700m"
