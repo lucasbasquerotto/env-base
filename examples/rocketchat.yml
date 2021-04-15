@@ -289,6 +289,7 @@ nodes:
           local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
           named_volumes: "{{ params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
+          internal_ssl: "{{ params.internal_ssl | default({}) }}"
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"

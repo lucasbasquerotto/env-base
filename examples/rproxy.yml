@@ -776,6 +776,7 @@ pod_shared_params:
     enable_logs_setup: false
     enable_sync_setup: false
     custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
+    internal_ssl: "{{ params.internal_ssl | default({}) }}"
     main_domain: "{{ params.local_main_domain | default('localhost') }}"
     domains: "{{ params.local_domains | default({}) }}"
   hub_item:

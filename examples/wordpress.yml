@@ -350,6 +350,7 @@ nodes:
           wp_env: "development"
           named_volumes: "{{ params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
+          internal_ssl: "{{ params.internal_ssl | default({}) }}"
           migrate_old_domain_host: "{{ params.wp_old_domain_host | default('') }}"
           migrate_new_domain_host: >-
             {{ params.use_ssl | default(false) | bool | ternary('https', 'http')
