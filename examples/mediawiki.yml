@@ -420,6 +420,7 @@ pods:
       main_domain: "{{ params.main_domain | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
+      use_secure_elasticsearch: "{{ params.use_ssl | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
       use_varnish: "{{ params.use_varnish | default(false) }}"
