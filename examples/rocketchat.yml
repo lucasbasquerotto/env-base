@@ -292,7 +292,7 @@ nodes:
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
-          domains: "{{ params.local_domains | default({}) }}"
+          domains: "{{ params.local_domains | default({ 'rocketchat': 'localhost'}) }}"
         group_params:
           db_backup: >-
             {{
@@ -363,6 +363,7 @@ pods:
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
+      use_nginx: "{{ params.use_nginx | default(false) }}"
       use_bot: "{{ params.use_bot | default(false) }}"
       use_mongo_express: "{{ params.use_mongo_express | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
@@ -374,6 +375,7 @@ pods:
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
+      use_basic_auth_private: "{{ params.use_basic_auth_private | default(false) }}"
       block_ips: "{{ params.block_ips | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"

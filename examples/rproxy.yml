@@ -811,6 +811,7 @@ pod_shared_params:
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
   local_web_1:
     main_domain: "{{ params.local_domains.rproxy_web_1 | default('') }}"
     domains:
@@ -860,10 +861,12 @@ pod_shared_params:
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "minio_gateway"
         when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
         private: true
+        use_basic_auth: false
   main_haproxy:
     rproxy_services:
       - name: "rproxy"
@@ -883,11 +886,13 @@ pod_shared_params:
           stats refresh 60s if is_domain_private
           stats admin if is_domain_private
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "theia"
         when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "minio_gateway"
         when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
@@ -912,6 +917,7 @@ pod_shared_params:
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "minio_gateway"
         when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
@@ -936,6 +942,7 @@ pod_shared_params:
           stats refresh 60s if is_domain_private
           stats admin if is_domain_private
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "rproxy_web_1"
         endpoint: "http://rproxy_web_1-main-nginx"
       - name: "rproxy_web_2"
@@ -947,6 +954,7 @@ pod_shared_params:
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "minio_gateway"
         when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
@@ -992,6 +1000,7 @@ pod_shared_params:
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "minio_gateway"
         when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
@@ -1016,6 +1025,7 @@ pod_shared_params:
           stats refresh 60s if is_domain_private
           stats admin if is_domain_private
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "rproxy_web_1"
         proxy: true
       - name: "rproxy_web_1_theia"
@@ -1048,6 +1058,7 @@ pod_shared_params:
         endpoint: "http://theia:3000"
         upgrade: true
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "minio_gateway"
         when: "{{ params.use_minio_gateway | default(false) }}"
         endpoint: "http://minio_gateway:9000"
@@ -1102,6 +1113,7 @@ pod_shared_params:
           stats refresh 60s if is_domain_private
           stats admin if is_domain_private
         private: true
+        use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "rproxy_replica"
         dependency_name: "replica"
         proxy: true

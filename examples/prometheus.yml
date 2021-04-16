@@ -87,7 +87,7 @@ main:
           prometheus:
             type: "node"
             host: "db"
-            port: "9090"
+            port: "{{ params.prometheus_external_port | default('9090', true) }}"
         params:
           service_params:
             tags:
@@ -221,7 +221,7 @@ services:
         - name: "prometheus"
           tags: ["prometheus"]
           inbound_rules:
-            - ports: "9090"
+            - ports: "{{ params.prometheus_external_port | default('9090', true) }}"
               sources:
                 tags: ["auto", "prometheus-web"]
         - name: "prometheus-web"
@@ -289,7 +289,7 @@ nodes:
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
-          domains: "{{ params.local_domains | default({}) }}"
+          domains: "{{ params.local_domains | default({ 'prometheus': 'localhost' }) }}"
           ports:
             public_http_port: "8080"
             public_https_port: "8443"
@@ -344,7 +344,7 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
-      grafana: "grafana"
+      grafana: "{{ params.use_grafana | default(false) | bool | ternary('grafana', '') }}"
       elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
@@ -364,7 +364,8 @@ pods:
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
       use_node_exporter: "{{ params.use_node_exporter | default(false) }}"
       use_cadvisor: "{{ params.use_cadvisor | default(false) }}"
-      use_nginx: "{{ params.use_nginx | default(true) }}"
+      use_nginx: "{{ params.use_nginx | default(false) }}"
+      use_grafana: "{{ params.use_grafana | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
       use_filestash: "{{ params.use_filestash | default(false) }}"
@@ -373,6 +374,8 @@ pods:
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
+      use_basic_auth_private: "{{ params.use_basic_auth_private | default(false) }}"
+      prometheus_external_port: "{{ params.prometheus_external_port | default('9090', true) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
@@ -401,8 +404,6 @@ pods:
       services:
         fluentd:
           port: "24224"
-        prometheus:
-          port: "9090"
         grafana:
           port: "3000"
       images:

@@ -353,6 +353,7 @@ pods:
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
+      use_basic_auth_private: "{{ params.use_basic_auth_private | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
