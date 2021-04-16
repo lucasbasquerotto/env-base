@@ -652,6 +652,7 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
+      elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
@@ -664,6 +665,7 @@ pods:
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       meta: "{{ params.pod_meta | default({}) }}"
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
+      fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
       backup_bucket_name: "{{ params.backup_bucket_name | default('') }}"
       backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
@@ -760,6 +762,7 @@ pod_shared_params:
     domains: "{{ params.domains | default({}) }}"
     use_secrets: "{{ params.use_secrets | default(false) }}"
     use_ssl: "{{ params.use_ssl | default(false) }}"
+    internal_ssl: "{{ params.internal_ssl | default({}) }}"
     use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
     use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
     use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
@@ -776,7 +779,6 @@ pod_shared_params:
     enable_logs_setup: false
     enable_sync_setup: false
     custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
-    internal_ssl: "{{ params.internal_ssl | default({}) }}"
     main_domain: "{{ params.local_main_domain | default('localhost') }}"
     domains: "{{ params.local_domains | default({}) }}"
   hub_item:

@@ -354,6 +354,7 @@ pods:
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
+      fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
       define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
@@ -388,7 +389,6 @@ pods:
       services:
         fluentd:
           port: "24224"
-          output_plugin: "{{ params.fluentd_output_plugin | default('file') }}"
         elasticsearch:
           port: "9200"
           java_opts: "-Xms700m -Xmx700m"

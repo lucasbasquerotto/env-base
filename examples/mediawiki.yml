@@ -352,7 +352,6 @@ nodes:
           local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
           named_volumes: "{{ params.named_volumes | default(false) }}"
           custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
-          internal_ssl: "{{ params.internal_ssl | default({}) }}"
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
@@ -407,6 +406,7 @@ pods:
     fast_prepare: "true"
     credentials:
       mediawiki: "mediawiki"
+      elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       uploads_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
@@ -421,6 +421,7 @@ pods:
       main_domain: "{{ params.main_domain | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
+      internal_ssl: "{{ params.internal_ssl | default({}) }}"
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
@@ -440,6 +441,7 @@ pods:
       use_private_path: "{{ params.use_private_path | default(false) }}"
       block_ips: "{{ params.block_ips | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
+      fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       mediawiki: "{{ params.mediawiki | default({}) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
       define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
