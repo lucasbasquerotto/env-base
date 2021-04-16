@@ -287,7 +287,7 @@ pods:
       minio_include_healthcheck: "{{ params.minio_include_healthcheck | default(false) }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
-      use_secure_elasticsearch: "{{ params.use_ssl | default(false) }}"
+      use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
