@@ -235,7 +235,9 @@ main:
         pods:
           rproxy:
             shared_params:
-              ["main_replicas_hub_{{ params.rproxy_type | default('nginx') }}"]
+              [
+                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}",
+              ]
         dependencies:
           replica:
             type: "node"
@@ -449,7 +451,7 @@ nodes:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.rproxy_type | default('nginx') }}"
+          - "main_{{ params.rproxy_type | default('nginx', true) }}"
           - "local"
   rproxy_hub_local:
     credentials:
@@ -461,7 +463,7 @@ nodes:
           - "main"
           - "local"
           - "hub_item"
-          - "main_hub_{{ params.rproxy_type | default('nginx') }}"
+          - "main_hub_{{ params.rproxy_type | default('nginx', true) }}"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["local", "hub_item", "hub_web", "local_web_1"]
@@ -481,7 +483,7 @@ nodes:
           - "main"
           - "local"
           - "hub_item"
-          - "main_replicas_hub_{{ params.rproxy_type | default('nginx') }}"
+          - "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}"
   rproxy_replica_1_local:
     service: "local_node"
     base_dir: "/var/cloud"
@@ -528,7 +530,7 @@ nodes:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_{{ params.rproxy_type | default('nginx') }}"
+          - "main_{{ params.rproxy_type | default('nginx', true) }}"
   rproxy_hub:
     service:
       name: "{{ params.node_service | default('skip') }}"
@@ -550,7 +552,7 @@ nodes:
         shared_params:
           - "main"
           - "hub_item"
-          - "main_hub_{{ params.rproxy_type | default('nginx') }}"
+          - "main_hub_{{ params.rproxy_type | default('nginx', true) }}"
       - name: "rproxy_web_1"
         key: "rproxy"
         shared_params: ["hub_item", "hub_web", "remote_web_1"]
@@ -579,7 +581,7 @@ nodes:
       - name: "rproxy"
         shared_params:
           - "main"
-          - "main_external_hub_{{ params.rproxy_type | default('nginx') }}"
+          - "main_external_hub_{{ params.rproxy_type | default('nginx', true) }}"
   rproxy_web:
     service:
       name: "{{ params.node_service | default('skip') }}"
@@ -659,7 +661,7 @@ pods:
     contents:
       auth_content: "{{ params.auth_content | default('') }}"
     params:
-      rproxy_type: "{{ params.rproxy_type | default('nginx') }}"
+      rproxy_type: "{{ params.rproxy_type | default('nginx', true) }}"
       orchestration: "docker_compose"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
@@ -768,6 +770,8 @@ pod_shared_params:
     use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
     use_theia: "{{ params.use_theia | default(false) }}"
     use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
+    use_s3: "{{ params.use_s3 | default(false) }}"
+    use_local_s3: "{{ params.use_local_s3 | default(false) }}"
     use_certbot: "{{ params.use_certbot | default(false) }}"
     use_private_path: "{{ params.use_private_path | default(false) }}"
     block_ips: "{{ params.block_ips | default(false) }}"
@@ -780,7 +784,7 @@ pod_shared_params:
     enable_sync_setup: false
     custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
     main_domain: "{{ params.local_main_domain | default('localhost') }}"
-    domains: "{{ params.local_domains | default({}) }}"
+    domains: "{{ params.local_domains | default({ 'rproxy': 'localhost' }) }}"
   hub_item:
     shared_network: "rproxy-hub-network"
   hub_web:
