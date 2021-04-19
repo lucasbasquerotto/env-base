@@ -36,7 +36,7 @@ main:
     extend_cloud: true
     nodes:
       - name: "app"
-        key: "prometheus_local"
+        key: "vault_local"
         local: true
   remote:
     extend_cloud: true
@@ -47,7 +47,7 @@ main:
         can_destroy: true
     nodes:
       - name: "app"
-        key: "prometheus"
+        key: "vault"
         can_destroy: true
     run_stages:
       - tasks:
@@ -66,36 +66,36 @@ main:
         can_destroy: true
     nodes:
       - name: "db"
-        key: "prometheus"
+        key: "vault"
         can_destroy: true
         params:
           service_params:
             tags:
               - "auto"
-              - "prometheus"
+              - "vault"
         pods:
-          prometheus:
+          vault:
             params:
               type: "db"
               use_nginx: false
             group_params:
               memory: "memory_db"
       - name: "web"
-        key: "prometheus"
+        key: "vault"
         can_destroy: true
         dependencies:
-          prometheus:
+          vault:
             type: "node"
             host: "db"
-            port: "{{ params.prometheus_external_port | default('9090', true) }}"
+            port: "{{ params.vault_external_port | default('8200', true) }}"
         params:
           service_params:
             tags:
               - "auto"
-              - "prometheus-web"
-              - "prometheus-dmz"
+              - "vault-web"
+              - "vault-dmz"
         pods:
-          prometheus:
+          vault:
             params:
               type: "web"
             group_params:
@@ -185,9 +185,9 @@ services:
     params:
       tags:
         - "auto"
-        - "prometheus"
-        - "prometheus-web"
-        - "prometheus-dmz"
+        - "vault"
+        - "vault-web"
+        - "vault-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -218,23 +218,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "prometheus"
-          tags: ["prometheus"]
+        - name: "vault"
+          tags: ["vault"]
           inbound_rules:
-            - ports: "{{ params.prometheus_external_port | default('9090', true) }}"
+            - ports: "{{ params.vault_external_port | default('8200', true) }}"
               sources:
-                tags: ["auto", "prometheus-web"]
-        - name: "prometheus-web"
-          tags: ["prometheus-web"]
+                tags: ["auto", "vault-web"]
+        - name: "vault-web"
+          tags: ["vault-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["prometheus-dmz"]
+                tags: ["vault-dmz"]
             - ports: "443"
               sources:
-                tags: ["prometheus-dmz"]
-        - name: "prometheus-dmz"
-          tags: ["prometheus-dmz"]
+                tags: ["vault-dmz"]
+        - name: "vault-dmz"
+          tags: ["vault-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -276,11 +276,11 @@ services:
         type: "env"
         name: "user_data_ubuntu"
 nodes:
-  prometheus_local:
+  vault_local:
     credentials:
       host: "localhost"
     pods:
-      - name: "prometheus"
+      - name: "vault"
         params:
           local: true
           local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
@@ -289,7 +289,7 @@ nodes:
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
-          domains: "{{ params.local_domains | default({ 'prometheus': 'localhost' }) }}"
+          domains: "{{ params.local_domains | default({ 'vault': 'localhost' }) }}"
           ports:
             public_http_port: "8080"
             public_https_port: "8443"
@@ -301,13 +301,13 @@ nodes:
               params.local_db_backup_sync | default(false) | bool
               | ternary('db_backup_sync', 'db_backup_no_sync')
             }}
-  prometheus:
+  vault:
     service:
       name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
-          - "prometheus-dmz"
+          - "vault-dmz"
     dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
@@ -323,7 +323,7 @@ nodes:
           initial_connection_timeout: 90
           setup_finished_timeout: 300
     pods:
-      - name: "prometheus"
+      - name: "vault"
         params:
           local: false
           domains: "{{ params.domains | default({}) }}"
@@ -333,18 +333,18 @@ nodes:
             private_http_port: "9080"
             private_https_port: "9443"
 pods:
-  prometheus:
+  vault:
     repo: "pod"
     root: "yes"
-    ctx: "ext-pod/prometheus/prometheus.ctx.yml"
-    schema: "ext-pod/prometheus/prometheus.schema.yml"
-    validator: "ext-pod/prometheus/prometheus.validator.yml"
+    ctx: "ext-pod/vault/vault.ctx.yml"
+    schema: "ext-pod/vault/vault.schema.yml"
+    validator: "ext-pod/vault/vault.validator.yml"
     fast_prepare: "true"
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
-      grafana: "{{ params.use_grafana | default(false) | bool | ternary('grafana', '') }}"
+      dev_vault: "{{ params.dev_vault | default(false) | bool | ternary('dev_vault', '') }}"
       elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
@@ -362,20 +362,16 @@ pods:
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
-      use_node_exporter: "{{ params.use_node_exporter | default(false) }}"
-      use_cadvisor: "{{ params.use_cadvisor | default(false) }}"
       use_nginx: "{{ params.use_nginx | default(false) }}"
-      use_grafana: "{{ params.use_grafana | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
-      use_filestash: "{{ params.use_filestash | default(false) }}"
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_local_s3: "{{ params.use_local_s3 | default(false) }}"
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
       use_basic_auth_private: "{{ params.use_basic_auth_private | default(false) }}"
-      prometheus_external_port: "{{ params.prometheus_external_port | default('9090', true) }}"
+      vault_external_port: "{{ params.vault_external_port | default('8200', true) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
@@ -389,7 +385,6 @@ pods:
       backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
       backup_replica_bucket_name: "{{ params.backup_replica_bucket_name | default('') }}"
       backup_replica_bucket_path: "{{ params.backup_replica_bucket_path | default('') }}"
-      restore_db: "{{ params.restore_db | default(false) }}"
       enable_logs_backup: "{{ params.enable_logs_backup | default(false) }}"
       enable_logs_setup: "{{ params.enable_logs_setup | default(false) }}"
       enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
@@ -402,19 +397,11 @@ pods:
       services:
         fluentd:
           port: "24224"
-        grafana:
-          port: "3000"
       images:
         nginx_image: "nginx"
         nginx_version: "1.14.2-alpine"
-        prometheus_image: "prom/prometheus"
-        prometheus_version: "v2.20.1"
-        grafana_image: "grafana/grafana"
-        grafana_version: "7.1.5"
-        node_exporter_image: "prom/node-exporter"
-        node_exporter_version: "v1.0.1"
-        cadvisor_image: "google/cadvisor"
-        cadvisor_version: "v0.33.0"
+        vault_image: "vault"
+        vault_version: "1.7.0"
         theia_image: "theiaide/theia"
         theia_version: "1.3.0"
         minio_gateway_image: "minio/minio"
@@ -439,6 +426,12 @@ pods:
         fluentd_version: "fluentd-20200617"
     group_params:
       memory: "memory_app"
+      db_setup: >-
+        {{
+        params.non_s3_setup | default(false) | bool |
+        ternary('db_setup_restore_file', 'db_setup_restore_s3')
+        }}
+      db_backup: "db_backup_sync"
     transfer:
       - dest: "env/cron/cron-file"
         when: "{{ params.define_cron | default(false) }}"
@@ -489,10 +482,7 @@ pods:
 pod_group_params:
   memory_app:
     nginx: 512mb
-    grafana: 512mb
-    prometheus: 1gb
-    node_exporter: 512mb
-    cadvisor: 512mb
+    vault: 1gb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
@@ -501,17 +491,12 @@ pod_group_params:
     s3_cli: 512mb
     fluentd: 256mb
   memory_db:
-    prometheus: 1gb
-    node_exporter: 512mb
-    cadvisor: 512mb
+    vault: 1gb
     toolbox: 512mb
     s3_cli: 512mb
     fluentd: 256mb
   memory_web:
     nginx: 512mb
-    grafana: 512mb
-    node_exporter: 512mb
-    cadvisor: 512mb
     theia: 512mb
     minio_gateway: 512mb
     filestash: 512mb
@@ -519,6 +504,18 @@ pod_group_params:
     certbot: 256mb
     s3_cli: 512mb
     fluentd: 256mb
+  db_backup_sync:
+    backup_bucket_sync_dir: "db"
+  db_backup_no_sync:
+    is_compressed_file: true
+  db_setup_restore_file:
+    restore_use_s3: false
+    restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/vault/db/20200624_214700.zip?raw=true"
+    is_compressed_file: true
+  db_setup_restore_s3:
+    restore_use_s3: true
+    restore_s3_sync: true
+    restore_bucket_path_dir: "db"
 tasks:
   docker_compose_install:
     type: "task"
