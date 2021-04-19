@@ -371,6 +371,7 @@ pods:
       use_certbot: "{{ params.use_certbot | default(false) }}"
       use_private_path: "{{ params.use_private_path | default(false) }}"
       use_basic_auth_private: "{{ params.use_basic_auth_private | default(false) }}"
+      dev_vault: "{{ params.dev_vault | default(false) }}"
       vault_external_port: "{{ params.vault_external_port | default('8200', true) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
