@@ -367,6 +367,7 @@ pods:
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
       use_consul: "{{ params.use_consul | default(false) }}"
+      use_secure_vault: "{{ params.use_secure_vault | default(false) }}"
       use_secure_consul: "{{ params.use_secure_consul | default(false) }}"
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_local_s3: "{{ params.use_local_s3 | default(false) }}"
