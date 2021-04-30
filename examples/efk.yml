@@ -325,7 +325,7 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
-      elasticsearch: "elasticsearch"
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
@@ -341,7 +341,8 @@ pods:
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
-      use_nginx: "{{ params.use_nginx | default(true) }}"
+      use_nginx: "{{ params.use_nginx | default(false) }}"
+      use_kibana: "{{ params.use_kibana | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
       use_filestash: "{{ params.use_filestash | default(false) }}"
