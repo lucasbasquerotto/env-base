@@ -1,9 +1,6 @@
 name: "{{ project_name }}"
 ctxs: "{{ project_ctxs }}"
-meta:
-  template_no_empty_lines: true
-  skip_local_node_preparation: false
-  skip_local_pod_preparation: false
+meta: "{{ params.meta | default({ 'template_no_empty_lines': true }) }}"
 cloud:
   repo: "cloud"
   ext_repos:

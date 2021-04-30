@@ -2,10 +2,7 @@ name: "{{ project_name }}"
 ctxs: "{{ project_ctxs }}"
 migration: ""
 container: ""
-meta:
-  ignore_validators: false
-  skip_local_pod_preparation: false
-  template_no_empty_lines: true
+meta: "{{ params.meta | default({ 'template_no_empty_lines': true }) }}"
 cloud:
   repo: "cloud"
   ext_repos:
@@ -564,4 +561,4 @@ repos:
   ext_pod:
     src: "https://github.com/lucasbasquerotto/ext-pod.git"
     version: "master"
-credentials: "{{ credentials }}"
+credentials: "{{ credentials | combine({ 'localhost': { 'host_user': 'root' } }) }}"
