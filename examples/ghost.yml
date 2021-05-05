@@ -33,7 +33,7 @@ main:
     extend_cloud: true
     nodes:
       - name: "app"
-        key: "mediawiki_local"
+        key: "ghost_local"
         local: true
   remote:
     extend_cloud: true
@@ -44,7 +44,7 @@ main:
         can_destroy: true
     nodes:
       - name: "app"
-        key: "mediawiki"
+        key: "ghost"
         can_destroy: true
     run_stages:
       - tasks:
@@ -63,73 +63,35 @@ main:
         can_destroy: true
     nodes:
       - name: "db"
-        key: "mediawiki"
+        key: "ghost"
         can_destroy: true
         params:
           service_params:
             tags:
               - "auto"
-              - "mediawiki-mysql"
+              - "ghost-mysql"
         pods:
-          mediawiki:
+          ghost:
             params:
               type: "db"
             group_params:
               memory: "memory_db"
-      - name: "cache"
-        key: "mediawiki"
-        can_destroy: true
-        when: >-
-          {{
-            (params.use_redis | default(false) | bool)
-            or
-            (params.use_memcached | default(false) | bool)
-          }}
-        params:
-          service_params:
-            tags:
-              - "auto"
-              - >-
-                {{
-                  params.use_redis | default(false) | bool
-                  | ternary(
-                    'mediawiki-redis',
-                    params.use_memcached | default(false) | bool
-                    | ternary('mediawiki-memcached', 'auto')
-                  )
-                }}
-        pods:
-          mediawiki:
-            params:
-              type: "cache"
-            group_params:
-              memory: "memory_cache"
       - name: "web"
-        key: "mediawiki"
+        key: "ghost"
         can_destroy: true
         dependencies:
           mysql:
             type: "node"
             host: "db"
             port: "3306"
-          memcached:
-            type: "node"
-            host: "cache"
-            port: "11211"
-            when: "{{ params.use_memcached | default(false) }}"
-          memcached:
-            type: "node"
-            host: "cache"
-            port: "11211"
-            when: "{{ params.use_redis | default(false) }}"
         params:
           service_params:
             tags:
               - "auto"
-              - "mediawiki-web"
-              - "mediawiki-dmz"
+              - "ghost-web"
+              - "ghost-dmz"
         pods:
-          mediawiki:
+          ghost:
             params:
               type: "web"
             group_params:
@@ -146,16 +108,6 @@ main:
             key: "main_upgrade"
             nodes: ["db"]
             task_target: "pod"
-          - name: "main_upgrade_cache"
-            key: "main_upgrade"
-            nodes: ["cache"]
-            task_target: "pod"
-            when: >-
-              {{
-                (params.use_redis | default(false) | bool)
-                or
-                (params.use_memcached | default(false) | bool)
-              }}
       - tasks:
           - name: "main_upgrade"
             nodes: ["web"]
@@ -234,11 +186,9 @@ services:
     params:
       tags:
         - "auto"
-        - "mediawiki-mysql"
-        - "mediawiki-redis"
-        - "mediawiki-memcached"
-        - "mediawiki-web"
-        - "mediawiki-dmz"
+        - "ghost-mysql"
+        - "ghost-web"
+        - "ghost-dmz"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -269,35 +219,23 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "mediawiki-mysql"
-          tags: ["mediawiki-mysql"]
+        - name: "ghost-mysql"
+          tags: ["ghost-mysql"]
           inbound_rules:
             - ports: "3306"
               sources:
-                tags: ["mediawiki-web"]
-        - name: "mediawiki-redis"
-          tags: ["mediawiki-redis"]
-          inbound_rules:
-            - ports: "6379"
-              sources:
-                tags: ["mediawiki-web"]
-        - name: "mediawiki-memcached"
-          tags: ["mediawiki-memcached"]
-          inbound_rules:
-            - ports: "11211"
-              sources:
-                tags: ["mediawiki-web"]
-        - name: "mediawiki-web"
-          tags: ["mediawiki-web"]
+                tags: ["ghost-web"]
+        - name: "ghost-web"
+          tags: ["ghost-web"]
           inbound_rules:
             - ports: "80"
               sources:
-                tags: ["mediawiki-dmz"]
+                tags: ["ghost-dmz"]
             - ports: "443"
               sources:
-                tags: ["mediawiki-dmz"]
-        - name: "mediawiki-dmz"
-          tags: ["mediawiki-dmz"]
+                tags: ["ghost-dmz"]
+        - name: "ghost-dmz"
+          tags: ["ghost-dmz"]
           inbound_rules:
             - ports: "80"
               sources:
@@ -339,11 +277,11 @@ services:
         type: "env"
         name: "user_data_ubuntu"
 nodes:
-  mediawiki_local:
+  ghost_local:
     credentials:
       host: "localhost"
     pods:
-      - name: "mediawiki"
+      - name: "ghost"
         params:
           local: true
           local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
@@ -352,7 +290,7 @@ nodes:
           enable_logs_setup: false
           enable_sync_setup: false
           main_domain: "{{ params.local_main_domain | default('localhost') }}"
-          domains: "{{ params.local_domains | default({ 'mediawiki': 'localhost'}) }}"
+          domains: "{{ params.local_domains | default({ 'ghost': 'localhost'}) }}"
         group_params:
           db_backup: >-
             {{
@@ -364,13 +302,13 @@ nodes:
               params.local_uploads_backup_sync | default(false) | bool
               | ternary('uploads_backup_sync', 'uploads_backup_no_sync')
             }}
-  mediawiki:
+  ghost:
     service:
       name: "{{ params.node_service | default('skip') }}"
       params:
         tags:
           - "auto"
-          - "mediawiki-dmz"
+          - "ghost-dmz"
     dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
@@ -386,23 +324,23 @@ nodes:
           initial_connection_timeout: 90
           setup_finished_timeout: 300
     pods:
-      - name: "mediawiki"
+      - name: "ghost"
         params:
           local: false
           domains: "{{ params.domains | default({}) }}"
 pods:
-  mediawiki:
+  ghost:
     repo: "pod"
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"
     root: true
-    ctx: "ext-pod/mediawiki/mediawiki.ctx.yml"
-    schema: "ext-pod/mediawiki/mediawiki.schema.yml"
-    validator: "ext-pod/mediawiki/mediawiki.validator.yml"
+    ctx: "ext-pod/ghost/ghost.ctx.yml"
+    schema: "ext-pod/ghost/ghost.schema.yml"
+    validator: "ext-pod/ghost/ghost.validator.yml"
     fast_prepare: "true"
     credentials:
-      mediawiki: "mediawiki"
+      db: "db"
       elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
@@ -424,13 +362,10 @@ pods:
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
       use_nginx: "{{ params.use_nginx | default(false) }}"
       use_varnish: "{{ params.use_varnish | default(false) }}"
-      use_redis: "{{ params.use_redis | default(false) }}"
-      use_memcached: "{{ params.use_memcached | default(false) }}"
       use_pma: "{{ params.use_pma | default(false) }}"
       use_adminer: "{{ params.use_adminer | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
-      use_filestash: "{{ params.use_filestash | default(false) }}"
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_local_s3: "{{ params.use_local_s3 | default(false) }}"
       use_s3_storage: "{{ params.use_s3_storage | default(false) }}"
@@ -441,7 +376,6 @@ pods:
       block_ips: "{{ params.block_ips | default(false) }}"
       auth_file: "{{ params.auth_file | default('') }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
-      mediawiki: "{{ params.mediawiki | default({}) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
       define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
@@ -483,12 +417,8 @@ pods:
         nginx_version: "1.14.2-alpine"
         varnish_image: "varnish"
         varnish_version: "6.4.0-1"
-        mediawiki_image: "lucasbasquerotto/image"
-        mediawiki_version: "mediawiki-20210331"
-        redis_image: "redis"
-        redis_version: "6.0.6"
-        memcached_image: "memcached"
-        memcached_version: "1.6.6"
+        ghost_image: "ghost"
+        ghost_version: "4.4.0"
         pma_image: "phpmyadmin/phpmyadmin"
         pma_version: "5.1.0"
         adminer_image: "lucasbasquerotto/image"
@@ -501,8 +431,6 @@ pods:
         minio_gateway_version: "RELEASE.2021-03-17T02-33-02Z"
         minio_image: "minio/minio"
         minio_version: "RELEASE.2021-03-17T02-33-02Z"
-        filestash_image: "machines/filestash"
-        filestash_version: "4cbeb2c"
         toolbox_image: "lucasbasquerotto/image"
         toolbox_version: "toolbox-20200715-02"
         certbot_image: "certbot/certbot"
@@ -586,23 +514,14 @@ pod_group_params:
   memory_app:
     nginx: 512mb
     varnish: 512mb
-    mediawiki: 1gb
-    redis: 512mb
-    memcached: 512mb
+    ghost: 1gb
     pma: 512mb
     adminer: 512mb
     mysql: 1gb
     theia: 512mb
     minio_gateway: 512mb
-    filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
-    s3_cli: 512mb
-    fluentd: 256mb
-  memory_cache:
-    redis: 512mb
-    memcached: 512mb
-    toolbox: 512mb
     s3_cli: 512mb
     fluentd: 256mb
   memory_db:
@@ -613,12 +532,11 @@ pod_group_params:
   memory_web:
     nginx: 512mb
     varnish: 512mb
-    mediawiki: 1gb
+    ghost: 1gb
     pma: 512mb
     adminer: 512mb
     theia: 512mb
     minio_gateway: 512mb
-    filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
     s3_cli: 512mb
@@ -631,7 +549,7 @@ pod_group_params:
     restore_use_s3: false
     restore_remote_file: "{{ params.db_setup_restore_remote_file | default('') }}"
     is_compressed_file: true
-    db_file_name: "{{ params.db_setup_restore_file.db_file_name | default(credentials.mediawiki.db.name + '.sql') }}"
+    db_file_name: "{{ params.db_setup_restore_file.db_file_name | default(credentials.db.name + '.sql') }}"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
