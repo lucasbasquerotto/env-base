@@ -410,9 +410,6 @@ pods:
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
       services:
-        nginx:
-          conf:
-            client_max_body_size: "{{ params.upload_max_size | default('5M') }}"
         mongo:
           host: "mongo"
           port: "27017"
