@@ -768,6 +768,8 @@ pod_shared_params:
     use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
     use_s3: "{{ params.use_s3 | default(false) }}"
     use_local_s3: "{{ params.use_local_s3 | default(false) }}"
+    use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
+    outer_proxy_type: "{{ params.outer_proxy_type | default('') }}"
     use_certbot: "{{ params.use_certbot | default(false) }}"
     use_private_path: "{{ params.use_private_path | default(false) }}"
     block_ips: "{{ params.block_ips | default(false) }}"
