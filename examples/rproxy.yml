@@ -66,10 +66,13 @@ main:
             required_amount: 1
       - name: "node_replica_1"
         key: "rproxy_replica_1_local"
+        local: true
       - name: "node_replica_2"
         key: "rproxy_replica_2_local"
+        local: true
       - name: "node_replica_3"
         key: "rproxy_replica_3_local"
+        local: true
   remote:
     extend_cloud: true
     initial_services:
@@ -803,6 +806,7 @@ pod_shared_params:
     auth_file: "{{ params.auth_file | default('') }}"
     rproxy_services:
       - name: "rproxy"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
@@ -853,6 +857,7 @@ pod_shared_params:
   main_nginx:
     rproxy_services:
       - name: "rproxy"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
@@ -873,6 +878,7 @@ pod_shared_params:
     rproxy_services:
       - name: "rproxy"
         endpoint: "http://nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
           http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
@@ -903,6 +909,7 @@ pod_shared_params:
   main_hub_nginx:
     rproxy_services:
       - name: "rproxy"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
@@ -910,10 +917,13 @@ pod_shared_params:
             data: "root /var/www;"
       - name: "rproxy_web_1"
         endpoint: "http://rproxy_web_1-main-nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       - name: "rproxy_web_2"
         endpoint: "http://rproxy_web_2-main-nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       - name: "rproxy_web_3"
         endpoint: "http://rproxy_web_3-main-nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       - name: "theia"
         when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
@@ -929,6 +939,7 @@ pod_shared_params:
     rproxy_services:
       - name: "rproxy"
         endpoint: "http://nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
           http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
@@ -938,6 +949,7 @@ pod_shared_params:
             server_args: "check maxconn 3"
       - name: "private"
         when: "{{ params.use_private_path | default(false) }}"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           stats enable if is_domain_private
           stats uri /stats if is_domain_private
@@ -947,10 +959,13 @@ pod_shared_params:
         use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "rproxy_web_1"
         endpoint: "http://rproxy_web_1-main-nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       - name: "rproxy_web_2"
         endpoint: "http://rproxy_web_2-main-nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       - name: "rproxy_web_3"
         endpoint: "http://rproxy_web_3-main-nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       - name: "theia"
         when: "{{ params.use_theia | default(false) }}"
         endpoint: "http://theia:3000"
@@ -965,12 +980,14 @@ pod_shared_params:
   main_external_hub_nginx:
     rproxy_services:
       - name: "rproxy"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
           - location: "/"
             data: "root /var/www;"
       - name: "rproxy_web_1"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_web_1_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -980,6 +997,7 @@ pod_shared_params:
         private: true
         use_basic_auth: false
       - name: "rproxy_web_2"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_web_2_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -989,6 +1007,7 @@ pod_shared_params:
         private: true
         use_basic_auth: false
       - name: "rproxy_web_3"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_web_3_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -1012,6 +1031,7 @@ pod_shared_params:
     rproxy_services:
       - name: "rproxy"
         endpoint: "http://nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
           http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
@@ -1029,6 +1049,7 @@ pod_shared_params:
         private: true
         use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "rproxy_web_1"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_web_1_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -1038,6 +1059,7 @@ pod_shared_params:
         private: true
         use_basic_auth: false
       - name: "rproxy_web_2"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_web_2_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -1047,6 +1069,7 @@ pod_shared_params:
         private: true
         use_basic_auth: false
       - name: "rproxy_web_3"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_web_3_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -1069,6 +1092,7 @@ pod_shared_params:
   main_replicas_hub_nginx:
     rproxy_services:
       - name: "rproxy"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         locations:
           - location: "= /nginx/basic_status"
             data: "stub_status;"
@@ -1076,6 +1100,7 @@ pod_shared_params:
             data: "root /var/www;"
       - name: "rproxy_replica"
         dependency_name: "replica"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_replica_theia"
         when: "{{ params.use_theia | default(false) }}"
@@ -1100,6 +1125,7 @@ pod_shared_params:
     rproxy_services:
       - name: "rproxy"
         endpoint: "http://nginx"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
           http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
@@ -1109,6 +1135,7 @@ pod_shared_params:
             server_args: "check maxconn 3"
       - name: "private"
         when: "{{ params.use_private_path | default(false) }}"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           stats enable if is_domain_private
           stats uri /stats if is_domain_private
@@ -1118,6 +1145,7 @@ pod_shared_params:
         use_basic_auth: "{{ params.use_basic_auth_private | default(false) }}"
       - name: "rproxy_replica"
         dependency_name: "replica"
+        use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         proxy: true
       - name: "rproxy_replica_theia"
         when: "{{ params.use_theia | default(false) }}"
