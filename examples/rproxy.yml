@@ -881,7 +881,7 @@ pod_shared_params:
         use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
-          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 5 }
         locations:
           - location: "path_beg /"
             data: "timeout queue 5s"
@@ -942,7 +942,7 @@ pod_shared_params:
         use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
-          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 5 }
         locations:
           - location: "path_beg /"
             data: "timeout queue 5s"
@@ -1034,7 +1034,7 @@ pod_shared_params:
         use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
-          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 5 }
         locations:
           - location: "path_beg /"
             data: "timeout queue 5s"
@@ -1128,7 +1128,7 @@ pod_shared_params:
         use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
         frontend_data: |-
           acl is_rate_limit_path_rproxy    path /
-          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 3 }
+          http-request deny deny_status 429 if is_domain_rproxy is_rate_limit_path_rproxy { sc_http_req_rate(0) gt 5 }
         locations:
           - location: "path_beg /"
             data: "timeout queue 5s"
