@@ -24,9 +24,11 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.cloud_service | default('skip') }}"
-      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
-      - "{{ params.mailcow.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+      - name: "{{ params.cloud_service | default('skip') }}"
+        when: "{{ (params.cloud_service | default('')) != '' }}"
+      - name: "dns_main_service"
+      - name: "s3_buckets"
+        when: "{{ params.use_s3 | default(false) | bool }}"
     nodes:
       - name: "app"
         key: "mailcow"
@@ -142,7 +144,7 @@ services:
       image_id: "ubuntu-18-04-x64"
       ipv6: true
       region_id: "ams3"
-      size_id: "s-1vcpu-1gb"
+      size_id: "s-2vcpu-4gb"
     contents:
       user_data:
         type: "template"
@@ -169,7 +171,7 @@ services:
     params:
       image: "linode/ubuntu18.04"
       region: "us-east"
-      type: "g6-standard-1"
+      type: "g6-standard-2"
     contents:
       user_data:
         type: "template"
