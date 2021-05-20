@@ -189,6 +189,8 @@ nodes:
   mailcow_local:
     credentials:
       host: "localhost"
+    group_params:
+      cron: "cron"
     pods: ["mailcow"]
   mailcow:
     service:
@@ -210,7 +212,25 @@ nodes:
           setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 90
           setup_finished_timeout: 300
+    group_params:
+      cron: "cron"
     pods: ["mailcow"]
+node_group_params:
+  cron:
+    - dest: "/var/spool/cron/crontabs/root"
+      when: "{{ params.use_s3 | default(false) }}"
+      user: "root"
+      src:
+        type: "template"
+        origin: "cloud"
+        file: "ext-cloud/files/cron/pod.tpl.sh"
+        schema: "ext-cloud/files/cron/pod.schema.yml"
+        params:
+          run_file: "update_diffs/custom-run"
+          tasks:
+            - name: "backup"
+              task: "backup s3_cli={{ params.s3_cli | default('') | quote }}"
+              cron: "0 */6 * * *"
 pods:
   mailcow:
     repo: "mailcow_docker"
@@ -237,6 +257,35 @@ pods:
         src:
           origin: "env"
           file: "{{ params.mailcow_env_dir_ssl }}/key.pem"
+      - dest: "update_diffs/custom/config.s3.txt"
+        when: "{{ params.use_s3 | default(false) }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          schema: "ext-cloud/files/s3/s3-cli.schema.yml"
+          file: "ext-cloud/files/s3/config.{{ params.s3_cli | default('') }}.j2"
+          params:
+            list:
+              - alias: "backup"
+                endpoint: "{{ credentials.s3.endpoint | default('') }}"
+                region: "{{ credentials.s3.region | default('') }}"
+                access_key: "{{ credentials.s3.access_key | default('') }}"
+                secret_key: "{{ credentials.s3.secret_key | default('') }}"
+      - dest: "update_diffs/custom/run-backup"
+        when: "{{ params.use_s3 | default(false) }}"
+        executable: true
+        src:
+          type: "template"
+          origin: "cloud"
+          schema: "ext-cloud/files/mailcow/run-backup.schema.yml"
+          file: "ext-cloud/files/mailcow/run-backup.tpl.sh"
+          params:
+            s3_cli: "{{ params.s3_cli | default('') }}"
+            s3_container_image: "{{ params.backup_s3_container_image | default('') }}"
+            s3_alias: "backup"
+            bucket_name: "{{ params.backup_bucket_name | default('') }}"
+            bucket_path: "{{ params.backup_bucket_path | default('') }}"
+            endpoint: "{{ credentials.s3.endpoint | default('') }}"
 tasks:
   mailcow_prepare:
     type: "shell"
@@ -250,6 +299,7 @@ contents:
   mailcow_conf:
     type: "template"
     origin: "cloud"
+    schema: "ext-cloud/files/mailcow/mailcow.schema.yml"
     file: "ext-cloud/files/mailcow/mailcow.tpl.conf"
     params: "{{ params.mailcow }}"
     credentials:
