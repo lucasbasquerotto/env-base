@@ -34,7 +34,7 @@ main:
                 src: >-
                   {{
                     params.discourse_app_container_content
-                    | default({ 'type': 'env', 'name': 'discourse_app_container' })
+                    | default({ 'type': 'env', 'name': 'discourse_app_container' }, true)
                   }}
     run_stages:
       - tasks:
@@ -62,13 +62,13 @@ main:
                 src: >-
                   {{
                     params.discourse_web_internal_container_content
-                    | default({ 'type': 'env', 'name': 'discourse_web_internal_container' })
+                    | default({ 'type': 'env', 'name': 'discourse_web_internal_container' }, true)
                   }}
               - dest: "containers/db.yml"
                 src: >-
                   {{
                     params.discourse_db_internal_container_content
-                    | default({ 'type': 'env', 'name': 'discourse_db_internal_container' })
+                    | default({ 'type': 'env', 'name': 'discourse_db_internal_container' }, true)
                   }}
     run_stages:
       - tasks:
@@ -116,7 +116,7 @@ main:
                 src: >-
                   {{
                     params.discourse_web_container_content
-                    | default({ 'type': 'env', 'name': 'discourse_web_container' })
+                    | default({ 'type': 'env', 'name': 'discourse_web_container' }, true)
                   }}
       - name: "redis"
         key: "discourse"
@@ -133,7 +133,7 @@ main:
                 src: >-
                   {{
                     params.discourse_redis_container_content
-                    | default({ 'type': 'env', 'name': 'discourse_redis_container' })
+                    | default({ 'type': 'env', 'name': 'discourse_redis_container' }, true)
                   }}
       - name: "db"
         key: "discourse"
@@ -150,7 +150,7 @@ main:
                 src: >-
                   {{
                     params.discourse_db_container_content
-                    | default({ 'type': 'env', 'name': 'discourse_db_container' })
+                    | default({ 'type': 'env', 'name': 'discourse_db_container' }, true)
                   }}
     run_stages:
       - tasks:
@@ -332,7 +332,7 @@ services:
         file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
         schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
         params:
-          user_directories: ["/var/cloud"]
+          user_directories: ["/var/discourse", "/var/cloud"]
           install_docker: true
           install_podman: false
           install_packages: false
@@ -457,4 +457,4 @@ repos:
   discourse_docker:
     src: "https://github.com/discourse/discourse_docker.git"
     version: "master"
-credentials: "{{ credentials | default({}) }}"
+credentials: "{{ credentials | combine({ 'localhost': { 'host_user': 'root' } }) }}"
