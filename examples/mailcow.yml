@@ -15,6 +15,12 @@ cloud:
     file: "files/hosts.tpl.ini"
     schema: "files/hosts.schema.yml"
 main:
+  cloud:
+    extend_cloud: true
+    initial_services:
+      - name: "{{ params.cloud_service | default('skip') }}"
+        when: "{{ (params.cloud_service | default('')) != '' }}"
+      - name: "dns_main_service"
   local:
     extend_cloud: true
     nodes:
@@ -126,10 +132,43 @@ services:
         - name: "mailcow-dmz"
           tags: ["mailcow-dmz"]
           inbound_rules:
+            - ports: "25"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
             - ports: "80"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "110"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "143"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
             - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "465"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "587"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "993"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "995"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "4190"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "5222"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "5269"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "5443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
   digital_ocean_node:
@@ -228,10 +267,10 @@ node_group_params:
         file: "ext-cloud/files/cron/pod.tpl.sh"
         schema: "ext-cloud/files/cron/pod.schema.yml"
         params:
-          run_file: "update_diffs/custom-run"
+          run_file: "update_diffs/run-backup"
           tasks:
             - name: "backup"
-              task: "backup s3_cli={{ params.s3_cli | default('') | quote }}"
+              task: "no-arg"
               cron: "0 */6 * * *"
 pods:
   mailcow:
@@ -259,6 +298,10 @@ pods:
         src:
           origin: "env"
           file: "{{ params.mailcow_env_dir_ssl }}/key.pem"
+      - dest: "data/conf/nginx/redirect.conf"
+        src:
+          origin: "cloud"
+          file: "ext-cloud/files/mailcow/nginx.redirect.conf"
       - dest: "update_diffs/custom/config.s3.txt"
         when: "{{ params.use_s3 | default(false) }}"
         src:
