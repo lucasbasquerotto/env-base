@@ -217,8 +217,8 @@ nodes:
           domains: "{{ params.local_domains | default({}) }}"
           bind_external_port: >-
             {{
-              params.local_bind_external_port
-              | default(params.bind_external_port | default('53', true), true)
+              params.local_standard_ports | default(false) | bool
+              | ternary(params.bind_external_port | default('53', true), '8003')
             }}
   bind:
     service:
@@ -321,6 +321,8 @@ pods:
       images:
         bind_image: "lucasbasquerotto/image"
         bind_version: "bind-20200429"
+        dnssec_image: "lucasbasquerotto/image"
+        dnssec_version: "dnssec-20200504"
         nginx_image: "nginx"
         nginx_version: "1.14.2-alpine"
         minio_image: "minio/minio"
