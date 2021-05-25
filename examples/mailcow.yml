@@ -19,7 +19,7 @@ main:
     extend_cloud: true
     initial_services:
       - name: "{{ params.cloud_service | default('skip') }}"
-        when: "{{ (params.cloud_service | default('')) != '' }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
       - name: "dns_main_service"
   local:
     extend_cloud: true
@@ -31,7 +31,7 @@ main:
     extend_cloud: true
     initial_services:
       - name: "{{ params.cloud_service | default('skip') }}"
-        when: "{{ (params.cloud_service | default('')) != '' }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
       - name: "dns_main_service"
       - name: "s3_buckets"
         when: "{{ params.use_s3 | default(false) | bool }}"
