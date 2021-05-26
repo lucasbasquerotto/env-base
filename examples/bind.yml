@@ -258,6 +258,7 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
+      bind: "bind"
       elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
