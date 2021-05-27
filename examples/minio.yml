@@ -20,8 +20,10 @@ main:
   cloud:
     extend_cloud: true
     initial_services:
-      - "{{ params.cloud_service | default('skip') }}"
-      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+      - name: "{{ params.cloud_service | default('skip', true) }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
+      - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+        when: "{{ params.run_dns_main | default(false) | bool }}"
   s3_replica_buckets:
     extend_cloud: true
     initial_services:
@@ -38,8 +40,10 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.cloud_service | default('skip') }}"
-      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+      - name: "{{ params.cloud_service | default('skip', true) }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
+      - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+        when: "{{ params.run_dns_main | default(false) | bool }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:

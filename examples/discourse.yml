@@ -18,9 +18,12 @@ main:
   remote:
     extend_cloud: true
     initial_services:
-      - "{{ params.cloud_service | default('skip') }}"
-      - "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
-      - "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+      - name: "{{ params.cloud_service | default('skip', true) }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
+      - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+        when: "{{ params.run_dns_main | default(false) | bool }}"
+      - name: "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+        when: "{{ params.discourse.use_s3 | default(false) | bool }}"
     nodes:
       - name: "app"
         key: "discourse"
