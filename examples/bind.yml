@@ -24,6 +24,9 @@ main:
         when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
+  dns_test:
+    extend_cloud: true
+    initial_services: ["dns_test_service"]
   s3_replica_buckets:
     extend_cloud: true
     initial_services:
@@ -92,6 +95,20 @@ services:
       - name: "dns_base_service"
         params:
           list: "{{ params.dns_main_service_params_list | default([]) }}"
+  dns_test_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_dns"
+    task: "tasks/dns/nsupdate/nsupdate.main.dns.yml"
+    schema: "tasks/dns/nsupdate/nsupdate.schema.dns.yml"
+    validator: "tasks/dns/nsupdate/nsupdate.validator.dns.yml"
+    credentials:
+      dns: "nsupdate"
+    params:
+      zone: "{{ params.bind_zone | default('') }}"
+      dns_type: "CNAME"
+      record: "test02"
+      value: "bind.lucasbasquerotto.com."
+      # list: "{{ params.dns_test_service_params_list | default([]) }}"
   dns_base_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
