@@ -346,6 +346,7 @@ pods:
     fast_prepare: "true"
     credentials:
       postgres: "postgres"
+      mattermost_mail: "{{ params.use_mattermost_mail | default(false) | bool | ternary('mattermost_mail', '') }}"
       pgadmin: "{{ params.use_pgadmin | default(false) | bool | ternary('pgadmin', '') }}"
       elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
@@ -366,6 +367,7 @@ pods:
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
+      use_mattermost_mail: "{{ params.use_mattermost_mail | default(false) }}"
       use_nginx: "{{ params.use_nginx | default(false) }}"
       use_pgadmin: "{{ params.use_pgadmin | default(false) }}"
       use_adminer: "{{ params.use_adminer | default(false) }}"
