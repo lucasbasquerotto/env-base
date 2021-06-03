@@ -554,7 +554,7 @@ pod_group_params:
     restore_use_s3: false
     restore_remote_file: "{{ params.db_setup_restore_remote_file | default('') }}"
     is_compressed_file: true
-    db_file_name: "{{ params.db_setup_restore_file.db_file_name | default((credentials.postgres.db_name | default('')) + '.sql') }}"
+    db_file_name: "{{ params.db_setup_restore_file.db_file_name | default((credentials.postgres.db_name | default('')) + '.dump') }}"
   db_setup_restore_s3:
     restore_use_s3: true
     restore_s3_sync: true
@@ -573,7 +573,7 @@ pod_group_params:
   uploads_setup_s3:
     restore_use_s3: true
     restore_s3_sync: true
-    restore_bucket_path_dir: "{{ params.uploads_setup_s3.restore_bucket_path_dir | default('[[ ]]') }}"
+    restore_bucket_path_dir: "{{ params.uploads_setup_s3.restore_bucket_path_dir | default('') }}"
     is_compressed_file: "{{ params.uploads_setup_s3.is_compressed_file | default(false) }}"
     compressed_file_name: "{{ params.uploads_setup_s3.compressed_file_name | default('') }}"
     restore_compressed_inner_dir: "uploads"
