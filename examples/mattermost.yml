@@ -300,7 +300,14 @@ nodes:
           db_backup: >-
             {{
               params.local_db_backup_sync | default(false) | bool
-              | ternary('db_backup_sync', 'db_backup_no_sync')
+              | ternary(
+                'db_backup_sync',
+                params.use_wale | default(false) | bool
+                | ternary(
+                  'db_backup_wale',
+                  'db_backup_no_sync'
+                )
+              )
             }}
           uploads_backup: >-
             {{
@@ -376,6 +383,7 @@ pods:
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_local_s3: "{{ params.use_local_s3 | default(false) }}"
       use_s3_storage: "{{ params.use_s3_storage | default(false) }}"
+      use_wale: "{{ params.use_wale | default(false) }}"
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
@@ -456,10 +464,21 @@ pods:
       memory: "memory_app"
       db_setup: >-
         {{
-          params.non_s3_setup | default(false) | bool |
-          ternary('db_setup_restore_file', 'db_setup_restore_s3')
+          params.use_wale | default(false) | bool
+          | ternary(
+            'db_setup_restore_wale',
+            params.non_s3_setup | default(false) | bool
+            | ternary('db_setup_restore_file', 'db_setup_restore_s3')
+          )
         }}
-      db_backup: "db_backup_no_sync"
+      db_backup: >-
+        {{
+          params.use_wale | default(false) | bool
+          | ternary(
+            'db_backup_wale',
+            'db_backup_no_sync'
+          )
+        }}
       uploads_setup: >-
         {{
           params.non_s3_setup | default(false) | bool |
@@ -550,6 +569,9 @@ pod_group_params:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
     is_compressed_file: true
+  db_backup_wale: {}
+  db_setup_restore_wale:
+    pitr: "{{ params.db_setup_wale_pitr | default('LATEST') }}"
   db_setup_restore_file:
     restore_use_s3: false
     restore_remote_file: "{{ params.db_setup_restore_remote_file | default('') }}"
