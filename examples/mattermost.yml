@@ -429,7 +429,7 @@ pods:
         pgadmin_image: "dpage/pgadmin4"
         pgadmin_version: "5.3"
         adminer_image: "lucasbasquerotto/image"
-        adminer_version: "adminer-20210408"
+        adminer_version: "adminer-20210609-02"
         postgres_image: "lucasbasquerotto/image"
         postgres_version: "postgres-13.3-20210528-02"
         theia_image: "theiaide/theia"
