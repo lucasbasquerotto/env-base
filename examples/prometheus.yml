@@ -298,12 +298,6 @@ nodes:
             public_https_port: "8443"
             private_http_port: "9080"
             private_https_port: "9443"
-        group_params:
-          db_backup: >-
-            {{
-              params.local_db_backup_sync | default(false) | bool
-              | ternary('db_backup_sync', 'db_backup_no_sync')
-            }}
   prometheus:
     service:
       name: "{{ params.node_service | default('skip') }}"
