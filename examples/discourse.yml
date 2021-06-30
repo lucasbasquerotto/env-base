@@ -20,6 +20,8 @@ main:
     initial_services:
       - name: "{{ params.cloud_service | default('skip', true) }}"
         when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
+      - name: "{{ params.run_nameserver_main | default(false) | bool | ternary('nameserver_main_service', 'skip') }}"
+        when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
       - name: "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
@@ -191,6 +193,32 @@ services:
           permission: "private"
         - bucket: "{{ params.discourse.uploads_bucket_name | default('') }}"
           permission: "public-read"
+  nameserver_main_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_nameserver"
+    task: >-
+      tasks/nameserver/{{
+        params.nameserver_provider | default('')
+      }}/{{
+        params.nameserver_provider | default('')
+      }}.main.nameserver.yml
+    schema: >-
+      tasks/nameserver/{{
+        params.nameserver_provider | default('')
+      }}/{{
+        params.nameserver_provider | default('')
+      }}.schema.nameserver.yml
+    validator: >-
+      tasks/nameserver/{{
+        params.nameserver_provider | default('')
+      }}/{{
+        params.nameserver_provider | default('')
+      }}.validator.nameserver.yml
+    credentials:
+      nameserver: "{{ params.nameserver_provider | default('') }}"
+    params:
+      zone: "{{ params.main_domain | default('') }}"
+      nameservers: "{{ params.main_nameservers | default([]) }}"
   dns_main_service:
     list: true
     services:
