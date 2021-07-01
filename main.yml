@@ -20,6 +20,21 @@ main:
       - name: "ctl"
         key: "local"
         local: true
+  cloud:
+    repo: "cloud"
+    ext_repos:
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host:children]
+    initial_services:
+      - "{{ params.vpn_service | default('') }}"
   remote:
     repo: "cloud"
     ext_repos:
