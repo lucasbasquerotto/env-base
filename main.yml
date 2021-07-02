@@ -196,10 +196,17 @@ pods:
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
 pod_shared_params:
   pod_params:
+    use_fluentd: "{{ params.use_fluentd | default(false) }}"
+    internal: "{{ params.internal | default(false) }}"
     fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('') }}"
     fluentd_port: "{{ params.fluentd_port | default('') }}"
     use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
     internal_ssl: "{{ params.internal_ssl | default({}) }}"
+    images:
+      toolbox_image: "lucasbasquerotto/image"
+      toolbox_version: "toolbox-20200715-02"
+      fluentd_image: "lucasbasquerotto/image"
+      fluentd_version: "fluentd-20200617"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
