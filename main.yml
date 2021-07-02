@@ -189,6 +189,17 @@ pods:
     root: true
     fast_prepare: true
     pod_dir_relpath: "ctl"
+    ctx: "{{ params.use_additional_services | default(false) | bool | ternary('ctl.ctx.yml', '') }}"
+    schema: "{{ params.use_additional_services | default(false) | bool | ternary('ctl.schema.yml', '') }}"
+    shared_params: "{{ params.use_additional_services | default(false) | bool | ternary(['pod_params'], []) }}"
+    credentials:
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
+pod_shared_params:
+  pod_params:
+    fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('') }}"
+    fluentd_port: "{{ params.fluentd_port | default('') }}"
+    use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
+    internal_ssl: "{{ params.internal_ssl | default({}) }}"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -206,3 +217,4 @@ repos:
 credentials:
   host: "{{ credentials.host | default({}) }}"
   digital_ocean: "{{ credentials.digital_ocean | default({}) }}"
+  elasticsearch: "{{ credentials.elasticsearch | default({}) }}"
