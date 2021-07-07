@@ -170,16 +170,14 @@ nodes:
       cron:
         - dest: "/var/spool/cron/crontabs/root"
           user: "root"
+          when: "{{ (params.cron_tasks | default([]) | length) > 0 }}"
           src:
             type: "template"
             origin: "cloud"
             file: "ext-cloud/files/cron/pod.tpl.sh"
             schema: "ext-cloud/files/cron/pod.schema.yml"
             params:
-              tasks:
-                - name: "sync"
-                  task: "sync:verify"
-                  cron: "*/1 * * * *"
+              tasks: "{{ params.cron_tasks | default([]) }}"
 pods:
   main:
     repo: "main"
