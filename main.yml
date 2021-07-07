@@ -152,6 +152,7 @@ services:
 nodes:
   local:
     pods: ["main"]
+    shared_params: ["shared"]
   remote:
     service: "{{ params.node_service | default('') }}"
     base_dir: "/var/cloud"
@@ -167,17 +168,20 @@ nodes:
           setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 90
           setup_finished_timeout: 300
-      cron:
-        - dest: "/var/spool/cron/crontabs/root"
-          user: "root"
-          when: "{{ (params.cron_tasks | default([]) | length) > 0 }}"
-          src:
-            type: "template"
-            origin: "cloud"
-            file: "ext-cloud/files/cron/pod.tpl.sh"
-            schema: "ext-cloud/files/cron/pod.schema.yml"
-            params:
-              tasks: "{{ params.cron_tasks | default([]) }}"
+    shared_params: ["shared"]
+node_shared_params:
+  shared:
+    cron:
+      - dest: "/var/spool/cron/crontabs/root"
+        user: "root"
+        when: "{{ (params.cron_tasks | default([]) | length) > 0 }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/cron/pod.tpl.sh"
+          schema: "ext-cloud/files/cron/pod.schema.yml"
+          params:
+            tasks: "{{ params.cron_tasks | default([]) }}"
 pods:
   main:
     repo: "main"
