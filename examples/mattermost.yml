@@ -588,14 +588,16 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
-    s3_cli: 512mb
     fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
   memory_db:
     postgres: 1gb
     toolbox: 512mb
-    s3_cli: 512mb
     fluentd: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
   memory_web:
     nginx: 512mb
     mattermost: 1gb
@@ -604,9 +606,10 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
-    s3_cli: 512mb
     fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
   db_backup_sync:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:

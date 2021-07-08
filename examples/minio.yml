@@ -432,9 +432,10 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    s3_cli: 512mb
     fluentd: 256mb
     certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
 tasks:
   docker_compose_install:
     type: "task"

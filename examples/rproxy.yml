@@ -749,6 +749,7 @@ pods:
         toolbox: 512mb
         certbot: 256mb
         fluentd: 256mb
+        logrotator: 256mb
         s3_cli: 512mb
     transfer:
       - dest: "env/{{ params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"

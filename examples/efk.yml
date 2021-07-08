@@ -502,13 +502,15 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
     fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
     s3_cli: 512mb
   memory_db:
     elasticsearch: 1gb
     toolbox: 512mb
     fluentd: 256mb
+    logrotator: 256mb
     s3_cli: 512mb
   memory_web:
     nginx: 512mb
@@ -516,8 +518,9 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
     fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
     s3_cli: 512mb
 tasks:
   docker_compose_install:

@@ -615,9 +615,10 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
-    s3_cli: 512mb
     fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
   memory_cache:
     redis: 512mb
     memcached: 512mb
@@ -627,8 +628,9 @@ pod_group_params:
   memory_db:
     mysql: 1gb
     toolbox: 512mb
-    s3_cli: 512mb
     fluentd: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
   memory_web:
     nginx: 512mb
     varnish: 512mb
@@ -638,9 +640,10 @@ pod_group_params:
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    certbot: 256mb
-    s3_cli: 512mb
     fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
   db_backup_sync:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
