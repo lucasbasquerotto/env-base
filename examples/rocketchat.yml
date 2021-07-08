@@ -404,7 +404,6 @@ pods:
       use_mongo_express: "{{ params.use_mongo_express | default(false) }}"
       use_theia: "{{ params.use_theia | default(false) }}"
       use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
-      use_filestash: "{{ params.use_filestash | default(false) }}"
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_local_s3: "{{ params.use_local_s3 | default(false) }}"
       use_s3_storage: "{{ params.use_s3_storage | default(false) }}"
@@ -455,38 +454,21 @@ pods:
         fluentd:
           port: "24224"
       images:
-        nginx_image: "nginx"
-        nginx_version: "1.14.2-alpine"
-        rocketchat_image: "rocket.chat"
-        rocketchat_version: "3.2.2"
-        hubot_image: "rocketchat/hubot-rocketchat"
-        hubot_version: "v1.0.11"
-        mongo_express_image: "mongo-express"
-        mongo_express_version: "0.54.0"
-        mongo_image: "mongo"
-        mongo_version: "4.0"
-        theia_image: "theiaide/theia"
-        theia_version: "1.3.0"
-        minio_gateway_image: "minio/minio"
-        minio_gateway_version: "RELEASE.2021-03-17T02-33-02Z"
-        minio_image: "minio/minio"
-        minio_version: "RELEASE.2021-03-17T02-33-02Z"
-        filestash_image: "machines/filestash"
-        filestash_version: "4cbeb2c"
-        toolbox_image: "lucasbasquerotto/image"
-        toolbox_version: "toolbox-20200715-02"
-        certbot_image: "certbot/certbot"
-        certbot_version: "v1.2.0"
-        awscli_image: "lucasbasquerotto/aws-cli"
-        awscli_version: "1.0.0"
-        mc_image: "minio/mc"
-        mc_version: "RELEASE.2021-03-12T03-36-59Z"
-        rclone_image: "rclone/rclone"
-        rclone_version: "1.54.0"
-        logrotator_image: "python"
-        logrotator_version: "3.8.4-buster"
-        fluentd_image: "lucasbasquerotto/image"
-        fluentd_version: "fluentd-20200617"
+        nginx: "nginx:1.14.2-alpine"
+        rocketchat: "rocket.chat:3.2.2"
+        hubot: "rocketchat/hubot-rocketchat:v1.0.11"
+        mongo_express: "mongo-express:0.54.0"
+        mongo: "mongo:4.0"
+        theia: "theiaide/theia:1.3.0"
+        minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
+        minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
+        toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
+        certbot: "certbot/certbot:v1.2.0"
+        awscli: "lucasbasquerotto/aws-cli:1.0.0"
+        mc: "minio/mc:RELEASE.2021-03-12T03-36-59Z"
+        rclone: "rclone/rclone:1.54.0"
+        logrotator: "python:3.8.4-buster"
+        fluentd: "lucasbasquerotto/image:fluentd-20200617"
     group_params:
       memory: "memory_app"
       db_setup: >-
@@ -561,7 +543,6 @@ pod_group_params:
     mongo: 1gb
     theia: 512mb
     minio_gateway: 512mb
-    filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
     mongo_init: 512mb
@@ -580,7 +561,6 @@ pod_group_params:
     mongo_express: 512mb
     theia: 512mb
     minio_gateway: 512mb
-    filestash: 512mb
     toolbox: 512mb
     certbot: 256mb
     s3_cli: 512mb

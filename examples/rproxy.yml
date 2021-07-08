@@ -247,7 +247,7 @@ main:
           rproxy:
             shared_params:
               [
-                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}"
+                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}",
               ]
         dependencies:
           replica:
@@ -730,30 +730,18 @@ pods:
         fluentd:
           port: "24224"
       images:
-        nginx_image: "nginx"
-        nginx_version: "1.14.2-alpine"
-        haproxy_image: "haproxy"
-        haproxy_version: "2.3"
-        theia_image: "theiaide/theia"
-        theia_version: "1.3.0"
-        minio_gateway_image: "minio/minio"
-        minio_gateway_version: "RELEASE.2021-03-17T02-33-02Z"
-        minio_image: "minio/minio"
-        minio_version: "RELEASE.2021-03-17T02-33-02Z"
-        toolbox_image: "lucasbasquerotto/image"
-        toolbox_version: "toolbox-20210309-02"
-        certbot_image: "certbot/certbot"
-        certbot_version: "v1.2.0"
-        awscli_image: "lucasbasquerotto/aws-cli"
-        awscli_version: "1.0.0"
-        mc_image: "minio/mc"
-        mc_version: "RELEASE.2021-03-12T03-36-59Z"
-        rclone_image: "rclone/rclone"
-        rclone_version: "1.54.0"
-        logrotator_image: "python"
-        logrotator_version: "3.8.4-buster"
-        fluentd_image: "lucasbasquerotto/image"
-        fluentd_version: "fluentd-20200617"
+        nginx: "nginx:1.14.2-alpine"
+        haproxy: "haproxy:2.3"
+        theia: "theiaide/theia:1.3.0"
+        minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
+        minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
+        toolbox: "lucasbasquerotto/image:toolbox-20210309-02"
+        certbot: "certbot/certbot:v1.2.0"
+        awscli: "lucasbasquerotto/aws-cli:1.0.0"
+        mc: "minio/mc:RELEASE.2021-03-12T03-36-59Z"
+        rclone: "rclone/rclone:1.54.0"
+        logrotator: "python:3.8.4-buster"
+        fluentd: "lucasbasquerotto/image:fluentd-20200617"
       memory:
         nginx: 512mb
         theia: 512mb
