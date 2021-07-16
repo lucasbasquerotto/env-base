@@ -196,6 +196,7 @@ pods:
     shared_params: "{{ params.use_additional_services | default(false) | bool | ternary(['pod_params'], []) }}"
     credentials:
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
+    transfer: "{{ transfer_contents }}"
 pod_shared_params:
   pod_params:
     use_fluentd: "{{ params.use_fluentd | default(false) }}"
