@@ -82,6 +82,7 @@ main:
             tags:
               - "auto"
               - "elasticsearch"
+          dns_service_params_list: "{{ params.dns_elasticsearch_params_list | default([]) }}"
         pods:
           efk:
             params:
