@@ -57,6 +57,10 @@ main:
       - name: "app"
         key: "wp"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
