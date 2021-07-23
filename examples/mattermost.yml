@@ -419,6 +419,8 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
+      postgres_port: "5432"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -481,11 +483,6 @@ pods:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        postgres:
-          port: "5432"
-        fluentd:
-          port: "24224"
       images:
         nginx: "nginx:1.14.2-alpine"
         mattermost: "mattermost/mattermost-team-edition:release-5.35"

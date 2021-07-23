@@ -700,6 +700,7 @@ pods:
     params:
       rproxy_type: "{{ params.rproxy_type | default('nginx', true) }}"
       orchestration: "docker_compose"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -717,18 +718,14 @@ pods:
       enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
+      haproxy_conf:
+        ssl: "{{ params.use_ssl | default(false) }}"
+        webservice_endpoint: "http://nginx"
+        basic_auth_data_content: "auth_content"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        haproxy:
-          conf:
-            ssl: "{{ params.use_ssl | default(false) }}"
-            webservice_endpoint: "http://nginx"
-            basic_auth_data_content: "auth_content"
-        fluentd:
-          port: "24224"
       images:
         nginx: "nginx:1.14.2-alpine"
         haproxy: "haproxy:2.3"

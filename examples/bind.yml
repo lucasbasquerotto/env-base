@@ -325,6 +325,7 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -376,9 +377,6 @@ pods:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        fluentd:
-          port: "24224"
       images:
         bind: "lucasbasquerotto/image:bind-20200429"
         dnssec: "lucasbasquerotto/image:dnssec-20200504"

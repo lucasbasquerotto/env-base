@@ -388,6 +388,9 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
+      mongo_host: "mongo"
+      mongo_port: "27017"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -447,12 +450,6 @@ pods:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        mongo:
-          host: "mongo"
-          port: "27017"
-        fluentd:
-          port: "24224"
       images:
         nginx: "nginx:1.14.2-alpine"
         rocketchat: "rocket.chat:3.2.2"

@@ -389,6 +389,8 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
+      mysql_port: "3306"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -445,15 +447,6 @@ pods:
       enable_uploads_setup: "{{ params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.enable_uploads_replica | default(false) }}"
-      certbot:
-        email: "{{ params.certbot_email | default('') }}"
-        staging: "{{ params.certbot_staging | default(false) }}"
-        force: "{{ params.certbot_force | default(false) }}"
-      services:
-        mysql:
-          port: "3306"
-        fluentd:
-          port: "24224"
       images:
         nginx: "nginx:1.14.2-alpine"
         varnish: "varnish:6.4.0-1"

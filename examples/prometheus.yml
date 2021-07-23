@@ -381,6 +381,8 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
+      grafana_port: "3000"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -428,11 +430,6 @@ pods:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        fluentd:
-          port: "24224"
-        grafana:
-          port: "3000"
       images:
         nginx: "nginx:1.14.2-alpine"
         prometheus: "prom/prometheus:v2.20.1"

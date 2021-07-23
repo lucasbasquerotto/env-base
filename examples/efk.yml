@@ -412,8 +412,11 @@ pods:
       enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
       enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
+      fluentd_port: "{{ params.fluentd_port | default(24224) }}"
+      kibana_external_port: "{{ params.kibana_external_port | default(5601) }}"
       expose_elasticsearch_port: "{{ params.expose_elasticsearch_port | default(false) }}"
       elasticsearch_external_port: "{{ params.elasticsearch_external_port | default(9200) }}"
+      elasticsearch_java_opts: "-Xms700m -Xmx700m"
       db_backup:
         s3_snapshot: "{{ params.db_backup_s3_snapshot | default(false) }}"
         is_compressed_file: "{{ not (params.db_backup_s3_snapshot | default(false) | bool) }}"
@@ -426,13 +429,6 @@ pods:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        fluentd:
-          port: "24224"
-        elasticsearch:
-          java_opts: "-Xms700m -Xmx700m"
-        kibana:
-          port: "5601"
       images:
         nginx: "nginx:1.14.2-alpine"
         elasticsearch: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"

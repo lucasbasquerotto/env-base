@@ -457,6 +457,10 @@ pods:
     params:
       type: "app"
       orchestration: "docker_compose"
+      wordpress_lang: "en_US"
+      wordpress_debug: "{{ params.wp_debug | default(false) }}"
+      mysql_port: "3306"
+      fluentd_port: "24224"
       custom_dir: "ext-pod"
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
@@ -530,14 +534,6 @@ pods:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
-      services:
-        mysql:
-          port: "3306"
-        wordpress:
-          lang: "en_US"
-          debug: "{{ params.wp_debug | default(false) }}"
-        fluentd:
-          port: "24224"
       images:
         nginx: "nginx:1.14.2-alpine"
         varnish: "varnish:6.4.0-1"
