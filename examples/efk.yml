@@ -96,7 +96,7 @@ main:
           elasticsearch:
             type: "node"
             host: "db"
-            port: "9200"
+            port: "{{ params.elasticsearch_external_port | default(9200) }}"
         params:
           service_params:
             tags:
@@ -256,7 +256,7 @@ services:
         - name: "elasticsearch"
           tags: ["elasticsearch"]
           inbound_rules:
-            - ports: "9200"
+            - ports: "{{ params.elasticsearch_external_port | default(9200) }}"
               sources:
                 tags: ["auto", "efk-web"]
         - name: "efk-web"
@@ -412,6 +412,8 @@ pods:
       enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
       enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
+      expose_elasticsearch_port: "{{ params.expose_elasticsearch_port | default(false) }}"
+      elasticsearch_external_port: "{{ params.elasticsearch_external_port | default(9200) }}"
       db_backup:
         s3_snapshot: "{{ params.db_backup_s3_snapshot | default(false) }}"
         is_compressed_file: "{{ not (params.db_backup_s3_snapshot | default(false) | bool) }}"
@@ -428,7 +430,6 @@ pods:
         fluentd:
           port: "24224"
         elasticsearch:
-          port: "9200"
           java_opts: "-Xms700m -Xmx700m"
         kibana:
           port: "5601"

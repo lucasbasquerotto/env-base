@@ -410,7 +410,7 @@ pods:
       postgres: "postgres"
       mattermost_mail: "{{ params.use_mattermost_mail | default(false) | bool | ternary('mattermost_mail', '') }}"
       pgadmin: "{{ params.use_pgadmin | default(false) | bool | ternary('pgadmin', '') }}"
-      elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       uploads_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"

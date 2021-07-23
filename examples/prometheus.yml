@@ -374,7 +374,7 @@ pods:
         dir: "ext-pod"
     credentials:
       grafana: "{{ params.use_grafana | default(false) | bool | ternary('grafana', '') }}"
-      elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"

@@ -39,6 +39,10 @@ main:
       - name: "app"
         key: "mediawiki_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   remote:
     extend_cloud: true
     initial_services:
@@ -54,6 +58,10 @@ main:
       - name: "app"
         key: "mediawiki"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -77,6 +85,10 @@ main:
       - name: "db"
         key: "mediawiki"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -97,6 +109,10 @@ main:
             or
             (params.use_memcached | default(false) | bool)
           }}
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -134,6 +150,9 @@ main:
             host: "cache"
             port: "11211"
             when: "{{ params.use_redis | default(false) }}"
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -441,7 +460,7 @@ pods:
     fast_prepare: "true"
     credentials:
       mediawiki: "mediawiki"
-      elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       uploads_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"

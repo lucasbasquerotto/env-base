@@ -39,6 +39,10 @@ main:
       - name: "app"
         key: "base_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   remote:
     extend_cloud: true
     initial_services:
@@ -54,6 +58,10 @@ main:
       - name: "app"
         key: "base"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -284,7 +292,7 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
-      elasticsearch: "{{ ((params.fluentd_output_plugin | default('')) == 'elasticsearch') | ternary('elasticsearch', '') }}"
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
       backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
