@@ -39,6 +39,10 @@ main:
       - name: "app"
         key: "minio_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   remote:
     extend_cloud: true
     initial_services:
@@ -54,6 +58,10 @@ main:
       - name: "app"
         key: "minio"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"

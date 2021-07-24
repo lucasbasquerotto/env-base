@@ -35,6 +35,10 @@ main:
       - name: "app"
         key: "mattermost_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   remote:
     extend_cloud: true
     initial_services:
@@ -46,6 +50,10 @@ main:
       - name: "app"
         key: "mattermost"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -65,6 +73,10 @@ main:
       - name: "db"
         key: "mattermost"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -80,6 +92,9 @@ main:
         key: "mattermost"
         can_destroy: true
         dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
           postgres:
             type: "node"
             host: "db"

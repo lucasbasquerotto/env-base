@@ -39,6 +39,10 @@ main:
       - name: "app"
         key: "rocketchat_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   remote:
     extend_cloud: true
     initial_services:
@@ -54,6 +58,10 @@ main:
       - name: "app"
         key: "rocketchat"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -77,6 +85,10 @@ main:
       - name: "db"
         key: "rocketchat"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -92,6 +104,9 @@ main:
         key: "rocketchat"
         can_destroy: true
         dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
           mongo:
             type: "node"
             host: "db"

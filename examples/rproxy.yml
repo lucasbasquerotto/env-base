@@ -39,12 +39,20 @@ main:
       - name: "app"
         key: "rproxy_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   local_hub:
     extend_cloud: true
     nodes:
       - name: "app"
         key: "rproxy_hub_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   local_replicas:
     extend_cloud: true
     nodes:
@@ -52,6 +60,9 @@ main:
         key: "rproxy_replicas_hub_local"
         local: true
         dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
           replica:
             type: "url"
             host:
@@ -71,12 +82,24 @@ main:
       - name: "node_replica_1"
         key: "rproxy_replica_1_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
       - name: "node_replica_2"
         key: "rproxy_replica_2_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
       - name: "node_replica_3"
         key: "rproxy_replica_3_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
   remote:
     extend_cloud: true
     initial_services:
@@ -92,6 +115,10 @@ main:
       - name: "app"
         key: "rproxy"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -115,6 +142,10 @@ main:
       - name: "app"
         key: "rproxy_hub"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -137,6 +168,10 @@ main:
       - name: "app"
         key: "rproxy_external_hub"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -182,6 +217,10 @@ main:
       - name: "web1"
         key: "rproxy_web"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -193,6 +232,10 @@ main:
       - name: "web2"
         key: "rproxy_web"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -204,6 +247,10 @@ main:
       - name: "web3"
         key: "rproxy_web"
         can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
@@ -250,6 +297,9 @@ main:
                 "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}",
               ]
         dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
           replica:
             type: "node"
             node_ip_type: "ipv4"
@@ -270,6 +320,10 @@ main:
         key: "rproxy_web"
         can_destroy: true
         amount: 3
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:

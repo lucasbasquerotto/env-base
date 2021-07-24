@@ -39,6 +39,10 @@ main:
       - name: "app"
         key: "wp_local"
         local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
     extra_repos:
       - repo: "app"
         dir: "app-wp"
@@ -108,6 +112,10 @@ main:
             or
             (params.use_memcached | default(false) | bool)
           }}
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
