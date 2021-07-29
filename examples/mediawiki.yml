@@ -57,6 +57,7 @@ main:
     nodes:
       - name: "app"
         key: "mediawiki"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -84,6 +85,7 @@ main:
     nodes:
       - name: "db"
         key: "mediawiki"
+        hostname: "{{ params.db_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -102,6 +104,7 @@ main:
               memory: "memory_db"
       - name: "cache"
         key: "mediawiki"
+        hostname: "{{ params.cache_hostname | default('') }}"
         can_destroy: true
         when: >-
           {{
@@ -134,6 +137,7 @@ main:
               memory: "memory_cache"
       - name: "web"
         key: "mediawiki"
+        hostname: "{{ params.web_hostname | default('') }}"
         can_destroy: true
         dependencies:
           mysql:

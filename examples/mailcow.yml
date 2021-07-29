@@ -43,6 +43,7 @@ main:
     nodes:
       - name: "app"
         key: "mailcow"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         params:
           dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"

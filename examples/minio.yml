@@ -57,6 +57,7 @@ main:
     nodes:
       - name: "app"
         key: "minio"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:

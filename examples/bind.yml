@@ -60,6 +60,7 @@ main:
     nodes:
       - name: "app"
         key: "bind"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:

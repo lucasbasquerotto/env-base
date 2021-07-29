@@ -60,6 +60,7 @@ main:
     nodes:
       - name: "app"
         key: "wp"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -87,6 +88,7 @@ main:
     nodes:
       - name: "db"
         key: "wp"
+        hostname: "{{ params.db_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -105,6 +107,7 @@ main:
               memory: "memory_db"
       - name: "cache"
         key: "wp"
+        hostname: "{{ params.cache_hostname | default('') }}"
         can_destroy: true
         when: >-
           {{
@@ -137,6 +140,7 @@ main:
               memory: "memory_cache"
       - name: "web"
         key: "wp"
+        hostname: "{{ params.web_hostname | default('') }}"
         can_destroy: true
         dependencies:
           mysql:

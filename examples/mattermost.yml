@@ -49,6 +49,7 @@ main:
     nodes:
       - name: "app"
         key: "mattermost"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -72,6 +73,7 @@ main:
     nodes:
       - name: "db"
         key: "mattermost"
+        hostname: "{{ params.db_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -90,6 +92,7 @@ main:
               memory: "memory_db"
       - name: "web"
         key: "mattermost"
+        hostname: "{{ params.web_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:

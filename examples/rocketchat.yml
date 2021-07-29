@@ -57,6 +57,7 @@ main:
     nodes:
       - name: "app"
         key: "rocketchat"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -84,6 +85,7 @@ main:
     nodes:
       - name: "db"
         key: "rocketchat"
+        hostname: "{{ params.db_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -102,6 +104,7 @@ main:
               memory: "memory_db"
       - name: "web"
         key: "rocketchat"
+        hostname: "{{ params.web_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:

@@ -29,6 +29,7 @@ main:
     nodes:
       - name: "app"
         key: "discourse"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         params:
           dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
@@ -57,6 +58,7 @@ main:
     nodes:
       - name: "app"
         key: "discourse"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
         params:
           dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
@@ -95,6 +97,7 @@ main:
     nodes:
       - name: "web"
         key: "discourse"
+        hostname: "{{ params.web_hostname | default('') }}"
         can_destroy: true
         dependencies:
           db:
@@ -125,6 +128,7 @@ main:
                   }}
       - name: "redis"
         key: "discourse"
+        hostname: "{{ params.redis_hostname | default('') }}"
         can_destroy: true
         params:
           service_params:
@@ -142,6 +146,7 @@ main:
                   }}
       - name: "db"
         key: "discourse"
+        hostname: "{{ params.db_hostname | default('') }}"
         can_destroy: true
         params:
           service_params:

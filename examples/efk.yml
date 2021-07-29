@@ -53,6 +53,7 @@ main:
     nodes:
       - name: "app"
         key: "efk"
+        hostname: "{{ params.app_hostname | default('') }}"
         can_destroy: true
     run_stages:
       - tasks:
@@ -76,6 +77,7 @@ main:
     nodes:
       - name: "db"
         key: "efk"
+        hostname: "{{ params.db_hostname | default('') }}"
         can_destroy: true
         params:
           service_params:
@@ -91,6 +93,7 @@ main:
               memory: "memory_db"
       - name: "web"
         key: "efk"
+        hostname: "{{ params.web_hostname | default('') }}"
         can_destroy: true
         dependencies:
           elasticsearch:
