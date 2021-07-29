@@ -462,6 +462,10 @@ pods:
       enable_uploads_setup: "{{ params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.enable_uploads_replica | default(false) }}"
+      certbot:
+        email: "{{ params.certbot_email | default('') }}"
+        staging: "{{ params.certbot_staging | default(false) }}"
+        force: "{{ params.certbot_force | default(false) }}"
       images:
         nginx: "nginx:1.14.2-alpine"
         varnish: "varnish:6.4.0-1"
