@@ -106,6 +106,7 @@ main:
               - "auto"
               - "efk-web"
               - "efk-dmz"
+          dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
         pods:
           efk:
             params:
@@ -341,7 +342,12 @@ nodes:
     credentials:
       host: "host"
     params:
-      dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
+      dns_service_params_list: >-
+        {{
+          (params.dns_service_params_list | default([]))
+          +
+          (params.dns_elasticsearch_params_list | default([]))
+        }}
       host_users:
         - name: "host"
           setup_log_file: "/var/log/setup.log"
