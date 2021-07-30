@@ -336,6 +336,7 @@ nodes:
         tags:
           - "auto"
           - "efk-dmz"
+          - "elasticsearch"
     dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
