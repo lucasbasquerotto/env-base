@@ -101,8 +101,7 @@ main:
             params:
               type: "db"
               use_nginx: false
-            group_params:
-              memory: "memory_db"
+              memory: "{{ params.memory_db | default({})}}"
       - name: "web"
         key: "vault"
         hostname: "{{ params.web_hostname | default('') }}"
@@ -125,8 +124,7 @@ main:
           vault:
             params:
               type: "web"
-            group_params:
-              memory: "memory_web"
+              memory: "{{ params.memory_web | default({})}}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -305,9 +303,9 @@ services:
       node: "digital_ocean"
     params:
       image_id: "ubuntu-18-04-x64"
+      region_id: "{{ params.digital_ocean_node_region | default('ams3') }}"
+      size_id: "{{ params.digital_ocean_node_size | default('s-2vcpu-2gb') }}"
       ipv6: true
-      region_id: "ams3"
-      size_id: "s-2vcpu-2gb"
     contents:
       user_data:
         type: "env"
@@ -322,8 +320,8 @@ services:
       node: "linode"
     params:
       image: "linode/ubuntu18.04"
-      region: "us-east"
-      type: "g6-standard-1"
+      region: "{{ params.linode_region | default('us-east') }}"
+      type: "{{ params.linode_type | default('g6-standard-1') }}"
     contents:
       user_data:
         type: "env"
@@ -411,6 +409,7 @@ pods:
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
       meta: "{{ params.pod_meta | default({}) }}"
+      memory: "{{ params.memory_app | default({})}}"
       main_domain: "{{ params.main_domain | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
@@ -469,7 +468,6 @@ pods:
         logrotator: "python:3.8.4-buster"
         fluentd: "lucasbasquerotto/image:fluentd-20200617"
     group_params:
-      memory: "memory_app"
       db_setup: >-
         {{
         params.non_s3_setup | default(false) | bool |
@@ -524,31 +522,6 @@ pods:
                 expiration_days: 30
                 older_versions_expiration_days: 180
 pod_group_params:
-  memory_app:
-    nginx: 512mb
-    vault: 1gb
-    theia: 512mb
-    minio_gateway: 512mb
-    toolbox: 512mb
-    fluentd: 256mb
-    certbot: 256mb
-    logrotator: 256mb
-    s3_cli: 512mb
-  memory_db:
-    vault: 1gb
-    toolbox: 512mb
-    fluentd: 256mb
-    logrotator: 256mb
-    s3_cli: 512mb
-  memory_web:
-    nginx: 512mb
-    theia: 512mb
-    minio_gateway: 512mb
-    toolbox: 512mb
-    fluentd: 256mb
-    certbot: 256mb
-    logrotator: 256mb
-    s3_cli: 512mb
   db_backup_sync:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:

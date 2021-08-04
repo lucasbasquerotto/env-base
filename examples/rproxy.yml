@@ -519,9 +519,9 @@ services:
       node: "digital_ocean"
     params:
       image_id: "ubuntu-18-04-x64"
+      region_id: "{{ params.digital_ocean_node_region | default('ams3') }}"
+      size_id: "{{ params.digital_ocean_node_size | default('s-2vcpu-2gb') }}"
       ipv6: true
-      region_id: "ams3"
-      size_id: "s-2vcpu-2gb"
     contents:
       user_data:
         type: "env"
@@ -536,8 +536,8 @@ services:
       node: "linode"
     params:
       image: "linode/ubuntu18.04"
-      region: "us-east"
-      type: "g6-standard-1"
+      region: "{{ params.linode_region | default('us-east') }}"
+      type: "{{ params.linode_type | default('g6-standard-1') }}"
     contents:
       user_data:
         type: "env"
@@ -767,6 +767,7 @@ pods:
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
       meta: "{{ params.pod_meta | default({}) }}"
+      memory: "{{ params.memory | default({})}}"
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
       s3_cli: "{{ params.s3_cli | default('') }}"
@@ -801,15 +802,6 @@ pods:
         rclone: "rclone/rclone:1.54.0"
         logrotator: "python:3.8.4-buster"
         fluentd: "lucasbasquerotto/image:fluentd-20200617"
-      memory:
-        nginx: 512mb
-        theia: 512mb
-        minio_gateway: 512mb
-        toolbox: 512mb
-        certbot: 256mb
-        fluentd: 256mb
-        logrotator: 256mb
-        s3_cli: 512mb
     transfer:
       - dest: "env/{{ params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
         when: "{{ params.define_s3_backup_lifecycle | default(false) }}"

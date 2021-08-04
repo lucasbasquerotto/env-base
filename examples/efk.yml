@@ -289,9 +289,9 @@ services:
       node: "digital_ocean"
     params:
       image_id: "ubuntu-18-04-x64"
+      region_id: "{{ params.digital_ocean_node_region | default('ams3') }}"
+      size_id: "{{ params.digital_ocean_node_size | default('s-2vcpu-2gb') }}"
       ipv6: true
-      region_id: "ams3"
-      size_id: "s-2vcpu-2gb"
     contents:
       user_data:
         type: "env"
@@ -306,8 +306,8 @@ services:
       node: "linode"
     params:
       image: "linode/ubuntu18.04"
-      region: "us-east"
-      type: "g6-standard-1"
+      region: "{{ params.linode_region | default('us-east') }}"
+      type: "{{ params.linode_type | default('g6-standard-1') }}"
     contents:
       user_data:
         type: "env"

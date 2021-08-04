@@ -103,8 +103,7 @@ main:
           wp:
             params:
               type: "db"
-            group_params:
-              memory: "memory_db"
+              memory: "{{ params.memory_db | default({})}}"
       - name: "cache"
         key: "wp"
         hostname: "{{ params.cache_hostname | default('') }}"
@@ -136,8 +135,7 @@ main:
           wp:
             params:
               type: "cache"
-            group_params:
-              memory: "memory_cache"
+              memory: "{{ params.memory_cache | default({})}}"
       - name: "web"
         key: "wp"
         hostname: "{{ params.web_hostname | default('') }}"
@@ -160,8 +158,7 @@ main:
           wp:
             params:
               type: "web"
-            group_params:
-              memory: "memory_web"
+              memory: "{{ params.memory_web | default({})}}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -344,24 +341,13 @@ services:
       node: "digital_ocean"
     params:
       image_id: "ubuntu-18-04-x64"
+      region_id: "{{ params.digital_ocean_node_region | default('ams3') }}"
+      size_id: "{{ params.digital_ocean_node_size | default('s-2vcpu-2gb') }}"
       ipv6: true
-      region_id: "ams3"
-      size_id: "s-2vcpu-2gb"
     contents:
       user_data:
-        type: "template"
-        origin: "cloud"
-        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
-        params:
-          user_directories: ["/var/cloud"]
-          install_docker: true
-          install_podman: false
-          install_packages: false
-        credentials:
-          node: "host"
-        contents:
-          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+        type: "env"
+        name: "user_data_ubuntu"
   linode:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -372,23 +358,12 @@ services:
       node: "linode"
     params:
       image: "linode/ubuntu18.04"
-      region: "us-east"
-      type: "g6-standard-1"
+      region: "{{ params.linode_region | default('us-east') }}"
+      type: "{{ params.linode_type | default('g6-standard-1') }}"
     contents:
       user_data:
-        type: "template"
-        origin: "cloud"
-        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
-        params:
-          user_directories: ["/var/cloud"]
-          install_docker: true
-          install_podman: false
-          install_packages: false
-        credentials:
-          node: "host"
-        contents:
-          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+        type: "env"
+        name: "user_data_ubuntu"
 nodes:
   wp_local:
     credentials:
@@ -477,6 +452,7 @@ pods:
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
       meta: "{{ params.pod_meta | default({}) }}"
+      memory: "{{ params.memory_app | default({})}}"
       main_domain: "{{ params.main_domain | default('') }}"
       wp_env: "staging"
       app_dev: "{{ params.app_dev | default(false) }}"
@@ -567,7 +543,6 @@ pods:
         logrotator: "python:3.8.4-buster"
         fluentd: "lucasbasquerotto/image:fluentd-20200617"
     group_params:
-      memory: "memory_app"
       db_setup_new: "db_setup_new"
       db_setup: >-
         {{
@@ -633,45 +608,6 @@ pods:
                 expiration_days: 15
                 older_versions_expiration_days: 90
 pod_group_params:
-  memory_app:
-    nginx: 256mb
-    varnish: 256mb
-    wordpress: 512mb
-    redis: 256mb
-    memcached: 256mb
-    pma: 256mb
-    adminer: 256mb
-    mysql: 512mb
-    theia: 512mb
-    minio_gateway: 256mb
-    toolbox: 256mb
-    composer: 256mb
-    fluentd: 256mb
-    certbot: 256mb
-    s3_cli: 256mb
-  memory_db:
-    mysql: 1gb
-    toolbox: 512mb
-    fluentd: 256mb
-    s3_cli: 512mb
-  memory_cache:
-    redis: 512mb
-    memcached: 512mb
-    toolbox: 512mb
-    fluentd: 256mb
-    s3_cli: 512mb
-  memory_web:
-    nginx: 512mb
-    varnish: 512mb
-    wordpress: 1gb
-    pma: 512mb
-    adminer: 512mb
-    theia: 512mb
-    minio_gateway: 512mb
-    toolbox: 512mb
-    fluentd: 256mb
-    certbot: 256mb
-    s3_cli: 512mb
   db_backup_sync:
     backup_bucket_sync_dir: "db"
   db_backup_no_sync:
