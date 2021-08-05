@@ -270,6 +270,7 @@ services:
         - "discourse-redis"
         - "discourse-web"
         - "discourse-dmz"
+        - "node-exporter"
       firewalls:
         - name: "auto"
           tags: ["auto"]
@@ -321,6 +322,13 @@ services:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "node-exporter"
+          tags: ["node-exporter"]
+          when: "{{ params.use_node_exporter | default(false) }}"
+          inbound_rules:
+            - ports: "9100"
+              sources:
+                tags: ["prometheus"]
   digital_ocean_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -417,6 +425,21 @@ tasks:
     root: true
     cmd: "./launcher rebuild web"
 contents:
+  user_data_ubuntu:
+    type: "template"
+    origin: "cloud"
+    file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+    schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+    params:
+      user_directories: ["/var/cloud"]
+      install_docker: true
+      install_podman: false
+      install_node_exporter: "{{ params.use_node_exporter | default(false) }}"
+      install_packages: true
+    credentials:
+      node: "host"
+    contents:
+      host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
   discourse_app_container:
     type: "env"
     name: "discourse_container"

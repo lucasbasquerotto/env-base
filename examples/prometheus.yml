@@ -96,6 +96,7 @@ main:
             tags:
               - "auto"
               - "prometheus"
+              - "prometheus-db"
         pods:
           prometheus:
             params:
@@ -237,8 +238,10 @@ services:
       tags:
         - "auto"
         - "prometheus"
+        - "prometheus-db"
         - "prometheus-web"
         - "prometheus-dmz"
+        - "node-exporter"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -269,8 +272,8 @@ services:
               ports: "1-65535"
               destinations:
                 addresses: ["0.0.0.0/0", "::/0"]
-        - name: "prometheus"
-          tags: ["prometheus"]
+        - name: "prometheus-db"
+          tags: ["prometheus-db"]
           inbound_rules:
             - ports: "{{ params.prometheus_external_port | default('9090', true) }}"
               sources:
@@ -293,6 +296,13 @@ services:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "node-exporter"
+          tags: ["node-exporter"]
+          when: "{{ params.use_node_exporter | default(false) }}"
+          inbound_rules:
+            - ports: "9100"
+              sources:
+                tags: ["prometheus"]
   digital_ocean_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -352,6 +362,7 @@ nodes:
       params:
         tags:
           - "auto"
+          - "prometheus"
           - "prometheus-dmz"
     dns_service: "dns_base_service"
     base_dir: "/var/cloud"
@@ -411,7 +422,7 @@ pods:
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
       use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
       use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
-      use_node_exporter: "{{ params.use_node_exporter | default(false) }}"
+      use_internal_node_exporter: "{{ params.use_internal_node_exporter | default(false) }}"
       use_cadvisor: "{{ params.use_cadvisor | default(false) }}"
       use_nginx: "{{ params.use_nginx | default(false) }}"
       use_grafana: "{{ params.use_grafana | default(false) }}"
@@ -537,6 +548,12 @@ contents:
       user_directories: ["/var/cloud"]
       install_docker: true
       install_podman: false
+      install_node_exporter: >-
+        {{
+          (params.use_node_exporter | default(false) | bool)
+          and
+          not (params.use_internal_node_exporter | default(false) | bool)
+        }}
       install_packages: true
     credentials:
       node: "host"

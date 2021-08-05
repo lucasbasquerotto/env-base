@@ -225,6 +225,7 @@ services:
         - "elasticsearch"
         - "efk-web"
         - "efk-dmz"
+        - "node-exporter"
       firewalls:
         - name: "private"
           tags: ["auto"]
@@ -279,6 +280,13 @@ services:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
+        - name: "node-exporter"
+          tags: ["node-exporter"]
+          when: "{{ params.use_node_exporter | default(false) }}"
+          inbound_rules:
+            - ports: "9100"
+              sources:
+                tags: ["prometheus"]
   digital_ocean_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -526,6 +534,7 @@ contents:
       user_directories: ["/var/cloud"]
       install_docker: true
       install_podman: false
+      install_node_exporter: "{{ params.use_node_exporter | default(false) }}"
       install_packages: true
     credentials:
       node: "host"
