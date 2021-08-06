@@ -384,6 +384,8 @@ services:
       region_id: "{{ params.digital_ocean_node_region | default('ams3') }}"
       size_id: "{{ params.digital_ocean_node_size | default('s-2vcpu-2gb') }}"
       ipv6: true
+      monitoring: true
+      resize_disk: true
     contents:
       user_data:
         type: "env"
