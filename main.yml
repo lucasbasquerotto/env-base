@@ -168,14 +168,13 @@ services:
     credentials:
       node: "aws"
     params:
-      detailed_monitoring: false
-      ebs_optimized: false
-      image_id: ""
       instance_type: "t2.micro"
+      region: "us-east-1"
+      image_id: ""
+      vpc_subnet_id: ""
       network:
         assign_public_ip: true
       purge_tags: false
-      region: "us-east-1"
       security_groups: []
       instance_initiated_shutdown_behavior: "terminate"
       termination_protection: false
@@ -184,8 +183,38 @@ services:
         ebs:
           volume_size: 22
           delete_on_termination: true
-      vpc_subnet_id: ""
       wait_timeout: 120
+      detailed_monitoring: false
+      ebs_optimized: false
+  aws_vpn:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      name: "my-test-rule"
+      description: "an example2 EC2 group"
+      region: "us-east-1"
+      vpc_id: ""
+      rules:
+        - proto: tcp
+          ports:
+            - 6379
+            - 26379
+          group_name:
+            - example-vpn
+            - example-redis
+        - proto: tcp
+          ports: 5665
+          group_name: example-vpn
+          cidr_ip:
+            - 172.16.1.0/24
+            - 172.16.17.0/24
+          cidr_ipv6:
+            - 2607:F8B0::/32
 nodes:
   local:
     pods: ["main"]
