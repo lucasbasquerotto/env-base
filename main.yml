@@ -159,6 +159,33 @@ services:
           node: "host"
         contents:
           host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+  aws_node:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/aws/aws.main.node.yml"
+    schema: "tasks/node/aws/aws.schema.node.yml"
+    validator: "tasks/node/aws/aws.validator.node.yml"
+    credentials:
+      node: "aws"
+    params:
+      detailed_monitoring: false
+      ebs_optimized: false
+      image_id: ""
+      instance_type: "t2.micro"
+      network:
+        assign_public_ip: true
+      purge_tags: false
+      region: "us-east-1"
+      security_groups: []
+      instance_initiated_shutdown_behavior: "terminate"
+      termination_protection: false
+      volumes:
+        device_name: "/dev/sda1"
+        ebs:
+          volume_size: 22
+          delete_on_termination: true
+      vpc_subnet_id: ""
+      wait_timeout: 120
 nodes:
   local:
     pods: ["main"]
@@ -236,5 +263,6 @@ repos:
     version: "master"
 credentials:
   host: "{{ credentials.host | default({}) }}"
+  aws: "{{ credentials.aws | default({}) }}"
   digital_ocean: "{{ credentials.digital_ocean | default({}) }}"
   elasticsearch: "{{ credentials.elasticsearch | default({}) }}"
