@@ -2,6 +2,9 @@ name: "{{ project_name }}"
 ctxs: "{{ project_ctxs }}"
 meta:
   template_no_empty_lines: true
+  ignore_validators: false
+  skip_local_node_preparation: false
+  skip_local_pod_preparation: false
 main:
   local:
     repo: "cloud"
@@ -174,15 +177,14 @@ services:
       vpc_subnet_id: ""
       network:
         assign_public_ip: true
-      purge_tags: false
       security_groups: []
       instance_initiated_shutdown_behavior: "terminate"
       termination_protection: false
       volumes:
-        device_name: "/dev/sda1"
-        ebs:
-          volume_size: 22
-          delete_on_termination: true
+        - device_name: "/dev/sda1"
+          ebs:
+            volume_size: 22
+            delete_on_termination: true
       wait_timeout: 120
       detailed_monitoring: false
       ebs_optimized: false
@@ -195,26 +197,27 @@ services:
     credentials:
       vpn: "aws"
     params:
-      name: "my-test-rule"
-      description: "an example2 EC2 group"
-      region: "us-east-1"
-      vpc_id: ""
-      rules:
-        - proto: tcp
-          ports:
-            - 6379
-            - 26379
-          group_name:
-            - example-vpn
-            - example-redis
-        - proto: tcp
-          ports: 5665
-          group_name: example-vpn
-          cidr_ip:
-            - 172.16.1.0/24
-            - 172.16.17.0/24
-          cidr_ipv6:
-            - 2607:F8B0::/32
+      security_groups:
+        - name: "my-test-rule"
+          description: "an example2 EC2 group"
+          region: "us-east-1"
+          vpc_id: ""
+          rules:
+            - proto: tcp
+              ports:
+                - 6379
+                - 26379
+              cidr_ip:
+                - 0.0.0.0/0
+              cidr_ipv6:
+                - "::/0"
+            - proto: tcp
+              ports: 5665
+              cidr_ip:
+                - 172.16.1.0/24
+                - 172.16.17.0/24
+              cidr_ipv6:
+                - 2607:F8B0::/32
 nodes:
   local:
     pods: ["main"]
