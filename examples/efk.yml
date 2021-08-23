@@ -96,10 +96,8 @@ main:
         can_destroy: true
         dependencies:
           elasticsearch:
-            type: "node"
-            protocol: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('https', 'http') }}"
-            host: "db"
-            port: "{{ params.elasticsearch_external_port | default(9200) }}"
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
             tags:
