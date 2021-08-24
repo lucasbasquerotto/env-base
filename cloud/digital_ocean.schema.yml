@@ -1,0 +1,69 @@
+root: "env"
+schemas:
+  env:
+    type: "dict"
+    description: "environment schema"
+    props:
+      name:
+        non_empty: true
+        type: "str"
+        description: "project name"
+      ctxs:
+        non_empty: true
+        type: "list"
+        elem_type: "str"
+        description: "project contexts"
+      env:
+        non_empty: true
+        type: "dict"
+        description: "project base environment definition"
+      params:
+        non_empty: true
+        schema: "params"
+        description: "project parameters"
+      credentials:
+        non_empty: true
+        schema: "credentials"
+        description: "project credentials"
+  params:
+    type: "dict"
+    description: "project parameters schema"
+    props:
+      host_ssh_public_keys_content:
+        non_empty: true
+        type: "str"
+        description: "ssh public keys (one in each line) to be included in the newly created hosts"
+  credentials:
+    type: "dict"
+    description: "project credentials schema"
+    props:
+      host:
+        schema: "credential_host"
+        description: "host credentials"
+      digital_ocean:
+        schema: "credential_digital_ocean"
+        description: "digital ocean credentials"
+  credential_host:
+    type: "dict"
+    description: "host credentials schema"
+    props:
+      host_user:
+        type: "str"
+        non_empty: true
+        description: "host username"
+      host_pass:
+        type: "str"
+        non_empty: true
+        description: "host password"
+      ssh_file:
+        type: "str"
+        non_empty: true
+        description: "ssh private key file path (relative to the project environment directory)"
+  credential_digital_ocean:
+    type: "dict"
+    description: "digital ocean credentials schema"
+    props:
+      api_token:
+        type: "str"
+        non_empty: true
+        description: "digital ocean api token"

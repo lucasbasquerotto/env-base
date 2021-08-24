@@ -1,8 +1,8 @@
 name: "{{ project_name }}"
 ctxs: "{{ project_ctxs }}"
-migration: ""
-container: ""
-meta: "{{ params.meta | default({ 'template_no_empty_lines': true }) }}"
+original_env_schema: "{{ env.repo_dir }}/cloud/cloudflare.schema.yml"
+meta:
+  template_no_empty_lines: true
 cloud:
   repo: "cloud"
   ext_repos:
@@ -17,26 +17,47 @@ cloud:
     file: "files/hosts.tpl.ini"
     schema: "files/hosts.schema.yml"
 main:
-  cloud:
+  dns:
     extend_cloud: true
-    initial_services: ["dns_main_service"]
+    initial_services: ["dns_service"]
 services:
-  dns_main_service:
+  dns_service:
     list: true
     services:
-      - name: "dns_base_service"
+      - name: "dns_service_item_sub1_ipv4"
+        key: "dns_service_item"
         params:
-          list: "{{ params.dns_main_service_params_list | default([]) }}"
-  dns_base_service:
+          dns_type: "A"
+          record: "sub1"
+          value: "1.2.3.4"
+      - name: "dns_service_item_sub1_ipv6"
+        key: "dns_service_item"
+        params:
+          dns_type: "AAAA"
+          record: "sub1"
+          value: "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+      - name: "dns_service_item_sub2_ipv4"
+        key: "dns_service_item"
+        params:
+          dns_type: "A"
+          record: "sub2"
+          value: "5.6.7.8"
+      - name: "dns_service_item_sub2_ipv6"
+        key: "dns_service_item"
+        params:
+          dns_type: "AAAA"
+          record: "sub2"
+          value: "2804:214:861b:1137:f9b2:4339:71ca:bd72"
+  dns_service_item:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/cloudflare/cloudflare.main.dns.yml"
-    schema: "tasks/dns/cloudflare/cloudflare.schema.dns.yml"
-    validator: "tasks/dns/cloudflare/cloudflare.validator.dns.yml"
+    task: "tasks/dns/cloudflare.main.dns.yml"
+    schema: "tasks/dns/cloudflare.schema.dns.yml"
+    validator: "tasks/dns/cloudflare.validator.dns.yml"
     credentials:
       dns: "cloudflare"
     params:
-      zone: "{{ params.main_domain | default('') }}"
+      zone: "{{ params.domain | default('') }}"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -44,4 +65,7 @@ repos:
   ext_cloud:
     src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
-credentials: "{{ credentials | combine({}) }}"
+credentials:
+  cloudflare:
+    email: "{{ credentials.cloudflare.email | default('') }}"
+    token: "{{ credentials.cloudflare.token | default('') }}"

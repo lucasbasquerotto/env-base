@@ -1,0 +1,69 @@
+root: "env"
+schemas:
+  env:
+    type: "dict"
+    description: "environment schema"
+    props:
+      name:
+        non_empty: true
+        type: "str"
+        description: "project name"
+      ctxs:
+        non_empty: true
+        type: "list"
+        elem_type: "str"
+        description: "project contexts"
+      env:
+        non_empty: true
+        type: "dict"
+        description: "project base environment definition"
+      params:
+        non_empty: true
+        schema: "params"
+        description: "project parameters"
+      credentials:
+        non_empty: true
+        schema: "credentials"
+        description: "project credentials"
+  params:
+    type: "dict"
+    description: "project parameters schema"
+    props:
+      private_bucket_name:
+        non_empty: true
+        type: "str"
+        description: "private bucket name"
+      public_bucket_name:
+        non_empty: true
+        type: "str"
+        description: "public (read) bucket name"
+      backup_bucket_name:
+        non_empty: true
+        type: "str"
+        description: "backup (private) bucket name"
+      uploads_bucket_name:
+        non_empty: true
+        type: "str"
+        description: "uploads (public) bucket name"
+  credentials:
+    type: "dict"
+    description: "project credentials schema"
+    props:
+      s3:
+        schema: "credential_s3"
+        description: "s3 credentials"
+  credential_s3:
+    type: "dict"
+    description: "s3 credentials schema"
+    props:
+      endpoint:
+        type: "str"
+        description: "s3 endpoint (when empty, defaults to the aws s3 endpoint)"
+      access_key:
+        type: "str"
+        non_empty: true
+        description: "s3 access key"
+      secret_key:
+        type: "str"
+        non_empty: true
+        description: "s3 secret key"
