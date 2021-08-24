@@ -19,7 +19,9 @@ cloud:
 main:
   cdn:
     extend_cloud: true
-    initial_services: ["cdn_service"]
+    initial_services:
+      - name: "cdn_service"
+        can_destroy: true
 services:
   cdn_service:
     base_dir: "ext-cloud"

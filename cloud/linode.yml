@@ -22,20 +22,24 @@ main:
     nodes:
       - name: "app"
         key: "linode_node"
+        can_destroy: true
       - name: "app2"
         key: "linode_node"
         amount: 2
         max_amount: 3
+        can_destroy: true
       - name: "app3"
         key: "linode_node"
         hostname: "myapp"
         amount: 3
         max_amount: 5
+        can_destroy: true
 nodes:
   linode_node:
     service: "node_service"
     base_dir: "/var/cloud"
-    credential: "host"
+    credentials:
+      host: "host"
     root: true
     params:
       node_setup:
@@ -75,6 +79,13 @@ contents:
       install_packages: true
     contents:
       host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
 credentials:
   host:
     host_user: "{{ credentials.host.host_user | default('') }}"

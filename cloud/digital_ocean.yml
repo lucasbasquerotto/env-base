@@ -22,28 +22,34 @@ main:
     initial_services: ["vpn_service"]
   storage:
     extend_cloud: true
-    initial_services: ["storage_service"]
+    initial_services:
+      - name: "storage_service"
+        can_destroy: true
   node:
     extend_cloud: true
     initial_services: ["node_vpn_service"]
     nodes:
       - name: "app"
         key: "digital_ocean_node"
+        can_destroy: true
       - name: "app2"
         key: "digital_ocean_node"
         amount: 2
         max_amount: 3
+        can_destroy: true
       - name: "app3"
         key: "digital_ocean_node"
         hostname: "myapp"
         amount: 3
         max_amount: 5
+        can_destroy: true
 nodes:
   digital_ocean_node:
     service: "node_service"
     base_dir: "/var/cloud"
-    credential: "host"
     root: true
+    credentials:
+      host: "host"
     params:
       node_setup:
         setup_log_file: "/var/log/setup.log"

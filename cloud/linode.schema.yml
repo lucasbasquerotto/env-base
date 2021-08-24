@@ -31,7 +31,8 @@ schemas:
     props:
       host_ssh_public_keys_content:
         non_empty: true
-        type: "str"
+        type: "simple_dict"
+        alternative_type: "str"
         description: "ssh public keys (one in each line) to be included in the newly created hosts"
   credentials:
     type: "dict"

@@ -19,7 +19,9 @@ cloud:
 main:
   dns:
     extend_cloud: true
-    initial_services: ["dns_service"]
+    initial_services:
+      - name: "dns_service"
+        can_destroy: true
 services:
   dns_service:
     list: true
