@@ -1,0 +1,47 @@
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
+migration: ""
+container: ""
+meta: "{{ params.meta | default({ 'template_no_empty_lines': true }) }}"
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
+main:
+  cloud:
+    extend_cloud: true
+    initial_services: ["dns_main_service"]
+services:
+  dns_main_service:
+    list: true
+    services:
+      - name: "dns_base_service"
+        params:
+          list: "{{ params.dns_main_service_params_list | default([]) }}"
+  dns_base_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_dns"
+    task: "tasks/dns/cloudflare/cloudflare.main.dns.yml"
+    schema: "tasks/dns/cloudflare/cloudflare.schema.dns.yml"
+    validator: "tasks/dns/cloudflare/cloudflare.validator.dns.yml"
+    credentials:
+      dns: "cloudflare"
+    params:
+      zone: "{{ params.main_domain | default('') }}"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
+credentials: "{{ credentials | combine({}) }}"

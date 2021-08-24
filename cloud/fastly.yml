@@ -1,0 +1,464 @@
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
+migration: ""
+container: ""
+meta: "{{ params.meta | default({ 'template_no_empty_lines': true }) }}"
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
+main:
+  cloud:
+    extend_cloud: true
+    initial_services:
+      - name: "{{ params.cloud_service | default('skip', true) }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
+      - name: "{{ params.run_nameserver_main | default(false) | bool | ternary('nameserver_main_service', 'skip') }}"
+        when: "{{ params.run_nameserver_main | default(false) | bool }}"
+      - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+        when: "{{ params.run_dns_main | default(false) | bool }}"
+  s3_replica_buckets:
+    extend_cloud: true
+    initial_services:
+      - name: "s3_buckets"
+        can_destroy: true
+      - name: "s3_replica_buckets"
+        can_destroy: true
+  local:
+    extend_cloud: true
+    nodes:
+      - name: "app"
+        key: "base_local"
+        local: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
+  remote:
+    extend_cloud: true
+    initial_services:
+      - name: "{{ params.cloud_service | default('skip', true) }}"
+        when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
+      - name: "{{ params.run_nameserver_main | default(false) | bool | ternary('nameserver_main_service', 'skip') }}"
+        when: "{{ params.run_nameserver_main | default(false) | bool }}"
+      - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
+        when: "{{ params.run_dns_main | default(false) | bool }}"
+      - name: "s3_buckets"
+        can_destroy: true
+    nodes:
+      - name: "app"
+        key: "base"
+        hostname: "{{ params.app_hostname | default('') }}"
+        can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
+    run_stages:
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            task_target: "node"
+          - name: "main_upgrade"
+            all_nodes: true
+            task_target: "pod"
+services:
+  skip:
+    list: true
+    services: []
+  s3_buckets:
+    base_dir: "ext-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/main.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
+    credentials:
+      s3: "s3"
+    params:
+      list:
+        - bucket: "{{ params.backup_bucket_name | default('') }}"
+          permission: "private"
+  s3_replica_buckets:
+    base_dir: "ext-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/main.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
+    credentials:
+      s3: "s3"
+    params:
+      list:
+        - bucket: "{{ params.backup_replica_bucket_name | default('') }}"
+          permission: "private"
+  nameserver_main_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_nameserver"
+    task: >-
+      tasks/nameserver/{{
+        params.nameserver_provider | default('')
+      }}/{{
+        params.nameserver_provider | default('')
+      }}.main.nameserver.yml
+    schema: >-
+      tasks/nameserver/{{
+        params.nameserver_provider | default('')
+      }}/{{
+        params.nameserver_provider | default('')
+      }}.schema.nameserver.yml
+    validator: >-
+      tasks/nameserver/{{
+        params.nameserver_provider | default('')
+      }}/{{
+        params.nameserver_provider | default('')
+      }}.validator.nameserver.yml
+    credentials:
+      nameserver: "{{ params.nameserver_provider | default('') }}"
+    params:
+      zone: "{{ params.main_domain | default('') }}"
+      nameservers: "{{ params.main_nameservers | default([]) }}"
+  dns_main_service:
+    list: true
+    services:
+      - name: "dns_base_service"
+        params:
+          list: "{{ params.dns_main_service_params_list | default([]) }}"
+  dns_base_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_dns"
+    task: >-
+      tasks/dns/{{
+        params.dns_provider | default('')
+      }}/{{
+        params.dns_provider | default('')
+      }}.main.dns.yml
+    schema: >-
+      tasks/dns/{{
+        params.dns_provider | default('')
+      }}/{{
+        params.dns_provider | default('')
+      }}.schema.dns.yml
+    validator: >-
+      tasks/dns/{{
+        params.dns_provider | default('')
+      }}/{{
+        params.dns_provider | default('')
+      }}.validator.dns.yml
+    credentials:
+      dns: "{{ params.dns_provider | default('') }}"
+    params:
+      zone: "{{ params.main_domain | default('') }}"
+  digital_ocean_vpn:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/digital_ocean/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean/digital_ocean.validator.vpn.yml"
+    credentials:
+      vpn: "digital_ocean"
+    params:
+      tags:
+        - "auto"
+        - "base-dmz"
+        - "node-exporter"
+      firewalls:
+        - name: "private"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.private_ips | default([]) }}"
+            - ports: "9443"
+              sources:
+                addresses: "{{ params.private_ips | default([]) }}"
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+                addresses: "{{ params.private_ips | default([]) }}"
+          outbound_rules:
+            - protocol: "tcp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "udp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - protocol: "icmp"
+              ports: "1-65535"
+              destinations:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "base-dmz"
+          tags: ["base-dmz"]
+          inbound_rules:
+            - ports: "80"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "443"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+        - name: "node-exporter"
+          tags: ["node-exporter"]
+          when: "{{ params.use_node_exporter | default(false) }}"
+          inbound_rules:
+            - ports: "9100"
+              sources:
+                tags: ["prometheus"]
+  digital_ocean_node:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
+    credentials:
+      node: "digital_ocean"
+    params:
+      image_id: "ubuntu-18-04-x64"
+      region_id: "{{ params.digital_ocean_node_region | default('ams3') }}"
+      size_id: "{{ params.digital_ocean_node_size | default('s-2vcpu-2gb') }}"
+      ipv6: true
+      monitoring: true
+      resize_disk: true
+    contents:
+      user_data:
+        type: "env"
+        name: "user_data_ubuntu"
+  linode:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/linode/linode.main.node.yml"
+    schema: "tasks/node/linode/linode.schema.node.yml"
+    validator: "tasks/node/linode/linode.validator.node.yml"
+    credentials:
+      node: "linode"
+    params:
+      image: "linode/ubuntu18.04"
+      region: "{{ params.linode_region | default('us-east') }}"
+      type: "{{ params.linode_type | default('g6-standard-1') }}"
+    contents:
+      user_data:
+        type: "env"
+        name: "user_data_ubuntu"
+nodes:
+  base_local:
+    credentials:
+      host: "localhost"
+    pods:
+      - name: "base"
+        params:
+          local: true
+          local_standard_ports: "{{ params.local_standard_ports | default(false) }}"
+          named_volumes: "{{ params.named_volumes | default(false) }}"
+          custom_ssl: "{{ params.local_custom_ssl | default({}) }}"
+          enable_logs_setup: false
+          enable_sync_setup: false
+          main_domain: "{{ params.local_main_domain | default('localhost') }}"
+          domains: "{{ params.local_domains | default({ 'base': 'localhost' }) }}"
+  base:
+    service:
+      name: "{{ params.node_service | default('skip') }}"
+      params:
+        tags:
+          - "auto"
+          - "base-dmz"
+    dns_service: "dns_base_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    params:
+      dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
+      host_users:
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 90
+          setup_finished_timeout: 300
+    pods:
+      - name: "base"
+        params:
+          local: false
+          domains: "{{ params.domains | default({}) }}"
+pods:
+  base:
+    repo: "pod"
+    root: "yes"
+    ctx: "ext-pod/base/base.ctx.yml"
+    schema: "ext-pod/base/base.schema.yml"
+    validator: "ext-pod/base/base.validator.yml"
+    fast_prepare: "true"
+    ext_repos:
+      - repo: "ext_pod"
+        dir: "ext-pod"
+    credentials:
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
+      minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
+      backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
+      backup_replica_bucket: "{{ params.enable_backup_replica | default(false) | bool | ternary('s3_replica', '') }}"
+    params:
+      type: "app"
+      orchestration: "docker_compose"
+      fluentd_port: "24224"
+      custom_dir: "ext-pod"
+      custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
+      inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
+      meta: "{{ params.pod_meta | default({}) }}"
+      memory: "{{ params.memory_app | default({})}}"
+      main_domain: "{{ params.main_domain | default('') }}"
+      use_secrets: "{{ params.use_secrets | default(false) }}"
+      use_ssl: "{{ params.use_ssl | default(false) }}"
+      internal_ssl: "{{ params.internal_ssl | default({}) }}"
+      use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
+      use_pod_prefix: "{{ params.use_pod_prefix | default(false) }}"
+      use_pod_full_prefix: "{{ params.use_pod_full_prefix | default(false) }}"
+      use_nginx: "{{ params.use_nginx | default(false) }}"
+      use_theia: "{{ params.use_theia | default(false) }}"
+      use_minio_gateway: "{{ params.use_minio_gateway | default(false) }}"
+      use_s3: "{{ params.use_s3 | default(false) }}"
+      use_local_s3: "{{ params.use_local_s3 | default(false) }}"
+      use_fluentd: "{{ params.use_fluentd | default(false) }}"
+      use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
+      use_certbot: "{{ params.use_certbot | default(false) }}"
+      use_private_path: "{{ params.use_private_path | default(false) }}"
+      use_basic_auth_private: "{{ params.use_basic_auth_private | default(false) }}"
+      auth_file: "{{ params.auth_file | default('') }}"
+      fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
+      s3_cli: "{{ params.s3_cli | default('') }}"
+      outer_proxy_type: "{{ params.outer_proxy_type | default('') }}"
+      define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
+      s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
+      define_cron: "{{ params.define_cron | default(false) }}"
+      include_cron_watch: "{{ params.include_cron_watch | default(false) }}"
+      cron_src: "env/cron/cron-file"
+      cron_dest: "/var/spool/cron/crontabs/root"
+      backup_bucket_name: "{{ params.backup_bucket_name | default('') }}"
+      backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
+      backup_replica_bucket_name: "{{ params.backup_replica_bucket_name | default('') }}"
+      backup_replica_bucket_path: "{{ params.backup_replica_bucket_path | default('') }}"
+      enable_logs_backup: "{{ params.enable_logs_backup | default(false) }}"
+      enable_logs_setup: "{{ params.enable_logs_setup | default(false) }}"
+      enable_sync_backup: "{{ params.enable_sync_backup | default(false) }}"
+      enable_sync_setup: "{{ params.enable_sync_setup | default(false) }}"
+      enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
+      certbot:
+        email: "{{ params.certbot_email | default('') }}"
+        staging: "{{ params.certbot_staging | default(false) }}"
+        force: "{{ params.certbot_force | default(false) }}"
+      images:
+        nginx: "nginx:1.14.2-alpine"
+        minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
+        theia: "theiaide/theia:1.3.0"
+        minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
+        toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
+        certbot: "certbot/certbot:v1.2.0"
+        awscli: "lucasbasquerotto/image:awscli-20210712"
+        mc: "minio/mc:RELEASE.2021-03-12T03-36-59Z"
+        rclone: "rclone/rclone:1.54.0"
+        logrotator: "python:3.8.4-buster"
+        fluentd: "lucasbasquerotto/image:fluentd-20200617"
+    transfer:
+      - dest: "env/cron/cron-file"
+        when: "{{ params.define_cron | default(false) }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/cron/pod.tpl.sh"
+          schema: "ext-cloud/files/cron/pod.schema.yml"
+          params:
+            tasks:
+              - name: "watch"
+                when: "{{ params.include_cron_watch | default(false) }}"
+                task: "unique:action:watch"
+                cron: "*/1 * * * *"
+              - name: "pending"
+                when: "{{ not (params.include_cron_watch | default(false) | bool) }}"
+                task: "unique:action:pending"
+                cron: "*/1 * * * *"
+              - name: "log"
+                task: "custom:unique:log"
+                cron: "*/5 * * * *"
+              - name: "block_ips"
+                when: "{{ params.block_ips | default(false) }}"
+                task: "unique:action:block_ips"
+                cron: "*/15 * * * *"
+              - name: "full_log"
+                task: "unique:all logrotate log_summary"
+                cron: "* */1 * * *"
+              - name: "backup"
+                task: "unique:action:backup"
+                cron: "0 */6 * * *"
+              - name: "replicate_s3"
+                task: "unique:action:replicate_s3"
+                cron: "3 */1 * * *"
+      - dest: "env/{{ params.s3_cli | default('') }}/etc/s3-backup-lifecycle.json"
+        when: "{{ params.define_s3_backup_lifecycle | default(false) | bool }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/s3/s3_lifecycle.json.j2"
+          schema: "ext-cloud/files/s3/s3_lifecycle.schema.yml"
+          params:
+            rules:
+              - name: "logs-expiration"
+                filter_prefix: "logs/"
+                expiration_days: 30
+                older_versions_expiration_days: 180
+tasks:
+  docker_compose_install:
+    type: "task"
+    root: true
+    file: "ext-cloud/run-tasks/docker.yml"
+    schema: "ext-cloud/run-tasks/docker.schema.yml"
+    params:
+      compose:
+        version: "1.27.2"
+  main_build:
+    type: "shell"
+    root: true
+    cmd: "./run build"
+  main_upgrade:
+    type: "shell"
+    root: true
+    cmd: "./run upgrade"
+contents:
+  user_data_ubuntu:
+    type: "template"
+    origin: "cloud"
+    file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+    schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+    params:
+      user_directories: ["/var/cloud"]
+      install_docker: true
+      install_podman: false
+      install_node_exporter: "{{ params.use_node_exporter | default(false) }}"
+      install_packages: true
+    credentials:
+      node: "host"
+    contents:
+      host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
+  pod:
+    src: "https://github.com/lucasbasquerotto/pod.git"
+    version: "master"
+  ext_pod:
+    src: "https://github.com/lucasbasquerotto/ext-pod.git"
+    version: "master"
+credentials: "{{ credentials | combine({ 'localhost': { 'host_user': 'root' } }) }}"
