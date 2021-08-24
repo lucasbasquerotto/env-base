@@ -51,9 +51,9 @@ services:
   dns_service_item:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
-    task: "tasks/dns/cloudflare.main.dns.yml"
-    schema: "tasks/dns/cloudflare.schema.dns.yml"
-    validator: "tasks/dns/cloudflare.validator.dns.yml"
+    task: "tasks/dns/cloudflare/cloudflare.main.dns.yml"
+    schema: "tasks/dns/cloudflare/cloudflare.schema.dns.yml"
+    validator: "tasks/dns/cloudflare/cloudflare.validator.dns.yml"
     credentials:
       dns: "cloudflare"
     params:
