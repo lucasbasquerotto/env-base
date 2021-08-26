@@ -97,6 +97,7 @@ main:
               - "auto"
               - "prometheus"
               - "prometheus-db"
+          dns_service_params_list: "{{ params.dns_prometheus_params_list | default([]) }}"
         pods:
           prometheus:
             params:
@@ -112,15 +113,15 @@ main:
             type: "url"
             host: "{{ params.elasticsearch_url | default('') }}"
           prometheus:
-            type: "node"
-            host: "db"
-            port: "{{ params.prometheus_external_port | default('9090', true) }}"
+            type: "url"
+            host: "{{ params.prometheus_url | default('') }}"
         params:
           service_params:
             tags:
               - "auto"
               - "prometheus-web"
               - "prometheus-dmz"
+          dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
         pods:
           prometheus:
             params:
@@ -372,7 +373,12 @@ nodes:
     credentials:
       host: "host"
     params:
-      dns_service_params_list: "{{ params.dns_service_params_list | default([]) }}"
+      dns_service_params_list: >-
+        {{
+          (params.dns_service_params_list | default([]))
+          +
+          (params.dns_prometheus_params_list | default([]))
+        }}
       host_users:
         - name: "host"
           setup_log_file: "/var/log/setup.log"
