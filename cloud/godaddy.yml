@@ -34,7 +34,7 @@ services:
       nameserver: "godaddy"
     params:
       zone: "{{ params.domain | default('') }}"
-      nameservers: ["8.8.8.8", "9.9.9.9"]
+      nameservers: ["ns29.domaincontrol.com", "ns30.domaincontrol.com"]
   dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
@@ -44,10 +44,19 @@ services:
     credentials:
       dns: "godaddy"
     params:
-      zone: "{{ params.domain | default('') }}"
-      dns_type: "NS"
-      record: "dev"
-      value: ["1.1.1.1", "2.2.2.2"]
+      list:
+        - zone: "{{ params.domain | default('') }}"
+          dns_type: "A"
+          record: "dev1"
+          value: ["1.1.1.1"]
+        - zone: "{{ params.domain | default('') }}"
+          dns_type: "A"
+          record: "dev2"
+          value: ["2.2.2.2"]
+        - zone: "{{ params.domain | default('') }}"
+          dns_type: "AAAA"
+          record: "dev3"
+          value: ["2001:db8::ff00:42:8329"]
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
