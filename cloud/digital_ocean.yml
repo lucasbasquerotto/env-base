@@ -152,6 +152,34 @@ services:
       tags:
         - "node-tag-01"
         - "node-tag-02"
+  node_service_2:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
+    credentials:
+      node: "digital_ocean"
+    params:
+      image_id: "ubuntu-18-04-x64"
+      region_id: "ams3"
+      size_id: "s-1vcpu-1gb"
+      ipv6: true
+      monitoring: true
+      tags:
+        - "node-tag-01"
+        - "node-tag-02"
+      volumes_to_attach: ["digital-ocean-vol-01"]
+      replica_volumes:
+        - prefix: "start1-"
+          suffix: "-end1"
+          can_destroy: true
+          block_size: 11
+          dettach: false
+        - prefix: "start2-"
+          suffix: "-end2"
+          can_destroy: true
+          block_size: 12
     contents:
       user_data:
         type: "template"
