@@ -403,7 +403,8 @@ pods:
       - repo: "ext_pod"
         dir: "ext-pod"
     credentials:
-      rocketchat: "rocketchat"
+      rocketchat_db: "rocketchat_db"
+      rocketchat_mail: "rocketchat_mail"
       hubot: "{{ params.use_bot | default(false) | bool | ternary('hubot', '') }}"
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
@@ -424,6 +425,7 @@ pods:
       memory: "{{ params.memory_app | default({})}}"
       main_domain: "{{ params.main_domain | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
+      use_rocketchat_mail: "{{ params.use_rocketchat_mail | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
       internal_ssl: "{{ params.internal_ssl | default({}) }}"
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
@@ -473,6 +475,7 @@ pods:
       enable_uploads_setup: "{{ params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.enable_uploads_replica | default(false) }}"
+      rocketchat_smtp_from: "{{ params.rocketchat_smtp_from | default('') }}"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"

@@ -471,6 +471,7 @@ pods:
     fast_prepare: "true"
     credentials:
       mediawiki: "mediawiki"
+      mediawiki_mail: "mediawiki_mail"
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"
@@ -489,6 +490,7 @@ pods:
       memory: "{{ params.memory_app | default({})}}"
       main_domain: "{{ params.main_domain | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
+      use_mediawiki_mail: "{{ params.use_mediawiki_mail | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
       internal_ssl: "{{ params.internal_ssl | default({}) }}"
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
