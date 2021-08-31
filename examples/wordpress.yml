@@ -444,6 +444,7 @@ pods:
         dir: "ext-pod"
     credentials:
       wordpress: "wordpress"
+      wordpress_mail: "wordpress_mail"
       mysql: "mysql"
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
@@ -469,6 +470,7 @@ pods:
       app_repo_dir: "app-wp"
       use_w3tc: "{{ params.use_w3tc | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
+      use_wordpress_mail: "{{ params.use_wordpress_mail | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
       internal_ssl: "{{ params.internal_ssl | default({}) }}"
       use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
@@ -486,6 +488,7 @@ pods:
       use_s3: "{{ params.use_s3 | default(false) }}"
       use_local_s3: "{{ params.use_local_s3 | default(false) }}"
       use_s3_storage: "{{ params.use_s3_storage | default('') }}"
+      use_custom_mail_plugin: "{{ params.use_custom_mail_plugin | default('') }}"
       use_fluentd: "{{ params.use_fluentd | default(false) }}"
       use_outer_proxy: "{{ params.use_outer_proxy | default(false) }}"
       use_certbot: "{{ params.use_certbot | default(false) }}"
@@ -528,6 +531,8 @@ pods:
       migrate_old_domain_host: "{{ params.wp_old_domain_host | default('') }}"
       migrate_new_domain_host: "{{ params.wp_new_domain_host | default('') }}"
       migrate_wp_rewrite_structure: "/%year%/%monthnum%/%day%/%postname%"
+      wordpress_smtp_from: "{{ params.wordpress_smtp_from | default('') }}"
+      wordpress_smtp_name: "{{ params.wordpress_smtp_name | default('') }}"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
