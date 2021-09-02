@@ -540,7 +540,7 @@ pods:
       images:
         nginx: "nginx:1.14.2-alpine"
         varnish: "varnish:6.4.0-1"
-        wordpress: "lucasbasquerotto/wordpress:20210401-05"
+        wordpress: "lucasbasquerotto/wordpress:5.8-20210901"
         redis: "redis:6.0.6"
         memcached: "memcached:1.6.6"
         pma: "phpmyadmin/phpmyadmin:5.1.0"
@@ -550,7 +550,7 @@ pods:
         minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
-        composer: "lucasbasquerotto/wordpress:composer-2.0.11"
+        composer: "lucasbasquerotto/wordpress:composer-2.1.6"
         certbot: "certbot/certbot:v1.2.0"
         awscli: "lucasbasquerotto/image:awscli-20210712"
         mc: "minio/mc:RELEASE.2021-03-12T03-36-59Z"
