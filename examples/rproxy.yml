@@ -175,12 +175,6 @@ main:
           elasticsearch:
             type: "url"
             host: "{{ params.elasticsearch_url | default('') }}"
-        params:
-          service_params:
-            tags:
-              - "auto"
-              - "rproxy-dmz"
-        dependencies:
           rproxy_web_1:
             type: "node"
             node_ip_type: "ipv4"
@@ -217,6 +211,11 @@ main:
             host: "web3"
             protocol: "{{ params.use_ssl_web | default(false) | bool | ternary('https', 'http') }}"
             port: "{{ params.use_ssl_web | default(false) | bool | ternary(9443, 9080) }}"
+        params:
+          service_params:
+            tags:
+              - "auto"
+              - "rproxy-dmz"
       - name: "web1"
         key: "rproxy_web"
         hostname: "{{ params.web1_hostname | default('') }}"
