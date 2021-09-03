@@ -247,10 +247,10 @@ services:
       list:
         - name: ghost-cdn
           domains:
-            - name: "{{ params.cdn_domain_prefix | default('') }}"
+            - name: "{{ params.cdn_domain | default('') }}"
               comment: go to the ghost host
           backends:
-            - name: ghost site
+            - name: "{{ params.fastly_cdn_prefix | default('') }}"
               port: 80
               address: "{{ params.cdn_dest_address | default('') }}"
   digital_ocean_vpn:
