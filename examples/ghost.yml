@@ -56,8 +56,10 @@ main:
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
+        can_destroy: true
       - name: "{{ (params.cdn_provider | default('')) + '_cdn' }}"
         when: "{{ params.run_cdn_main | default(false) | bool }}"
+        can_destroy: true
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -86,8 +88,10 @@ main:
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
+        can_destroy: true
       - name: "{{ (params.cdn_provider | default('')) + '_cdn' }}"
         when: "{{ params.run_cdn_main | default(false) | bool }}"
+        can_destroy: true
       - name: "s3_buckets"
         can_destroy: true
     nodes:
