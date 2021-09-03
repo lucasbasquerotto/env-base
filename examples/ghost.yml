@@ -26,6 +26,8 @@ main:
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
+      - name: "{{ (params.cdn_provider | default('')) + '_cdn' }}"
+        when: "{{ params.run_cdn_main | default(false) | bool }}"
   s3_replica_buckets:
     extend_cloud: true
     initial_services:
@@ -52,6 +54,8 @@ main:
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
+      - name: "{{ (params.cdn_provider | default('')) + '_cdn' }}"
+        when: "{{ params.run_cdn_main | default(false) | bool }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -80,6 +84,8 @@ main:
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
+      - name: "{{ (params.cdn_provider | default('')) + '_cdn' }}"
+        when: "{{ params.run_cdn_main | default(false) | bool }}"
       - name: "s3_buckets"
         can_destroy: true
     nodes:
@@ -229,6 +235,24 @@ services:
       dns: "{{ params.dns_provider | default('') }}"
     params:
       zone: "{{ params.main_domain | default('') }}"
+  fastly_cdn:
+    base_dir: "ext-cloud"
+    namespace: "ext_cdn"
+    task: "tasks/cdn/fastly/fastly.main.cdn.yml"
+    schema: "tasks/cdn/fastly/fastly.schema.cdn.yml"
+    validator: "tasks/cdn/fastly/fastly.validator.cdn.yml"
+    credentials:
+      cdn: "fastly"
+    params:
+      list:
+        - name: ghost-cdn
+          domains:
+            - name: "{{ params.cdn_domain_prefix | default('') }}"
+              comment: go to the ghost host
+          backends:
+            - name: ghost site
+              port: 80
+              address: "{{ params.cdn_dest_address | default('') }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
