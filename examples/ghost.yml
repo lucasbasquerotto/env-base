@@ -253,12 +253,12 @@ services:
       list:
         - name: ghost-cdn
           domains:
-            - name: "{{ params.cdn_domain | default('') }}"
+            - name: "{{ params.cdn_prefix | default('') }}"
               comment: go to the ghost host
           backends:
-            - name: "{{ params.fastly_cdn_prefix | default('') }}"
+            - name: "cdn origin"
               port: 80
-              address: "{{ params.cdn_dest_address | default('') }}"
+              address: "{{ params.cdn_origin | default('') }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
