@@ -1,0 +1,42 @@
+root: "env"
+schemas:
+  env:
+    type: "dict"
+    description: "environment schema"
+    props:
+      name:
+        non_empty: true
+        type: "str"
+        description: "project name"
+      ctxs:
+        non_empty: true
+        type: "list"
+        elem_type: "str"
+        description: "project contexts"
+      env:
+        non_empty: true
+        type: "dict"
+        description: "project base environment definition"
+      credentials:
+        non_empty: true
+        schema: "credentials"
+        description: "project credentials"
+  credentials:
+    type: "dict"
+    description: "project credentials schema"
+    props:
+      aws:
+        schema: "credential_aws"
+        description: "aws credentials"
+  credential_aws:
+    type: "dict"
+    description: "aws credentials schema"
+    props:
+      access_key:
+        type: "str"
+        non_empty: true
+        description: "aws access key"
+      secret_key:
+        type: "str"
+        non_empty: true
+        description: "aws secret key"

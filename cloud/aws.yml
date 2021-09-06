@@ -1,0 +1,91 @@
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
+original_env_schema: "{{ env.repo_dir }}/cloud/aws.schema.yml"
+meta:
+  template_no_empty_lines: true
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
+main:
+  cdn:
+    extend_cloud: true
+    initial_services:
+      - name: "cdn_service"
+        can_destroy: true
+services:
+  cdn_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_cdn"
+    task: "tasks/cdn/aws/aws.main.cdn.yml"
+    schema: "tasks/cdn/aws/aws.schema.cdn.yml"
+    validator: "tasks/cdn/aws/aws.validator.cdn.yml"
+    credentials:
+      cdn: "aws"
+    params:
+      list:
+        - name: test-service1
+          aliases: [ 'www.my-distribution-source.com', 'zzz.aaa.io' ]
+        - name: test-service2
+          comment: modified by ansible cloudfront.py
+          tags:
+            Name: example distribution
+            Project: example project
+            Priority: '1'
+          purge_tags: yes
+        - name: test-service3
+          origins:
+              - id: 'my test origin-000111'
+                domain_name: www.example.com
+                origin_path: /production
+                custom_headers:
+                  - header_name: MyCustomHeaderName
+                    header_value: MyCustomHeaderValue
+          default_cache_behavior:
+            target_origin_id: 'my test origin-000111'
+            forwarded_values:
+              query_string: true
+              cookies:
+                forward: all
+              headers:
+              - '*'
+              viewer_protocol_policy: allow-all
+              smooth_streaming: true
+              compress: true
+              allowed_methods:
+                items:
+                  - GET
+                  - HEAD
+                cached_methods:
+                  - GET
+                  - HEAD
+          logging:
+            enabled: true
+            include_cookies: false
+            bucket: mylogbucket.s3.amazonaws.com
+            prefix: myprefix/
+          enabled: false
+          comment: this is a CloudFront distribution with logging
+        - name: test-service4
+          absent: true
+          comment: destroy this distribution
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
+credentials:
+  aws:
+    access_key: "{{ credentials.aws.access_key | default('') }}"
+    secret_key: "{{ credentials.aws.secret_key | default('') }}"
