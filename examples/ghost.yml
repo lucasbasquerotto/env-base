@@ -253,7 +253,7 @@ services:
       list:
         - name: ghost-cdn
           domains:
-            - name: "{{ params.cdn_prefix | default('') }}"
+            - name: "{{ params.cdn_domain | default('') }}"
               comment: go to the ghost host
           backends:
             - name: "cdn origin"
