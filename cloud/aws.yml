@@ -27,10 +27,112 @@ main:
     initial_services:
       - name: "dns_service"
         can_destroy: true
+  volume:
+    extend_cloud: true
+    initial_services:
+      - name: "volume_service"
+        can_destroy: true
   vpn:
     extend_cloud: true
     initial_services: ["vpn_service"]
 services:
+  cdn_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_cdn"
+    task: "tasks/cdn/aws/aws.main.cdn.yml"
+    schema: "tasks/cdn/aws/aws.schema.cdn.yml"
+    validator: "tasks/cdn/aws/aws.validator.cdn.yml"
+    credentials:
+      cdn: "aws"
+    params:
+      list:
+        - name: test-service1
+          aliases: ["www.my-distribution-source.com", "zzz.aaa.io"]
+        - name: test-service2
+          comment: modified by ansible cloudfront.py
+          tags:
+            Name: example distribution
+            Project: example project
+            Priority: "1"
+          purge_tags: yes
+        - name: test-service3
+          origins:
+            - id: "my test origin-000111"
+              domain_name: www.example.com
+              origin_path: /production
+              custom_headers:
+                - header_name: MyCustomHeaderName
+                  header_value: MyCustomHeaderValue
+          default_cache_behavior:
+            target_origin_id: "my test origin-000111"
+            forwarded_values:
+              query_string: true
+              cookies:
+                forward: all
+              headers:
+                - "*"
+              viewer_protocol_policy: allow-all
+              smooth_streaming: true
+              compress: true
+              allowed_methods:
+                items:
+                  - GET
+                  - HEAD
+                cached_methods:
+                  - GET
+                  - HEAD
+          logging:
+            enabled: true
+            include_cookies: false
+            bucket: mylogbucket.s3.amazonaws.com
+            prefix: myprefix/
+          enabled: false
+          comment: this is a CloudFront distribution with logging
+        - name: test-service4
+          absent: true
+          comment: destroy this distribution
+  dns_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_dns"
+    task: "tasks/dns/aws/aws.main.dns.yml"
+    schema: "tasks/dns/aws/aws.schema.dns.yml"
+    validator: "tasks/dns/aws/aws.validator.dns.yml"
+    credentials:
+      dns: "aws"
+    params:
+      list:
+        - zone: "{{ params.domain | default('') }}"
+          dns_type: "A"
+          record: "dev1"
+          value: ["1.1.1.1"]
+        - zone: "{{ params.domain | default('') }}"
+          dns_type: "A"
+          record: "dev2"
+          value: ["2.2.2.2"]
+        - zone: "{{ params.domain | default('') }}"
+          dns_type: "AAAA"
+          record: "dev3"
+          value: ["2001:db8::ff00:42:8329"]
+  volume_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_volume"
+    task: "tasks/volume/aws/aws.main.volume.yml"
+    schema: "tasks/volume/aws/aws.schema.volume.yml"
+    validator: "tasks/volume/aws/aws.validator.volume.yml"
+    credentials:
+      volume: "aws"
+    params:
+      list:
+        - name: "aws-vol-01"
+          region: "us-east-1"
+          zone: "us-east-1a"
+          volume_size: "15"
+        - name: "aws-vol-02"
+          region: "us-east-1"
+          zone: "us-east-1b"
+          device_name: "/dev/sdf"
+          volume_size: "20"
+          volume_type: "gp2"
   vpn_service:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -138,83 +240,6 @@ services:
                 - 64:ff9b::/96
               group_id:
                 - sg-edcd9784
-  cdn_service:
-    base_dir: "ext-cloud"
-    namespace: "ext_cdn"
-    task: "tasks/cdn/aws/aws.main.cdn.yml"
-    schema: "tasks/cdn/aws/aws.schema.cdn.yml"
-    validator: "tasks/cdn/aws/aws.validator.cdn.yml"
-    credentials:
-      cdn: "aws"
-    params:
-      list:
-        - name: test-service1
-          aliases: ["www.my-distribution-source.com", "zzz.aaa.io"]
-        - name: test-service2
-          comment: modified by ansible cloudfront.py
-          tags:
-            Name: example distribution
-            Project: example project
-            Priority: "1"
-          purge_tags: yes
-        - name: test-service3
-          origins:
-            - id: "my test origin-000111"
-              domain_name: www.example.com
-              origin_path: /production
-              custom_headers:
-                - header_name: MyCustomHeaderName
-                  header_value: MyCustomHeaderValue
-          default_cache_behavior:
-            target_origin_id: "my test origin-000111"
-            forwarded_values:
-              query_string: true
-              cookies:
-                forward: all
-              headers:
-                - "*"
-              viewer_protocol_policy: allow-all
-              smooth_streaming: true
-              compress: true
-              allowed_methods:
-                items:
-                  - GET
-                  - HEAD
-                cached_methods:
-                  - GET
-                  - HEAD
-          logging:
-            enabled: true
-            include_cookies: false
-            bucket: mylogbucket.s3.amazonaws.com
-            prefix: myprefix/
-          enabled: false
-          comment: this is a CloudFront distribution with logging
-        - name: test-service4
-          absent: true
-          comment: destroy this distribution
-  dns_service:
-    base_dir: "ext-cloud"
-    namespace: "ext_dns"
-    task: "tasks/dns/aws/aws.main.dns.yml"
-    schema: "tasks/dns/aws/aws.schema.dns.yml"
-    validator: "tasks/dns/aws/aws.validator.dns.yml"
-    credentials:
-      dns: "aws"
-    params:
-      list:
-        - zone: "{{ params.domain | default('') }}"
-          dns_type: "A"
-          record: "dev1"
-          value: ["1.1.1.1"]
-        - zone: "{{ params.domain | default('') }}"
-          dns_type: "A"
-          record: "dev2"
-          value: ["2.2.2.2"]
-        - zone: "{{ params.domain | default('') }}"
-          dns_type: "AAAA"
-          record: "dev3"
-          value: ["2001:db8::ff00:42:8329"]
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
