@@ -142,8 +142,8 @@ services:
         when: "{{ params.run_dns_main | default(false) | bool }}"
       - name: "{{ params.run_cdn_main | default(false) | bool | ternary('cdn_main_service', 'skip') }}"
         when: "{{ params.run_cdn_main | default(false) | bool }}"
-      - name: "{{ params.run_storage_main | default(false) | bool | ternary('digital_ocean_storage', 'skip') }}"
-        when: "{{ params.run_storage_main | default(false) | bool }}"
+      - name: "{{ params.run_volume_main | default(false) | bool | ternary('digital_ocean_volume', 'skip') }}"
+        when: "{{ params.run_volume_main | default(false) | bool }}"
   s3_buckets:
     base_dir: "ext-cloud"
     namespace: "ext_s3"
@@ -348,18 +348,18 @@ services:
       user_data:
         type: "env"
         name: "user_data_ubuntu"
-  digital_ocean_storage:
+  digital_ocean_volume:
     base_dir: "ext-cloud"
-    namespace: "ext_storage"
-    task: "tasks/storage/digital_ocean/digital_ocean.main.storage.yml"
-    schema: "tasks/storage/digital_ocean/digital_ocean.schema.storage.yml"
-    validator: "tasks/storage/digital_ocean/digital_ocean.validator.storage.yml"
+    namespace: "ext_volume"
+    task: "tasks/volume/digital_ocean/digital_ocean.main.volume.yml"
+    schema: "tasks/volume/digital_ocean/digital_ocean.schema.volume.yml"
+    validator: "tasks/volume/digital_ocean/digital_ocean.validator.volume.yml"
     credentials:
-      storage: "digital_ocean"
+      volume: "digital_ocean"
     params:
       name: "do_vol_01"
-      region: "{{ params.digital_ocean_storage_region | default('ams3') }}"
-      block_size: "{{ params.digital_ocean_storage_block_size | default(15) }}"
+      region: "{{ params.digital_ocean_volume_region | default('ams3') }}"
+      block_size: "{{ params.digital_ocean_volume_block_size | default(15) }}"
   linode:
     base_dir: "ext-cloud"
     namespace: "ext_node"

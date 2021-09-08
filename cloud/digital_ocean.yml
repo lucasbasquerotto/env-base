@@ -20,10 +20,10 @@ main:
   vpn:
     extend_cloud: true
     initial_services: ["vpn_service"]
-  storage:
+  volume:
     extend_cloud: true
     initial_services:
-      - name: "storage_service"
+      - name: "volume_service"
         can_destroy: true
   node:
     extend_cloud: true
@@ -111,14 +111,14 @@ services:
             - ports: "443"
               sources:
                 addresses: ["0.0.0.0/0", "::/0"]
-  storage_service:
+  volume_service:
     base_dir: "ext-cloud"
-    namespace: "ext_storage"
-    task: "tasks/storage/digital_ocean/digital_ocean.main.storage.yml"
-    schema: "tasks/storage/digital_ocean/digital_ocean.schema.storage.yml"
-    validator: "tasks/storage/digital_ocean/digital_ocean.validator.storage.yml"
+    namespace: "ext_volume"
+    task: "tasks/volume/digital_ocean/digital_ocean.main.volume.yml"
+    schema: "tasks/volume/digital_ocean/digital_ocean.schema.volume.yml"
+    validator: "tasks/volume/digital_ocean/digital_ocean.validator.volume.yml"
     credentials:
-      storage: "digital_ocean"
+      volume: "digital_ocean"
     params:
       name: "digital-ocean-vol-01"
       region: "ams3"
@@ -152,7 +152,7 @@ services:
       tags:
         - "node-tag-01"
         - "node-tag-02"
-  node_service_storage:
+  node_service_volume:
     base_dir: "ext-cloud"
     namespace: "ext_node"
     task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"

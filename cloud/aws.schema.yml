@@ -17,10 +17,22 @@ schemas:
         non_empty: true
         type: "dict"
         description: "project base environment definition"
+      params:
+        non_empty: true
+        schema: "params"
+        description: "project parameters"
       credentials:
         non_empty: true
         schema: "credentials"
         description: "project credentials"
+  params:
+    type: "dict"
+    description: "project parameters schema"
+    props:
+      domain:
+        non_empty: true
+        type: "str"
+        description: "domain name (dns zone)"
   credentials:
     type: "dict"
     description: "project credentials schema"
