@@ -551,7 +551,7 @@ pods:
       images:
         nginx: "nginx:1.14.2-alpine"
         varnish: "varnish:6.4.0-1"
-        mediawiki: "lucasbasquerotto/image:mediawiki-20210331"
+        mediawiki: "lucasbasquerotto/image:mediawiki-1.36.1-20210909"
         redis: "redis:6.0.6"
         memcached: "memcached:1.6.6"
         pma: "phpmyadmin/phpmyadmin:5.1.0"
