@@ -250,15 +250,14 @@ services:
     credentials:
       cdn: "fastly"
     params:
-      list:
-        - name: ghost-cdn
-          domains:
-            - name: "{{ params.cdn_domain | default('') }}"
-              comment: go to the ghost host
-          backends:
-            - name: "cdn origin"
-              port: 80
-              address: "{{ params.cdn_origin | default('') }}"
+      name: ghost-cdn
+      domains:
+        - name: "{{ params.cdn_domain | default('') }}"
+          comment: go to the ghost host
+      backends:
+        - name: "cdn origin"
+          port: 80
+          address: "{{ params.cdn_origin | default('') }}"
   digital_ocean_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
