@@ -482,7 +482,7 @@ pods:
         force: "{{ params.certbot_force | default(false) }}"
       images:
         nginx: "nginx:1.14.2-alpine"
-        rocketchat: "rocket.chat:3.2.2"
+        rocketchat: "rocket.chat:3.18.0"
         hubot: "rocketchat/hubot-rocketchat:v1.0.11"
         mongo_express: "mongo-express:0.54.0"
         mongo: "mongo:4.0"
