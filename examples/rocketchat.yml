@@ -450,6 +450,9 @@ pods:
       s3_cli: "{{ params.s3_cli | default('') }}"
       outer_proxy_type: "{{ params.outer_proxy_type | default('') }}"
       rocketchat_block_default_settings: "{{ params.rocketchat_block_default_settings | default('') }}"
+      rocketchat_cdn_prefix: "{{ params.rocketchat_cdn_prefix | default('') }}"
+      rocketchat_s3_cdn: "{{ params.rocketchat_s3_cdn | default('') }}"
+      rocketchat_smtp_from: "{{ params.rocketchat_smtp_from | default('') }}"
       define_s3_backup_lifecycle: "{{ params.define_s3_backup_lifecycle | default(false) }}"
       s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
       define_cron: "{{ params.define_cron | default(false) }}"
@@ -475,7 +478,6 @@ pods:
       enable_uploads_setup: "{{ params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.enable_uploads_replica | default(false) }}"
-      rocketchat_smtp_from: "{{ params.rocketchat_smtp_from | default('') }}"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
