@@ -526,7 +526,7 @@ pods:
         force: "{{ params.certbot_force | default(false) }}"
       images:
         nginx: "nginx:1.14.2-alpine"
-        mattermost: "mattermost/mattermost-team-edition:release-5.35"
+        mattermost: "mattermost/mattermost-team-edition:release-6.0"
         pgadmin: "dpage/pgadmin4:5.3"
         adminer: "lucasbasquerotto/image:adminer-20210609-02"
         postgres: "lucasbasquerotto/image:postgres-13.3-20210610"
