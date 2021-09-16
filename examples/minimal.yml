@@ -32,7 +32,7 @@ main:
       - tasks:
           - name: "start"
             all_nodes: true
-            task_target: "node"
+            task_target: "pod"
 services:
   cloudflare_dns:
     base_dir: "ext-cloud"
@@ -136,7 +136,8 @@ contents:
       node: "host"
     contents:
       host_ssh_public_keys:
-        file: "examples/minimal/id_rsa.pub"
+        origin: "env"
+        file: "{{ env.repo_dir }}/examples/minimal/id_rsa.pub"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -153,7 +154,7 @@ credentials:
   host:
     host_user: "host"
     host_pass: "111222"
-    ssh_file: "examples/minimal/id_rsa"
+    ssh_file: "{{ env.repo_dir }}/examples/minimal/id_rsa"
   digital_ocean:
     api_token: "{{ credentials.digital_ocean_api_token | default('') }}"
   cloudflare:
