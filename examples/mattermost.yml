@@ -520,6 +520,10 @@ pods:
       enable_uploads_setup: "{{ params.enable_uploads_setup | default(false) }}"
       enable_backup_replica: "{{ params.enable_backup_replica | default(false) }}"
       enable_uploads_replica: "{{ params.enable_uploads_replica | default(false) }}"
+      smtp_feedback_email: "{{ params.smtp_feedback_email | default('') }}"
+      smtp_reply_to_email: "{{ params.smtp_reply_to_email | default('') }}"
+      send_email_notifications: "{{ params.send_email_notifications | default(false) }}"
+      require_email_verification: "{{ params.require_email_verification | default(false) }}"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
