@@ -391,8 +391,8 @@ pods:
     repo: "discourse_docker"
     base_dir: "/var/discourse"
     flat: true
-    root: "yes"
-    fast_prepare: "true"
+    root: true
+    fast_prepare: true
     transfer:
       - dest: "shared/bin/setup"
         executable: true

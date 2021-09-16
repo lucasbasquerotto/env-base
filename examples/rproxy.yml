@@ -300,7 +300,7 @@ main:
           rproxy:
             shared_params:
               [
-                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}",
+                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}"
               ]
         dependencies:
           elasticsearch:
@@ -753,11 +753,11 @@ node_shared_params:
 pods:
   rproxy:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/rproxy/rproxy.ctx.yml"
     schema: "ext-pod/rproxy/rproxy.schema.yml"
     validator: "ext-pod/rproxy/rproxy.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

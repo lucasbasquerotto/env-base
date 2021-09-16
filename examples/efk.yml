@@ -371,11 +371,11 @@ nodes:
 pods:
   efk:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/efk/efk.ctx.yml"
     schema: "ext-pod/efk/efk.schema.yml"
     validator: "ext-pod/efk/efk.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

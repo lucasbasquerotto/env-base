@@ -399,11 +399,11 @@ nodes:
 pods:
   prometheus:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/prometheus/prometheus.ctx.yml"
     schema: "ext-pod/prometheus/prometheus.schema.yml"
     validator: "ext-pod/prometheus/prometheus.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

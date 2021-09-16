@@ -468,7 +468,7 @@ pods:
     ctx: "ext-pod/mediawiki/mediawiki.ctx.yml"
     schema: "ext-pod/mediawiki/mediawiki.schema.yml"
     validator: "ext-pod/mediawiki/mediawiki.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     credentials:
       mediawiki: "mediawiki"
       mediawiki_mail: "mediawiki_mail"

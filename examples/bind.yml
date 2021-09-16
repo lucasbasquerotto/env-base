@@ -319,11 +319,11 @@ nodes:
 pods:
   bind:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/bind/bind.ctx.yml"
     schema: "ext-pod/bind/bind.schema.yml"
     validator: "ext-pod/bind/bind.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

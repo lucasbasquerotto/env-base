@@ -394,11 +394,11 @@ nodes:
 pods:
   rocketchat:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/rocketchat/rocketchat.ctx.yml"
     schema: "ext-pod/rocketchat/rocketchat.schema.yml"
     validator: "ext-pod/rocketchat/rocketchat.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

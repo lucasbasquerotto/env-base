@@ -445,7 +445,7 @@ pods:
     ctx: "ext-pod/mattermost/mattermost.ctx.yml"
     schema: "ext-pod/mattermost/mattermost.schema.yml"
     validator: "ext-pod/mattermost/mattermost.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     credentials:
       postgres: "postgres"
       mattermost_mail: "{{ params.use_mattermost_mail | default(false) | bool | ternary('mattermost_mail', '') }}"

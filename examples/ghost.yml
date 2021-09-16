@@ -431,7 +431,7 @@ pods:
     ctx: "ext-pod/ghost/ghost.ctx.yml"
     schema: "ext-pod/ghost/ghost.schema.yml"
     validator: "ext-pod/ghost/ghost.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     credentials:
       db: "db"
       ghost_mail: "ghost_mail"

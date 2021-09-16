@@ -434,11 +434,11 @@ nodes:
 pods:
   wp:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/wordpress/wordpress.ctx.yml"
     schema: "ext-pod/wordpress/wordpress.schema.yml"
     validator: "ext-pod/wordpress/wordpress.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

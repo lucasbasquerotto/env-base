@@ -294,11 +294,11 @@ nodes:
 pods:
   base:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/base/base.ctx.yml"
     schema: "ext-pod/base/base.schema.yml"
     validator: "ext-pod/base/base.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

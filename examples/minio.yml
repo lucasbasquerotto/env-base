@@ -311,11 +311,11 @@ nodes:
 pods:
   minio:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/minio/minio.ctx.yml"
     schema: "ext-pod/minio/minio.schema.yml"
     validator: "ext-pod/minio/minio.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

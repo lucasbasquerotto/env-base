@@ -396,11 +396,11 @@ nodes:
 pods:
   vault:
     repo: "pod"
-    root: "yes"
+    root: true
     ctx: "ext-pod/vault/vault.ctx.yml"
     schema: "ext-pod/vault/vault.schema.yml"
     validator: "ext-pod/vault/vault.validator.yml"
-    fast_prepare: "true"
+    fast_prepare: true
     ext_repos:
       - repo: "ext_pod"
         dir: "ext-pod"

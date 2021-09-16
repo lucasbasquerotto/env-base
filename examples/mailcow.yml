@@ -297,8 +297,8 @@ pods:
     repo: "mailcow_docker"
     base_dir: "/opt/mailcow-dockerized"
     flat: true
-    root: "yes"
-    fast_prepare: "true"
+    root: true
+    fast_prepare: true
     transfer:
       - dest: "mailcow.conf"
         src: >-
