@@ -540,7 +540,7 @@ pods:
       images:
         nginx: "nginx:1.14.2-alpine"
         varnish: "varnish:6.4.0-1"
-        wordpress: "lucasbasquerotto/wordpress:5.8-20210901"
+        wordpress: "lucasbasquerotto/wordpress:5.8-20210915"
         redis: "redis:6.0.6"
         memcached: "memcached:1.6.6"
         pma: "phpmyadmin/phpmyadmin:5.1.0"
