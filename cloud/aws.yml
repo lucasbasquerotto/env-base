@@ -22,6 +22,11 @@ main:
     initial_services:
       - name: "cdn_service"
         can_destroy: true
+  db:
+    extend_cloud: true
+    initial_services:
+      - name: "db_service"
+        can_destroy: true
   dns:
     extend_cloud: true
     initial_services:
@@ -96,6 +101,42 @@ services:
         - name: test-service4
           absent: true
           comment: destroy this distribution
+  db_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_db"
+    task: "tasks/db/aws/aws.main.db.yml"
+    schema: "tasks/db/aws/aws.schema.db.yml"
+    validator: "tasks/db/aws/aws.validator.db.yml"
+    credentials:
+      db: "aws_rds"
+    params:
+      list:
+        - name: test-db-01
+          engine: aurora
+          db_instance_identifier: ansible-test-aurora-db-instance
+          db_cluster_identifier: ansible-test-cluster
+          instance_type: db.t2.small
+          master_username: "user1"
+
+        - name: test-encrypted-db
+          engine: mariadb
+          storage_encrypted: true
+          db_instance_class: db.t2.medium
+          master_username: "user2"
+          allocated_storage: 15
+
+        - name: test-db-01
+          absent: true
+          skip_final_snapshot: true
+
+        - name: test-encrypted-db
+          state: absent
+          final_snapshot_identifier: "test-encrypted-db-snapshot"
+
+        - name: test-db-02
+          vpc_security_group_ids:
+            - sg-0be17ba10c9286b0b
+          purge_security_groups: false
   dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
@@ -286,3 +327,7 @@ credentials:
   aws:
     access_key: "{{ credentials.aws.access_key | default('') }}"
     secret_key: "{{ credentials.aws.secret_key | default('') }}"
+  aws_rds:
+    access_key: "{{ credentials.aws.access_key | default('') }}"
+    secret_key: "{{ credentials.aws.secret_key | default('') }}"
+    master_user_password: "RD$-p4ss"
