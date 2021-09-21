@@ -110,6 +110,7 @@ services:
     credentials:
       db: "aws_rds"
     params:
+      region: "us-east-1"
       list:
         - name: ansible-test-aurora-db-instance
           engine: aurora
