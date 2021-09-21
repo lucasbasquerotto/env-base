@@ -111,28 +111,23 @@ services:
       db: "aws_rds"
     params:
       list:
-        - name: test-db-01
+        - name: ansible-test-aurora-db-instance
           engine: aurora
-          db_instance_identifier: ansible-test-aurora-db-instance
           db_cluster_identifier: ansible-test-cluster
           instance_type: db.t2.small
           master_username: "user1"
-
         - name: test-encrypted-db
           engine: mariadb
           storage_encrypted: true
-          db_instance_class: db.t2.medium
+          instance_type: db.t2.medium
           master_username: "user2"
           allocated_storage: 15
-
-        - name: test-db-01
+        - name: ansible-test-aurora-db-instance
           absent: true
           skip_final_snapshot: true
-
         - name: test-encrypted-db
-          state: absent
-          final_snapshot_identifier: "test-encrypted-db-snapshot"
-
+          force_state: terminated
+          final_db_snapshot_identifier: "test-encrypted-db-snapshot"
         - name: test-db-02
           vpc_security_group_ids:
             - sg-0be17ba10c9286b0b
