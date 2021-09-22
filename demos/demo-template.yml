@@ -1,0 +1,165 @@
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
+meta:
+  template_no_empty_lines: true
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
+main:
+  local:
+    extend_cloud: true
+    nodes:
+      - name: "minimal"
+        key: "minimal_local"
+        local: true
+  remote:
+    extend_cloud: true
+    initial_services: ["digital_ocean_vpn"]
+    nodes:
+      - name: "minimal"
+        can_destroy: true
+    run_stages:
+      - tasks:
+          - name: "start"
+            all_nodes: true
+            task_target: "pod"
+services:
+  cloudflare_dns:
+    base_dir: "ext-cloud"
+    namespace: "ext_dns"
+    task: "tasks/dns/cloudflare/cloudflare.main.dns.yml"
+    schema: "tasks/dns/cloudflare/cloudflare.schema.dns.yml"
+    validator: "tasks/dns/cloudflare/cloudflare.validator.dns.yml"
+    credentials:
+      dns: "cloudflare"
+    params:
+      zone: "{{ params.domain | default('') }}"
+  digital_ocean_vpn:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/digital_ocean/digital_ocean.main.vpn.yml"
+    schema: "tasks/vpn/digital_ocean/digital_ocean.schema.vpn.yml"
+    validator: "tasks/vpn/digital_ocean/digital_ocean.validator.vpn.yml"
+    credentials:
+      vpn: "digital_ocean"
+    params:
+      tags:
+        - "minimal-dmz"
+      firewalls:
+        - name: "minimal-dmz"
+          tags: ["minimal-dmz"]
+          inbound_rules:
+            - ports: "8080"
+              sources:
+                addresses: ["0.0.0.0/0", "::/0"]
+            - ports: "9080"
+              sources:
+                addresses: "{{ params.private_ips | default([]) }}"
+  digital_ocean_node:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/digital_ocean/digital_ocean.main.node.yml"
+    schema: "tasks/node/digital_ocean/digital_ocean.schema.node.yml"
+    validator: "tasks/node/digital_ocean/digital_ocean.validator.node.yml"
+    credentials:
+      node: "digital_ocean"
+    params:
+      image_id: "ubuntu-18-04-x64"
+      region_id: "ams3"
+      size_id: "s-1vcpu-1gb"
+      ipv6: true
+      monitoring: true
+      resize_disk: true
+    contents:
+      user_data:
+        type: "env"
+        name: "user_data_ubuntu"
+nodes:
+  minimal_local:
+    credentials:
+      host: "localhost"
+    pods: ["minimal"]
+  minimal:
+    service:
+      name: "digital_ocean_node"
+      params:
+        tags:
+          - "auto"
+          - "minimal-dmz"
+    dns_service: "cloudflare_dns"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    params:
+      dns_service_params_list:
+        - record: "{{ params.dns_record | default('') }}"
+      host_users:
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 90
+          setup_finished_timeout: 300
+    pods: ["minimal"]
+pods:
+  minimal:
+    repo: "pod"
+    ctx: "demos/template/demo.ctx.yml"
+    root: true
+    fast_prepare: true
+    params:
+      main_domain: "{{ params.main_domain | default('') }}"
+tasks:
+  start:
+    type: "shell"
+    root: true
+    cmd: "docker-compose up -d"
+contents:
+  user_data_ubuntu:
+    type: "template"
+    origin: "cloud"
+    file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+    schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+    params:
+      user_directories: ["/var/cloud"]
+      install_docker: true
+      install_packages: true
+    credentials:
+      node: "host"
+    contents:
+      host_ssh_public_keys:
+        origin: "env"
+        file: "{{ env.repo_dir }}/examples/minimal/id_rsa.pub"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
+  pod:
+    src: "https://github.com/lucasbasquerotto/pod.git"
+    version: "master"
+credentials:
+  localhost:
+    host_user: "root"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    ssh_file: "{{ env.repo_dir }}/examples/minimal/id_rsa"
+  digital_ocean:
+    api_token: "{{ credentials.digital_ocean_api_token | default('') }}"
+  cloudflare:
+    email: "{{ credentials.cloudflare_email | default('') }}"
+    token: "{{ credentials.cloudflare_token | default('') }}"
