@@ -300,7 +300,7 @@ main:
           rproxy:
             shared_params:
               [
-                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}",
+                "main_replicas_hub_{{ params.rproxy_type | default('nginx', true) }}"
               ]
         dependencies:
           elasticsearch:
@@ -1257,8 +1257,8 @@ tasks:
   docker_compose_install:
     type: "task"
     root: true
-    file: "ext-cloud/run-tasks/docker.yml"
-    schema: "ext-cloud/run-tasks/docker.schema.yml"
+    file: "ext-cloud/run-tasks/docker/docker.yml"
+    schema: "ext-cloud/run-tasks/docker/docker.schema.yml"
     params:
       compose:
         version: "1.27.2"
