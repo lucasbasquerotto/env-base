@@ -208,9 +208,9 @@ services:
       s3: "discourse_s3"
     params:
       list:
-        - bucket: "{{ params.discourse.backup_bucket_name | default('') }}"
+        - bucket: "{{ params.discourse.discourse_s3_backup_bucket | default('') }}"
           permission: "private"
-        - bucket: "{{ params.discourse.uploads_bucket_name | default('') }}"
+        - bucket: "{{ params.discourse.discourse_s3_bucket | default('') }}"
           permission: "public-read"
   nameserver_main_service:
     base_dir: "ext-cloud"
