@@ -493,6 +493,7 @@ contents:
     type: "template"
     origin: "cloud"
     file: "ext-cloud/files/discourse/container.tpl.yml"
+    schema: "ext-cloud/files/discourse/container.schema.yml"
     shared_params: ["discourse_params"]
     credentials:
       db: "db"
