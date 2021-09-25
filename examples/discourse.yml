@@ -33,8 +33,8 @@ main:
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
       - name: "{{ params.run_dns_main | default(false) | bool | ternary('dns_main_service', 'skip') }}"
         when: "{{ params.run_dns_main | default(false) | bool }}"
-      - name: "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
-        when: "{{ params.discourse.use_s3 | default(false) | bool }}"
+      - name: "{{ params.discourse.use_s3_backup | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+        when: "{{ params.discourse.use_s3_backup | default(false) | bool }}"
         can_destroy: true
     nodes:
       - name: "app"
@@ -64,8 +64,8 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service }}"
-      - name: "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
-        when: "{{ params.discourse.use_s3 | default(false) | bool }}"
+      - name: "{{ params.discourse.use_s3_backup | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+        when: "{{ params.discourse.use_s3_backup | default(false) | bool }}"
         can_destroy: true
     nodes:
       - name: "app"
@@ -105,8 +105,8 @@ main:
     extend_cloud: true
     initial_services:
       - "{{ params.cloud_service }}"
-      - name: "{{ params.discourse.use_s3 | default(false) | bool | ternary('s3_buckets', 'skip') }}"
-        when: "{{ params.discourse.use_s3 | default(false) | bool }}"
+      - name: "{{ params.discourse.use_s3_backup | default(false) | bool | ternary('s3_buckets', 'skip') }}"
+        when: "{{ params.discourse.use_s3_backup | default(false) | bool }}"
         can_destroy: true
     nodes:
       - name: "web"
