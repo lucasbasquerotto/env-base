@@ -422,7 +422,6 @@ pods:
       backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
       backup_replica_bucket_name: "{{ params.backup_replica_bucket_name | default('') }}"
       backup_replica_bucket_path: "{{ params.backup_replica_bucket_path | default('') }}"
-      restore_db: "{{ params.restore_db | default(false) }}"
       enable_db_backup: "{{ params.enable_db_backup | default(false) }}"
       enable_db_setup: "{{ params.enable_db_setup | default(false) }}"
       enable_logs_backup: "{{ params.enable_logs_backup | default(false) }}"

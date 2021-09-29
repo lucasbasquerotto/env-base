@@ -39,7 +39,6 @@ params:
   app_dev: "{{ params.app_dev | default(false) }}"
   wp_debug: true
   use_pod_prefix: true
-  restore_db: true
   db_gui_root_user: true
   use_s3_storage: false
   non_s3_setup: true

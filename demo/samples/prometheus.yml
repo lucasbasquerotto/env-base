@@ -33,7 +33,6 @@ params:
   pod_custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
   use_pod_prefix: true
   db_backup_use_s3: false
-  restore_db: false
   use_node_exporter: true
   use_cadvisor: true
   use_theia: true
