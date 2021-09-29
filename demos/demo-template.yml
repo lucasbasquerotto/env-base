@@ -54,6 +54,7 @@ services:
       vpn: "digital_ocean"
     params:
       tags:
+        - "auto"
         - "minimal-dmz"
       firewalls:
         - name: "minimal-dmz"
@@ -103,7 +104,8 @@ nodes:
       host: "host"
     params:
       dns_service_params_list:
-        - record: "{{ params.dns_record | default('') }}"
+        - record: "@"
+        - record: "theia"
       host_users:
         - name: "host"
           setup_log_file: "/var/log/setup.log"
@@ -119,7 +121,7 @@ pods:
     root: true
     fast_prepare: true
     params:
-      main_domain: "{{ params.main_domain | default('') }}"
+      domain: "{{ params.domain | default('') }}"
 tasks:
   start:
     type: "shell"
