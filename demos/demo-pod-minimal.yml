@@ -1,0 +1,41 @@
+name: "demo-pod-minimal"
+ctxs: ["local"]
+meta:
+  template_no_empty_lines: true
+main:
+  local:
+    repo: "cloud"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    nodes:
+      - name: "minimal"
+        key: "minimal_local"
+        local: true
+nodes:
+  minimal_local:
+    credentials:
+      host: "localhost"
+    pods: ["minimal"]
+pods:
+  minimal:
+    repo: "pod"
+    ctx: "demos/minimal/demo.ctx.yml"
+    root: true
+    fast_prepare: true
+    params:
+      domain: "{{ params.domain | default('') }}"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
+  pod:
+    src: "https://github.com/lucasbasquerotto/pod.git"
+    version: "master"
+credentials:
+  localhost:
+    host_user: "root"
