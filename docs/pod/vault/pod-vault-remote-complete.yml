@@ -1,4 +1,4 @@
-name: "prometheus-remote"
+name: "vault-remote"
 ctxs: ["remote"]
 env:
   repo:
@@ -11,7 +11,6 @@ params:
   private_ips: "{{ params.private_ips | default([]) }}"
   cloud_service: "digital_ocean_vpn"
   node_service: "digital_ocean_node"
-  nameserver_provider: "godaddy"
   dns_provider: "cloudflare"
   local_main_domain: "localhost"
   main_domain: "{{ params.your_domain }}"
@@ -34,7 +33,7 @@ params:
     - record: "files-vault"
     - record: "s3-vault"
   digital_ocean_node_region: "ams3"
-  digital_ocean_node_size: "s-2vcpu-2gb"
+  digital_ocean_node_size: "s-1vcpu-1gb"
   certbot_email: "{{ params.certbot_email }}"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
   meta:
@@ -48,9 +47,9 @@ params:
     no_info_wrap: false
     no_summary: false
     no_colors: false
-  run_nameserver_main: true
+  run_nameserver_main: false
   run_dns_main: false
-  dev_vault: true
+  dev_vault: false
   use_pod_prefix: true
   use_secrets: false
   use_nginx: true

@@ -1,4 +1,4 @@
-name: "prometheus-min-remote"
+name: "vault-min-remote"
 ctxs: ["remote"]
 env:
   repo:
@@ -24,7 +24,6 @@ params:
     skip_local_pod_preparation: false
     template_no_empty_lines: true
   use_nginx: true
-  use_grafana: true
   host_ssh_public_keys_content:
     origin: "env"
     file: "demo/ssh/id_rsa.pub"

@@ -1,16 +1,16 @@
-name: "vault-local"
+name: "rproxy-local"
 ctxs: ["local"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "examples/vault.yml"
+  file: "examples/rproxy.yml"
 params:
+  rproxy_type: "haproxy"
   local_main_domain: "localhost"
   local_domains:
-    vault: "localhost"
-    consul: "consul.localhost"
+    rproxy: "localhost"
     private: "private.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
@@ -26,60 +26,48 @@ params:
     no_info_wrap: false
     no_summary: false
     no_colors: false
-  dev_vault: true
   use_pod_prefix: true
   use_secrets: false
-  use_nginx: true
   use_theia: true
   use_minio_gateway: true
-  use_consul: true
-  use_secure_consul: true
   use_s3: true
   use_local_s3: true
   use_fluentd: true
+  use_outer_proxy: false
   use_certbot: true
   use_private_path: true
   use_basic_auth_private: true
-  use_ssl: false
+  use_ssl: true
   use_secure_elasticsearch: false
   use_node_exporter: false
   use_pod_full_prefix: true
-  db_backup_use_s3: false
+  block_ips: true
+  define_s3_backup_lifecycle: true
   define_cron: true
   include_cron_watch: true
-  define_s3_backup_lifecycle: true
   enable_logs_backup: true
-  enable_logs_setup: true
+  enable_logs_setup: false
   enable_sync_backup: true
-  enable_sync_setup: true
+  enable_sync_setup: false
   enable_backup_replica: false
   local_standard_ports: false
   pod_custom_dir_sync: true
   inner_scripts_dir: ""
   named_volumes: false
   fluentd_output_plugin: "file"
-  s3_cli: "awscli"
+  s3_cli: "mc"
   auth_file: "demo/auth/.htpasswd"
-  internal_ssl:
-    fullchain: "demo/ssl/internal.bundle.crt"
-    cert: "demo/ssl/internal.crt"
-    ca: "demo/ssl/internal.ca.crt"
-    privkey: "demo/ssl/internal.key"
-  memory_app:
+  auth_content:
+    origin: "env"
+    type: "file"
+    file: "demo/auth/.mkpasswd"
+  memory:
     nginx: 512mb
-    vault: 1gb
+    haproxy: 512mb
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
-    fluentd: 256mb
     certbot: 256mb
+    fluentd: 256mb
     logrotator: 256mb
     s3_cli: 512mb
-credentials:
-  dev_vault:
-    root_token: "vault123"
-  consul:
-    # consul keygen
-    encrypt_key: "pUqJrVyVRj5jsiYEkM/tFQYfWyJIv4s3XkvDwy7Cu5s="
-  s3: {}
-  minio_gateway: {}

@@ -1,19 +1,21 @@
-name: "rocketchat-min-remote"
+name: "rproxy-min-remote"
 ctxs: ["remote"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "examples/rocketchat.yml"
+  file: "examples/rproxy.yml"
 params:
   private_ips: ["{{ params.private_ip }}"]
   cloud_service: "digital_ocean_vpn"
   node_service: "digital_ocean_node"
   dns_provider: "cloudflare"
   main_domain: "{{ params.your_domain }}"
+  domains:
+    rproxy: "rproxy.{{ params.your_domain }}"
   dns_service_params_list:
-    - record: "rocketchat"
+    - record: "rproxy"
   digital_ocean_node_region: "ams3"
   digital_ocean_node_size: "s-1vcpu-1gb"
   meta:
@@ -25,14 +27,6 @@ params:
     origin: "env"
     file: "demo/ssh/id_rsa.pub"
 credentials:
-  rocketchat_db:
-    name: "rocketchat"
-    user: "rocket"
-    password: "111111"
-    root_user: "root"
-    root_password: "222222"
-    viewer_password: "333333"
-    oploguser_password: "444444"
   host:
     host_user: "host"
     host_pass: "111222"

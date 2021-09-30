@@ -13,10 +13,9 @@ params:
   private_ips: ["{{ params.private_ip }}"]
   cloud_service: "digital_ocean_vpn"
   node_service: "digital_ocean_node"
-  nameserver_provider: "godaddy"
   dns_provider: "cloudflare"
-  main_domain: "{{ params.your_domain }}"
   rocketchat_smtp_from: "contact@chat.{{ params.your_domain }}"
+  main_domain: "{{ params.your_domain }}"
   domains:
     rocketchat: "chat.{{ params.your_domain }}"
     private: "private-chat.{{ params.your_domain }}"
@@ -41,8 +40,8 @@ params:
     no_info_wrap: false
     no_summary: false
     no_colors: false
-  run_nameserver_main: true
-  run_dns_main: true
+  run_nameserver_main: false
+  run_dns_main: false
   use_pod_prefix: true
   use_secrets: true
   use_rocketchat_mail: true

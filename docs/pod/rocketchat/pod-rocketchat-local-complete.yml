@@ -7,8 +7,8 @@ env:
   repo_dir: "env-base"
   file: "examples/rocketchat.yml"
 params:
-  local_main_domain: "localhost"
   rocketchat_smtp_from: "contact@chat.example.com"
+  local_main_domain: "localhost"
   local_domains:
     rocketchat: "localhost"
     private: "private.localhost"
