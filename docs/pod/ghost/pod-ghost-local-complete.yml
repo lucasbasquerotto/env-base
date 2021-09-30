@@ -40,8 +40,10 @@ params:
   use_basic_auth_private: true
   use_ssl: false
   use_pod_full_prefix: true
-  db_backup_s3_snapshot: true
   define_s3_backup_lifecycle: true
+  non_s3_setup: true
+  db_gui_root_user: true
+  block_ips: true
   define_cron: true
   include_cron_watch: true
   enable_db_backup: true

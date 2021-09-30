@@ -23,7 +23,7 @@ params:
   use_nginx: true
   host_ssh_public_keys_content:
     origin: "env"
-    file: "ssh/id_rsa.pub"
+    file: "demo/ssh/id_rsa.pub"
 credentials:
   postgres:
     root_password: "111111"
@@ -34,7 +34,7 @@ credentials:
   host:
     host_user: "host"
     host_pass: "111222"
-    ssh_file: "ssh/id_rsa"
+    ssh_file: "demo/ssh/id_rsa"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
   cloudflare:

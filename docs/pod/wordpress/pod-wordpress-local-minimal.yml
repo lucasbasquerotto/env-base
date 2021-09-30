@@ -1,0 +1,34 @@
+name: "wordpress-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/wordpress.yml"
+params:
+  pod_custom_dir_sync: true
+  app_dev: false
+  enable_db_setup_new: true
+credentials:
+  mysql:
+    root_password: "111111"
+    viewer_password: "222222"
+  wordpress:
+    db:
+      name: "wordpress"
+      user: "wp_user"
+      password: "123456"
+    setup:
+      admin_user: "wp_user"
+      admin_password: "111222"
+      admin_email: "email@domain.com"
+    config:
+      auth_key: ")}rFg|03au>%G;xa<nBi+Nk@9o2A>X[*W]W]oymh#)-=AYIIoAD]i6OmfLWD)#P6"
+      secure_auth_key: "Xu+V0E/)y|i?5*l?8LLV/;HE{?xa)~m[~SS0D5d uDabtwqNu-:T2lP=J]s<J<oG"
+      logged_in_key: "sCaHS-}0)n8+2Ow^l}IDyjHLx#ym*%#po`8h|7JIv#~j4w}*q%nDl-7<vjF([ltT"
+      nonce_key: ")^q3T5{ 2/u|M+>[kbPq(_<y/(7Y,0`TQ>y|b+40MT?AQ~B6mM-SOnh;@~%[Hy3J"
+      auth_salt: "Y|b[TK:~|=&Xxl*!0Jm3{H!N~?_<- ADG5dxmdM{ETs|`5|,fKa{+m=7fuoy:8c|"
+      secure_auth_salt: "+ekE BMikKj-;iSsIgVhDG*OAPss!XZ[Rb$_0i)]h94vtX%1)<5BwOjjj1C3_$uZ"
+      logged_in_salt: "9iO)S9xRz aI:c4tOo,Z`(!)7lO[I|!S)r<hP9fK-9hP:n/;))T=Z8Z-p-xNI[$F"
+      nonce_salt: "4r<DkL7|vgmtZ)]9=%TaQT8Dw#p;YAE9.G-o;Z7rbtRrKlF9w0ykmtUBZ?-~n(9q"

@@ -88,17 +88,20 @@ params:
     logrotator: 256mb
     s3_cli: 512mb
 credentials:
-  host:
-    host_user: "host"
-    host_pass: "111222"
-    ssh_file: "demo/ssh/id_rsa"
   elasticsearch:
     elastic_password: "111111"
     kibana_system_password: "222222"
     kibana_admin_password: "333333"
     fluentd_password: "444444"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    ssh_file: "demo/ssh/id_rsa"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"
   s3:
     endpoint: "{{ params.s3_endpoint }}"
     access_key: "{{ params.s3_access_key }}"
@@ -107,6 +110,3 @@ credentials:
     endpoint: "{{ params.minio_gateway_endpoint }}"
     access_key: "{{ params.minio_gateway_access_key }}"
     secret_key: "{{ params.minio_gateway_secret_key }}"
-  cloudflare:
-    email: "{{ params.cloudflare_email }}"
-    token: "{{ params.cloudflare_token }}"

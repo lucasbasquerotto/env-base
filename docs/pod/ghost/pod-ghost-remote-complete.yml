@@ -52,8 +52,10 @@ params:
   use_ssl: false
   use_node_exporter: false
   use_pod_full_prefix: true
-  db_backup_s3_snapshot: true
   define_s3_backup_lifecycle: true
+  non_s3_setup: true
+  db_gui_root_user: true
+  block_ips: true
   define_cron: true
   include_cron_watch: true
   enable_db_backup: true
@@ -114,6 +116,9 @@ credentials:
     ssh_file: "demo/ssh/id_rsa"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"
   s3:
     endpoint: "{{ params.s3_endpoint }}"
     access_key: "{{ params.s3_access_key }}"
@@ -122,6 +127,3 @@ credentials:
     endpoint: "{{ params.minio_gateway_endpoint }}"
     access_key: "{{ params.minio_gateway_access_key }}"
     secret_key: "{{ params.minio_gateway_secret_key }}"
-  cloudflare:
-    email: "{{ params.cloudflare_email }}"
-    token: "{{ params.cloudflare_token }}"

@@ -8,6 +8,8 @@ env:
   file: "examples/efk.yml"
 params:
   pod_custom_dir_sync: true
+  local_domains:
+    kibana: "localhost"
   use_kibana: true
   use_nginx: true
 credentials: {}

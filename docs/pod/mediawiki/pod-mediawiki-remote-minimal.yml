@@ -25,7 +25,7 @@ params:
     logo: "https://www.mediawiki.org/static/images/project-logos/mediawikiwiki.png"
   host_ssh_public_keys_content:
     origin: "env"
-    file: "ssh/id_rsa.pub"
+    file: "demo/ssh/id_rsa.pub"
 credentials:
   mediawiki:
     secret_key: "ce4e374745189efeeb2202833493c13242de589d59299f43f8325d59c7d4ebbe"
@@ -38,7 +38,7 @@ credentials:
   host:
     host_user: "host"
     host_pass: "111222"
-    ssh_file: "ssh/id_rsa"
+    ssh_file: "demo/ssh/id_rsa"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
   cloudflare:

@@ -56,6 +56,7 @@ params:
     no_colors: false
   run_nameserver_main: false
   run_dns_main: false
+  use_mediawiki_mail: true
   use_pod_prefix: true
   use_secrets: true
   use_mediawiki_mail: true
@@ -144,6 +145,9 @@ credentials:
     ssh_file: "demo/ssh/id_rsa"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"
   s3:
     endpoint: "{{ params.s3_endpoint }}"
     access_key: "{{ params.s3_access_key }}"
@@ -152,6 +156,3 @@ credentials:
     endpoint: "{{ params.minio_gateway_endpoint }}"
     access_key: "{{ params.minio_gateway_access_key }}"
     secret_key: "{{ params.minio_gateway_secret_key }}"
-  cloudflare:
-    email: "{{ params.cloudflare_email }}"
-    token: "{{ params.cloudflare_token }}"
