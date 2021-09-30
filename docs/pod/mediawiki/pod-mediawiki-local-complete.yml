@@ -15,7 +15,8 @@ params:
     adminer: "adminer.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
-  backup_bucket_name: "mediawiki-backup"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
+  uploads_bucket_name: "{{ params.uploads_bucket_name }}"
   db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
   uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
   meta:

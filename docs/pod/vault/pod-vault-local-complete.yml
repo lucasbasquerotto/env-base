@@ -1,54 +1,53 @@
-name: "ghost-local"
+name: "prometheus-local"
 ctxs: ["local"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "examples/ghost.yml"
+  file: "examples/vault.yml"
 params:
   local_main_domain: "localhost"
   local_domains:
-    ghost: "localhost"
+    vault: "localhost"
+    consul: "consul.localhost"
     private: "private.localhost"
-    phpmyadmin: "pma.localhost"
-    adminer: "adminer.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
-  uploads_bucket_name: "{{ params.uploads_bucket_name }}"
-  db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/ghost/db/20210505_013103.zip?raw=true"
-  uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/ghost/uploads/20210505_013115.zip?raw=true"
   meta:
     ignore_validators: true
     skip_local_node_preparation: true
     skip_local_pod_preparation: true
     template_no_empty_lines: true
+  pod_meta:
+    no_stacktrace: false
+    no_info: false
+    no_info_wrap: false
+    no_summary: false
+    no_colors: false
+  dev_vault: true
   use_pod_prefix: true
   use_secrets: false
-  use_kibana: true
+  use_nginx: true
   use_theia: true
   use_minio_gateway: true
+  use_consul: true
+  use_secure_consul: true
   use_s3: true
   use_local_s3: true
-  use_nginx: true
-  use_varnish: true
-  use_pma: true
-  use_adminer: true
   use_fluentd: true
   use_certbot: true
   use_private_path: true
   use_basic_auth_private: true
   use_ssl: false
+  use_secure_elasticsearch: false
+  use_node_exporter: false
   use_pod_full_prefix: true
-  define_s3_backup_lifecycle: true
-  non_s3_setup: true
-  db_gui_root_user: true
-  block_ips: true
+  db_backup_use_s3: false
   define_cron: true
   include_cron_watch: true
-  enable_db_backup: true
-  enable_db_setup: true
+  define_s3_backup_lifecycle: true
   enable_logs_backup: true
   enable_logs_setup: true
   enable_sync_backup: true
@@ -58,21 +57,17 @@ params:
   pod_custom_dir_sync: true
   inner_scripts_dir: ""
   named_volumes: false
+  fluentd_output_plugin: "file"
   s3_cli: "awscli"
   auth_file: "demo/auth/.htpasswd"
-  fluentd_output_plugin: "file"
-  local_custom_ssl:
+  internal_ssl:
     fullchain: "demo/ssl/internal.bundle.crt"
     cert: "demo/ssl/internal.crt"
     ca: "demo/ssl/internal.ca.crt"
     privkey: "demo/ssl/internal.key"
   memory_app:
     nginx: 512mb
-    varnish: 512mb
-    ghost: 1gb
-    pma: 512mb
-    adminer: 512mb
-    mysql: 1gb
+    vault: 1gb
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
@@ -81,21 +76,10 @@ params:
     logrotator: 256mb
     s3_cli: 512mb
 credentials:
-  db:
-    root_password: "111111"
-    viewer_password: "222222"
-    name: "ghost_db"
-    user: "ghost_user"
-    password: "333333"
-  ghost_mail:
-    from: "'My Send Email' <{{ params.sender_email }}>"
-    transport: "SMTP"
-    options:
-      service: "Sendgrid"
-      host: "smtp.sendgrid.net"
-      port: "587"
-      auth:
-        user: "apikey"
-        pass: "{{ params.sendgrid_password }}"
+  dev_vault:
+    root_token: "vault123"
+  consul:
+    # consul keygen
+    encrypt_key: "pUqJrVyVRj5jsiYEkM/tFQYfWyJIv4s3XkvDwy7Cu5s="
   s3: {}
   minio_gateway: {}

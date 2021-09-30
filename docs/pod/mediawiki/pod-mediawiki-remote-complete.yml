@@ -62,7 +62,6 @@ params:
   use_mediawiki_mail: true
   use_pod_prefix: true
   use_secrets: true
-  use_mediawiki_mail: true
   use_nginx: true
   use_varnish: true
   use_redis: false

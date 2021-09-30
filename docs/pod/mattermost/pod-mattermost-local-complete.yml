@@ -15,7 +15,8 @@ params:
     adminer: "adminer.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
-  backup_bucket_name: "mattermost-backup"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
+  uploads_bucket_name: "{{ params.uploads_bucket_name }}"
   db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mattermost/db/20210608_002440.zip?raw=true"
   uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mattermost/uploads/20210608_002449.zip?raw=true"
   meta:

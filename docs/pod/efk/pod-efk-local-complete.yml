@@ -13,7 +13,7 @@ params:
     private: "private.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
-  backup_bucket_name: "efk-backup"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
   snapshot_name: "snapshot-20200813-230131"
   db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/efk/db/20200813_230132.zip?raw=true"
   meta:

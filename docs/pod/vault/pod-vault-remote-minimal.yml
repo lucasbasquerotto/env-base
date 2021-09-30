@@ -5,7 +5,7 @@ env:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "examples/prometheus.yml"
+  file: "examples/vault.yml"
 params:
   private_ips: ["{{ params.private_ip }}"]
   cloud_service: "digital_ocean_vpn"
@@ -13,10 +13,9 @@ params:
   dns_provider: "cloudflare"
   main_domain: "{{ params.your_domain }}"
   domains:
-    grafana: "monitor.{{ params.your_domain }}"
-    prometheus: "prometheus-monitor.{{ params.your_domain }}"
+    vault: "vault.{{ params.your_domain }}"
   dns_service_params_list:
-    - record: "monitor"
+    - record: "vault"
   digital_ocean_node_region: "ams3"
   digital_ocean_node_size: "s-1vcpu-1gb"
   meta:
@@ -30,14 +29,6 @@ params:
     origin: "env"
     file: "demo/ssh/id_rsa.pub"
 credentials:
-  grafana:
-    security_admin_password: "123456"
-    server_domain: "monitor.{{ params.your_domain }}"
-    smtp_enabled: true
-    smtp_host: "smtp.sendgrid.net:587"
-    smtp_user: "apikey"
-    smtp_password: "123456"
-    smtp_from_address: "noreply@monitor.{{ params.your_domain }}"
   host:
     host_user: "host"
     host_pass: "111222"

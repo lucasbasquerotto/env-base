@@ -8,7 +8,7 @@ env:
   file: "examples/rocketchat.yml"
 params:
   local_main_domain: "localhost"
-  rocketchat_smtp_from: "contact@chat.{{ params.your_domain }}"
+  rocketchat_smtp_from: "contact@chat.example.com"
   local_domains:
     rocketchat: "localhost"
     private: "private.localhost"
@@ -100,5 +100,17 @@ credentials:
     root_password: "222222"
     viewer_password: "333333"
     oploguser_password: "444444"
+  rocketchat_mail:
+    address: "smtp.sendgrid.net"
+    port: "587"
+    ignore_tls: false
+    smtp_username: "apikey"
+    smtp_password: "{{ params.sendgrid_password }}"
+  hubot:
+    email: "hubot@test.internal"
+    room: ""
+    user: "mybot"
+    password: "mypass"
+    bot_name: "bothere"
   s3: {}
   minio_gateway: {}

@@ -1,0 +1,13 @@
+name: "vault-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/vault.yml"
+params:
+  pod_custom_dir_sync: true
+credentials:
+  dev_vault:
+    root_token: "vault123"

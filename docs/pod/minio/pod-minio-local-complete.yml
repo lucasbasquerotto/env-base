@@ -13,7 +13,7 @@ params:
     private: "private.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
-  backup_bucket_name: "minio-backup"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
   meta:
     ignore_validators: true
     skip_local_node_preparation: true
