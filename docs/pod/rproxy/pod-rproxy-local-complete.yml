@@ -71,3 +71,6 @@ params:
     fluentd: 256mb
     logrotator: 256mb
     s3_cli: 512mb
+credentials:
+  s3: {}
+  minio_gateway: {}
