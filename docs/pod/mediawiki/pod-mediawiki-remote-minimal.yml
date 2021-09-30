@@ -1,0 +1,46 @@
+name: "mediawiki-min-remote"
+ctxs: ["remote"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/mediawiki.yml"
+params:
+  private_ips: ["{{ params.private_ip }}"]
+  cloud_service: "digital_ocean_vpn"
+  node_service: "digital_ocean_node"
+  dns_provider: "cloudflare"
+  main_domain: "{{ params.your_domain }}"
+  domains:
+    mediawiki: "wiki.{{ params.your_domain }}"
+  dns_service_params_list:
+    - record: "wiki"
+  digital_ocean_node_region: "ams3"
+  digital_ocean_node_size: "s-1vcpu-1gb"
+  meta:
+    template_no_empty_lines: true
+  use_nginx: true
+  mediawiki:
+    logo: "https://www.mediawiki.org/static/images/project-logos/mediawikiwiki.png"
+  host_ssh_public_keys_content:
+    origin: "env"
+    file: "ssh/id_rsa.pub"
+credentials:
+  mediawiki:
+    secret_key: "ce4e374745189efeeb2202833493c13242de589d59299f43f8325d59c7d4ebbe"
+    db:
+      root_password: "1234556"
+      viewer_password: "123456"
+      name: "my_wiki"
+      user: "wikiuser"
+      password: "AULT;1.2;AES2"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    ssh_file: "ssh/id_rsa"
+  digital_ocean:
+    api_token: "{{ params.digital_ocean_api_token }}"
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"

@@ -1,6 +1,6 @@
 # EFK (Elasticsearch + Fluentd + Kibana)
 
-This example deploys a pod with containers containing the following services:
+These examples deploy a pod with containers containing the following services:
 
 - Elasticsearch
 - Fluentd

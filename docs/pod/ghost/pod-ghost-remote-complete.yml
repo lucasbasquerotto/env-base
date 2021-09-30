@@ -18,6 +18,8 @@ params:
   domains:
     ghost: "blog.{{ params.your_domain }}"
     private: "private-blog.{{ params.your_domain }}"
+    phpmyadmin: "pma-blog.{{ params.your_domain }}"
+    adminer: "adminer-blog.{{ params.your_domain }}"
     theia: "files-blog.{{ params.your_domain }}"
     minio_gateway: "s3-blog.{{ params.your_domain }}"
   dns_service_params_list:
@@ -63,22 +65,23 @@ params:
   inner_scripts_dir: ""
   named_volumes: false
   s3_cli: "awscli"
-  auth_file: "auth/.htpasswd"
-  expose_elasticsearch_port: true
-  elasticsearch_external_port: "9200"
-  fluentd_output_plugin: "elasticsearch"
+  auth_file: "demo/auth/.htpasswd"
+  fluentd_output_plugin: "file"
   internal_ssl:
-    fullchain: "ssl/internal.bundle.crt"
-    cert: "ssl/internal.crt"
-    ca: "ssl/internal.ca.crt"
-    privkey: "ssl/internal.key"
+    fullchain: "demo/ssl/internal.bundle.crt"
+    cert: "demo/ssl/internal.crt"
+    ca: "demo/ssl/internal.ca.crt"
+    privkey: "demo/ssl/internal.key"
   host_ssh_public_keys_content:
     origin: "env"
-    file: "ssh/id_rsa.pub"
+    file: "demo/ssh/id_rsa.pub"
   memory_app:
     nginx: 512mb
-    kibana: 512mb
-    elasticsearch: 1512mb
+    varnish: 512mb
+    ghost: 1gb
+    pma: 512mb
+    adminer: 512mb
+    mysql: 1gb
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
@@ -102,11 +105,11 @@ credentials:
       port: "587"
       auth:
         user: "apikey"
-        pass: "{{ params.sendgrid_pass }}"
+        pass: "{{ params.sendgrid_password }}"
   host:
     host_user: "host"
     host_pass: "111222"
-    ssh_file: "ssh/id_rsa"
+    ssh_file: "demo/ssh/id_rsa"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
   s3:

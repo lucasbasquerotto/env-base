@@ -1,0 +1,21 @@
+name: "mediawiki-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/mediawiki.yml"
+params:
+  pod_custom_dir_sync: true
+  mediawiki:
+    logo: "https://www.mediawiki.org/static/images/project-logos/mediawikiwiki.png"
+credentials:
+  mediawiki:
+    secret_key: "ce4e374745189efeeb2202833493c13242de589d59299f43f8325d59c7d4ebbe"
+    db:
+      root_password: "1234556"
+      viewer_password: "123456"
+      name: "my_wiki"
+      user: "wikiuser"
+      password: "AULT;1.2;AES2"

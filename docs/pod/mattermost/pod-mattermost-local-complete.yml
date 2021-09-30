@@ -9,8 +9,10 @@ env:
 params:
   local_main_domain: "localhost"
   local_domains:
-    kibana: "localhost"
+    mattermost: "localhost"
     private: "private.localhost"
+    pgadmin: "pgadmin.localhost"
+    adminer: "adminer.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
   backup_bucket_name: "mattermost-backup"
@@ -23,13 +25,13 @@ params:
     template_no_empty_lines: true
   use_pod_prefix: true
   use_secrets: false
-  use_kibana: true
   use_theia: true
   use_minio_gateway: true
   use_s3: true
   use_local_s3: true
   use_nginx: true
   use_pgadmin: true
+  use_adminer: true
   use_fluentd: true
   use_certbot: true
   use_private_path: true
@@ -52,13 +54,13 @@ params:
   inner_scripts_dir: ""
   named_volumes: false
   s3_cli: "awscli"
-  auth_file: "auth/.htpasswd"
+  auth_file: "demo/auth/.htpasswd"
   fluentd_output_plugin: "elasticsearch"
   local_custom_ssl:
-    fullchain: "ssl/internal.bundle.crt"
-    cert: "ssl/internal.crt"
-    ca: "ssl/internal.ca.crt"
-    privkey: "ssl/internal.key"
+    fullchain: "demo/ssl/internal.bundle.crt"
+    cert: "demo/ssl/internal.crt"
+    ca: "demo/ssl/internal.ca.crt"
+    privkey: "demo/ssl/internal.key"
   memory_app:
     nginx: 512mb
     mattermost: 1gb
@@ -80,7 +82,7 @@ credentials:
     db_user: "mattermost"
     db_password: "333333"
   mattermost:
-    secret_key: "{{ params.mattermost_secret_key }}"
+    secret_key: "abce374745180efeeb2202933493d132429e589d59209f43f8325d59c7d4ebba"
   mattermost_mail:
     address: "smtp.sendgrid.net"
     port: "587"
@@ -90,3 +92,5 @@ credentials:
   pgadmin:
     email: "{{ params.your_email }}"
     password: "123456"
+  s3: {}
+  minio_gateway: {}
