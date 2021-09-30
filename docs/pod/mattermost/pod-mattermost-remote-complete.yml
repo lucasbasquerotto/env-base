@@ -1,0 +1,121 @@
+name: "mattermost-remote"
+ctxs: ["remote"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/mattermost.yml"
+params:
+  app_hostname: "mattermost_app"
+  db_hostname: "mattermost_db"
+  web_hostname: "mattermost_web"
+  private_ips: ["{{ params.private_ip }}"]
+  cloud_service: "digital_ocean_vpn"
+  node_service: "digital_ocean_node"
+  dns_provider: "cloudflare"
+  main_domain: "{{ params.your_domain }}"
+  domains:
+    mattermost: "chat.{{ params.your_domain }}"
+    private: "private-chat.{{ params.your_domain }}"
+    theia: "files-chat.{{ params.your_domain }}"
+    minio_gateway: "s3-chat.{{ params.your_domain }}"
+  dns_service_params_list:
+    - record: "chat"
+    - record: "private-chat"
+    - record: "files-chat"
+    - record: "s3-chat"
+  digital_ocean_node_region: "ams3"
+  digital_ocean_node_size: "s-2vcpu-2gb"
+  certbot_email: "{{ params.certbot_email }}"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
+  meta:
+    template_no_empty_lines: true
+  run_dns_main: false
+  use_pod_prefix: true
+  use_secrets: false
+  use_theia: true
+  use_minio_gateway: true
+  use_s3: true
+  use_nginx: true
+  use_pgadmin: true
+  use_fluentd: true
+  use_certbot: true
+  use_private_path: true
+  use_basic_auth_private: true
+  use_ssl: false
+  use_node_exporter: false
+  use_pod_full_prefix: true
+  db_backup_s3_snapshot: true
+  define_s3_backup_lifecycle: true
+  define_cron: true
+  include_cron_watch: true
+  enable_db_backup: true
+  enable_db_setup: false
+  enable_logs_backup: true
+  enable_logs_setup: false
+  enable_sync_backup: true
+  enable_sync_setup: false
+  enable_backup_replica: false
+  pod_custom_dir_sync: true
+  inner_scripts_dir: ""
+  named_volumes: false
+  s3_cli: "awscli"
+  auth_file: "auth/.htpasswd"
+  expose_elasticsearch_port: true
+  elasticsearch_external_port: "9200"
+  fluentd_output_plugin: "elasticsearch"
+  internal_ssl:
+    fullchain: "ssl/internal.bundle.crt"
+    cert: "ssl/internal.crt"
+    ca: "ssl/internal.ca.crt"
+    privkey: "ssl/internal.key"
+  host_ssh_public_keys_content:
+    origin: "env"
+    file: "ssh/id_rsa.pub"
+  memory_app:
+    nginx: 512mb
+    kibana: 512mb
+    elasticsearch: 1512mb
+    theia: 512mb
+    minio_gateway: 512mb
+    toolbox: 512mb
+    fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
+credentials:
+  postgres:
+    root_password: "111111"
+    viewer_password: "222222"
+    db_name: "mmdb"
+    db_user: "mattermost"
+    db_password: "333333"
+  mattermost:
+    secret_key: "{{ params.mattermost_secret_key }}"
+  mattermost_mail:
+    address: "smtp.sendgrid.net"
+    port: "587"
+    connection_security: "STARTTLS"
+    smtp_username: "apikey"
+    smtp_password: "{{ params.sendgrid_password }}"
+  pgadmin:
+    email: "{{ params.your_email }}"
+    password: "123456"
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    ssh_file: "ssh/id_rsa"
+  digital_ocean:
+    api_token: "{{ params.digital_ocean_api_token }}"
+  s3:
+    endpoint: "{{ params.s3_endpoint }}"
+    access_key: "{{ params.s3_access_key }}"
+    secret_key: "{{ params.s3_secret_key }}"
+  minio_gateway:
+    endpoint: "{{ params.minio_gateway_endpoint }}"
+    access_key: "{{ params.minio_gateway_access_key }}"
+    secret_key: "{{ params.minio_gateway_secret_key }}"
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"

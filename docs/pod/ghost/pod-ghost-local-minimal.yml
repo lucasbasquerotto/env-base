@@ -1,0 +1,19 @@
+name: "ghost-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/ghost.yml"
+params:
+  pod_custom_dir_sync: true
+  use_nginx: true
+credentials:
+  db:
+    root_password: "111111"
+    viewer_password: "222222"
+    name: "ghost_db"
+    user: "ghost_user"
+    password: "333333"
+  ghost_mail: {}
