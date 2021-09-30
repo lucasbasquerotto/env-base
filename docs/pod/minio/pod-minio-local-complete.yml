@@ -1,23 +1,21 @@
-name: "mediawiki-local"
+name: "efk-local"
 ctxs: ["local"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "examples/mediawiki.yml"
+  file: "examples/efk.yml"
 params:
   local_main_domain: "localhost"
   local_domains:
-    mediawiki: "localhost"
+    kibana: "localhost"
     private: "private.localhost"
-    phpmyadmin: "pma.localhost"
-    adminer: "adminer.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
-  backup_bucket_name: "mediawiki-backup"
-  db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
-  uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
+  backup_bucket_name: "efk-backup"
+  snapshot_name: "snapshot-20200813-230131"
+  db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/efk/db/20200813_230132.zip?raw=true"
   meta:
     ignore_validators: true
     skip_local_node_preparation: true
@@ -31,14 +29,12 @@ params:
   use_s3: true
   use_local_s3: true
   use_nginx: true
-  use_varnish: true
-  use_pma: true
-  use_adminer: true
   use_fluentd: true
   use_certbot: true
   use_private_path: true
   use_basic_auth_private: true
   use_ssl: false
+  use_secure_elasticsearch: true
   use_pod_full_prefix: true
   db_backup_s3_snapshot: true
   define_s3_backup_lifecycle: true
@@ -57,7 +53,7 @@ params:
   named_volumes: false
   s3_cli: "awscli"
   auth_file: "demo/auth/.htpasswd"
-  fluentd_output_plugin: "file"
+  fluentd_output_plugin: "elasticsearch"
   local_custom_ssl:
     fullchain: "demo/ssl/internal.bundle.crt"
     cert: "demo/ssl/internal.crt"
@@ -65,13 +61,8 @@ params:
     privkey: "demo/ssl/internal.key"
   memory_app:
     nginx: 512mb
-    varnish: 512mb
-    mediawiki: 1gb
-    redis: 512mb
-    memcached: 512mb
-    pma: 512mb
-    adminer: 512mb
-    mysql: 1gb
+    kibana: 512mb
+    elasticsearch: 1512mb
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
@@ -80,18 +71,5 @@ params:
     logrotator: 256mb
     s3_cli: 512mb
 credentials:
-  mediawiki:
-    secret_key: "ce4e374745189efeeb2202833493c13242de589d59299f43f8325d59c7d4ebbe"
-    db:
-      root_password: "1234556"
-      viewer_password: "123456"
-      name: "my_wiki"
-      user: "wikiuser"
-      password: "AULT;1.2;AES2"
-  mediawiki_mail:
-    address: "tls://smtp.sendgrid.net"
-    port: "587"
-    smtp_username: "apikey"
-    smtp_password: "{{ params.sendgrid_password }}"
   s3: {}
   minio_gateway: {}

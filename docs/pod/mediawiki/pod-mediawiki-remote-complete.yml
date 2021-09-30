@@ -16,13 +16,6 @@ params:
   node_service: "digital_ocean_node"
   dns_provider: "cloudflare"
   main_domain: "{{ params.your_domain }}"
-  local_domains:
-    mediawiki: "localhost"
-    private: "private.localhost"
-    phpmyadmin: "pma.localhost"
-    adminer: "adminer.localhost"
-    theia: "theia.localhost"
-    minio_gateway: "s3.localhost"
   domains:
     mediawiki: "wiki.{{ params.your_domain }}"
     private: "private-wiki.{{ params.your_domain }}"
@@ -55,11 +48,6 @@ params:
   uploads_bucket_name: "mediawiki-uploads"
   backup_replica_bucket_name: "mediawiki-replica-backup"
   uploads_replica_bucket_name: "mediawiki-replica-uploads"
-  meta:
-    ignore_validators: true
-    skip_local_node_preparation: true
-    skip_local_pod_preparation: true
-    template_no_empty_lines: true
   pod_meta:
     no_stacktrace: false
     no_info: false
@@ -80,7 +68,6 @@ params:
   use_theia: true
   use_minio_gateway: true
   use_s3: true
-  use_local_s3: true
   use_s3_storage: false
   use_fluentd: true
   use_outer_proxy: false
@@ -106,9 +93,6 @@ params:
   enable_uploads_setup: true
   enable_backup_replica: false
   enable_uploads_replica: false
-  local_standard_ports: false
-  local_db_backup_sync: false
-  local_uploads_backup_sync: true
   fluentd_output_plugin: "file"
   s3_cli: "awscli"
   outer_proxy_type: "cloudflare"

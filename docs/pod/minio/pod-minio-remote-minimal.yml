@@ -1,0 +1,37 @@
+name: "efk-min-remote"
+ctxs: ["remote"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/efk.yml"
+params:
+  private_ips: ["{{ params.private_ip }}"]
+  cloud_service: "digital_ocean_vpn"
+  node_service: "digital_ocean_node"
+  dns_provider: "cloudflare"
+  main_domain: "{{ params.your_domain }}"
+  domains:
+    kibana: "log.{{ params.your_domain }}"
+  dns_service_params_list:
+    - record: "log"
+  digital_ocean_node_region: "ams3"
+  digital_ocean_node_size: "s-2vcpu-2gb"
+  meta:
+    template_no_empty_lines: true
+  use_kibana: true
+  use_nginx: true
+  host_ssh_public_keys_content:
+    origin: "env"
+    file: "ssh/id_rsa.pub"
+credentials:
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    ssh_file: "ssh/id_rsa"
+  digital_ocean:
+    api_token: "{{ params.digital_ocean_api_token }}"
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"

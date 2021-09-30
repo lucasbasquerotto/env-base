@@ -1,0 +1,13 @@
+name: "efk-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/efk.yml"
+params:
+  pod_custom_dir_sync: true
+  use_kibana: true
+  use_nginx: true
+credentials: {}

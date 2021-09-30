@@ -1,34 +1,32 @@
-name: "ghost-remote"
+name: "efk-remote"
 ctxs: ["remote"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
     version: "master"
   repo_dir: "env-base"
-  file: "examples/ghost.yml"
+  file: "examples/efk.yml"
 params:
-  app_hostname: "ghost_app"
-  db_hostname: "ghost_db"
-  web_hostname: "ghost_web"
+  app_hostname: "efk_app"
+  db_hostname: "efk_db"
+  web_hostname: "efk_web"
   private_ips: ["{{ params.private_ip }}"]
   cloud_service: "digital_ocean_vpn"
   node_service: "digital_ocean_node"
   dns_provider: "cloudflare"
   main_domain: "{{ params.your_domain }}"
   domains:
-    ghost: "blog.{{ params.your_domain }}"
-    private: "private-blog.{{ params.your_domain }}"
-    phpmyadmin: "pma-blog.{{ params.your_domain }}"
-    adminer: "adminer-blog.{{ params.your_domain }}"
-    theia: "files-blog.{{ params.your_domain }}"
-    minio_gateway: "s3-blog.{{ params.your_domain }}"
+    kibana: "log.{{ params.your_domain }}"
+    private: "private-log.{{ params.your_domain }}"
+    theia: "files-log.{{ params.your_domain }}"
+    minio_gateway: "s3-log.{{ params.your_domain }}"
   dns_service_params_list:
-    - record: "blog"
-    - record: "private-blog"
-    - record: "pma-blog"
-    - record: "adminer-blog"
-    - record: "files-blog"
-    - record: "s3-blog"
+    - record: "log"
+    - record: "private-log"
+    - record: "files-log"
+    - record: "s3-log"
+  dns_elasticsearch_params_list:
+    - record: "elasticsearch"
   digital_ocean_node_region: "ams3"
   digital_ocean_node_size: "s-2vcpu-2gb"
   certbot_email: "{{ params.certbot_email }}"
@@ -38,18 +36,17 @@ params:
   run_dns_main: false
   use_pod_prefix: true
   use_secrets: false
+  use_kibana: true
   use_theia: true
   use_minio_gateway: true
   use_s3: true
   use_nginx: true
-  use_varnish: true
-  use_pma: true
-  use_adminer: true
   use_fluentd: true
   use_certbot: true
   use_private_path: true
   use_basic_auth_private: true
   use_ssl: false
+  use_secure_elasticsearch: true
   use_node_exporter: false
   use_pod_full_prefix: true
   db_backup_s3_snapshot: true
@@ -68,7 +65,9 @@ params:
   named_volumes: false
   s3_cli: "awscli"
   auth_file: "demo/auth/.htpasswd"
-  fluentd_output_plugin: "file"
+  expose_elasticsearch_port: true
+  elasticsearch_external_port: "9200"
+  fluentd_output_plugin: "elasticsearch"
   internal_ssl:
     fullchain: "demo/ssl/internal.bundle.crt"
     cert: "demo/ssl/internal.crt"
@@ -79,11 +78,8 @@ params:
     file: "demo/ssh/id_rsa.pub"
   memory_app:
     nginx: 512mb
-    varnish: 512mb
-    ghost: 1gb
-    pma: 512mb
-    adminer: 512mb
-    mysql: 1gb
+    kibana: 512mb
+    elasticsearch: 1512mb
     theia: 512mb
     minio_gateway: 512mb
     toolbox: 512mb
@@ -92,26 +88,15 @@ params:
     logrotator: 256mb
     s3_cli: 512mb
 credentials:
-  db:
-    root_password: "111111"
-    viewer_password: "222222"
-    name: "ghost_db"
-    user: "ghost_user"
-    password: "333333"
-  ghost_mail:
-    from: "'My Send Email' <{{ params.sender_email }}>"
-    transport: "SMTP"
-    options:
-      service: "Sendgrid"
-      host: "smtp.sendgrid.net"
-      port: "587"
-      auth:
-        user: "apikey"
-        pass: "{{ params.sendgrid_password }}"
   host:
     host_user: "host"
     host_pass: "111222"
     ssh_file: "demo/ssh/id_rsa"
+  elasticsearch:
+    elastic_password: "111111"
+    kibana_system_password: "222222"
+    kibana_admin_password: "333333"
+    fluentd_password: "444444"
   digital_ocean:
     api_token: "{{ params.digital_ocean_api_token }}"
   s3:

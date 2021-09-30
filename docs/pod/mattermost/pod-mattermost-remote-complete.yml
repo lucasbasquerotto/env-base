@@ -24,18 +24,23 @@ params:
     minio_gateway: "s3-chat.{{ params.your_domain }}"
   dns_service_params_list:
     - record: "chat"
+      proxied: false
     - record: "private-chat"
+    - record: "pgadmin-chat"
+    - record: "adminer-chat"
     - record: "files-chat"
     - record: "s3-chat"
   digital_ocean_node_region: "ams3"
   digital_ocean_node_size: "s-2vcpu-2gb"
   certbot_email: "{{ params.certbot_email }}"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
+  db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mattermost/db/20210608_002440.zip?raw=true"
+  uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mattermost/uploads/20210608_002449.zip?raw=true"
   meta:
     template_no_empty_lines: true
   run_dns_main: false
   use_pod_prefix: true
-  use_secrets: false
+  use_secrets: true
   use_theia: true
   use_minio_gateway: true
   use_s3: true
@@ -65,9 +70,7 @@ params:
   named_volumes: false
   s3_cli: "awscli"
   auth_file: "demo/auth/.htpasswd"
-  expose_elasticsearch_port: true
-  elasticsearch_external_port: "9200"
-  fluentd_output_plugin: "elasticsearch"
+  fluentd_output_plugin: "file"
   internal_ssl:
     fullchain: "demo/ssl/internal.bundle.crt"
     cert: "demo/ssl/internal.crt"
@@ -105,7 +108,7 @@ credentials:
     smtp_username: "apikey"
     smtp_password: "{{ params.sendgrid_password }}"
   pgadmin:
-    email: "{{ params.your_email }}"
+    email: "email@example.com"
     password: "123456"
   host:
     host_user: "host"
