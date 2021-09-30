@@ -41,11 +41,16 @@ params:
   digital_ocean_node_size: "s-2vcpu-2gb"
   certbot_email: "{{ params.certbot_email }}"
   wp_title: "My Blog Title"
-  backup_bucket_name: "wp-backup"
-  uploads_bucket_name: "wp-uploads"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
+  uploads_bucket_name: "{{ params.uploads_bucket_name }}"
   migrate_wp_plugins_to_activate: ["contact-form-7"]
   migrate_wp_plugins_to_deactivate:
     ["ewww-image-optimizer", "jetpack", "wp-mail-smtp", "wpdiscuz"]
+  meta:
+    ignore_validators: false
+    skip_local_node_preparation: false
+    skip_local_pod_preparation: false
+    template_no_empty_lines: true
   pod_meta:
     no_stacktrace: false
     no_info: false

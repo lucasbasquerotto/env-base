@@ -32,6 +32,9 @@ params:
   certbot_email: "{{ params.certbot_email }}"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
   meta:
+    ignore_validators: false
+    skip_local_node_preparation: false
+    skip_local_pod_preparation: false
     template_no_empty_lines: true
   run_dns_main: false
   use_pod_prefix: true

@@ -20,7 +20,11 @@ params:
   digital_ocean_node_region: "ams3"
   digital_ocean_node_size: "s-1vcpu-1gb"
   meta:
+    ignore_validators: false
+    skip_local_node_preparation: false
+    skip_local_pod_preparation: false
     template_no_empty_lines: true
+  lax: true
   use_nginx: true
   use_grafana: true
   host_ssh_public_keys_content:

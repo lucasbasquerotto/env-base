@@ -26,8 +26,10 @@ main:
     extend_cloud: true
     initial_services:
       - name: "s3_buckets"
+        when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
       - name: "s3_replica_buckets"
+        when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
   local:
     extend_cloud: true
@@ -45,6 +47,7 @@ main:
       - name: "base_services"
         can_destroy: true
       - name: "s3_buckets"
+        when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
     nodes:
       - name: "app"
@@ -69,6 +72,7 @@ main:
       - name: "base_services"
         can_destroy: true
       - name: "s3_buckets"
+        when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
     nodes:
       - name: "db"

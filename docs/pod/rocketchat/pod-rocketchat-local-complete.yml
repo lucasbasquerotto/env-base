@@ -1,0 +1,104 @@
+name: "rocketchat-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/rocketchat.yml"
+params:
+  local_main_domain: "localhost"
+  rocketchat_smtp_from: "contact@chat.{{ params.your_domain }}"
+  local_domains:
+    rocketchat: "localhost"
+    private: "private.localhost"
+    mongo_express: "me.localhost"
+    theia: "theia.localhost"
+    minio_gateway: "s3.localhost"
+  db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/db/20200612_221938.zip?raw=true"
+  uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/rocketchat/uploads/20200612_221938.zip?raw=true"
+  backup_bucket_name: "{{ params.backup_bucket_name }}"
+  uploads_bucket_name: "{{ params.uploads_bucket_name }}"
+  meta:
+    ignore_validators: true
+    skip_local_node_preparation: true
+    skip_local_pod_preparation: true
+    template_no_empty_lines: true
+  pod_meta:
+    no_stacktrace: false
+    no_info: false
+    no_info_wrap: false
+    no_summary: false
+    no_colors: false
+  use_pod_prefix: true
+  use_secrets: true
+  use_rocketchat_mail: true
+  non_s3_setup: true
+  use_nginx: true
+  use_mongo_express: true
+  use_theia: true
+  use_minio_gateway: true
+  use_s3: true
+  use_local_s3: true
+  use_s3_storage: false
+  use_fluentd: true
+  use_outer_proxy: false
+  use_certbot: true
+  use_private_path: true
+  use_basic_auth_private: true
+  use_ssl: false
+  use_secure_elasticsearch: false
+  use_node_exporter: false
+  use_pod_full_prefix: true
+  use_bot: true
+  db_gui_root_user: true
+  block_ips: true
+  s3_uploads: false
+  define_cron: true
+  include_cron_watch: true
+  define_s3_backup_lifecycle: true
+  enable_db_backup: true
+  enable_db_setup: true
+  enable_logs_backup: true
+  enable_logs_setup: true
+  enable_sync_backup: true
+  enable_sync_setup: true
+  enable_uploads_backup: true
+  enable_uploads_setup: true
+  enable_backup_replica: false
+  enable_uploads_replica: false
+  local_standard_ports: false
+  local_db_backup_sync: false
+  local_uploads_backup_sync: true
+  rocketchat_block_default_settings: true
+  pod_custom_dir_sync: true
+  inner_scripts_dir: ""
+  named_volumes: false
+  fluentd_output_plugin: "file"
+  s3_cli: "mc"
+  auth_file: "demo/auth/.htpasswd"
+  memory_app:
+    nginx: 512mb
+    rocketchat: 1gb
+    hubot: 512mb
+    mongo_express: 512mb
+    mongo: 1gb
+    theia: 512mb
+    minio_gateway: 512mb
+    toolbox: 512mb
+    fluentd: 256mb
+    certbot: 256mb
+    mongo_init: 512mb
+    logrotator: 256mb
+    s3_cli: 512mb
+credentials:
+  rocketchat_db:
+    name: "rocketchat"
+    user: "rocket"
+    password: "111111"
+    root_user: "root"
+    root_password: "222222"
+    viewer_password: "333333"
+    oploguser_password: "444444"
+  s3: {}
+  minio_gateway: {}

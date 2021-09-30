@@ -1,0 +1,19 @@
+name: "rocketchat-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/rocketchat.yml"
+params:
+  pod_custom_dir_sync: true
+credentials:
+  rocketchat_db:
+    name: "rocketchat"
+    user: "rocket"
+    password: "111111"
+    root_user: "root"
+    root_password: "222222"
+    viewer_password: "333333"
+    oploguser_password: "444444"
