@@ -59,7 +59,6 @@ params:
   use_private_path: true
   use_basic_auth_private: true
   use_ssl: false
-  use_secure_elasticsearch: true
   use_node_exporter: false
   use_pod_full_prefix: true
   non_s3_setup: true
@@ -84,7 +83,6 @@ params:
   local_db_backup_sync: false
   local_uploads_backup_sync: false
   pod_custom_dir_sync: true
-  enable_db_setup_new: true
   inner_scripts_dir: ""
   named_volumes: false
   app_dev: false
@@ -130,3 +128,11 @@ credentials:
       secure_auth_salt: "+ekE BMikKj-;iSsIgVhDG*OAPss!XZ[Rb$_0i)]h94vtX%1)<5BwOjjj1C3_$uZ"
       logged_in_salt: "9iO)S9xRz aI:c4tOo,Z`(!)7lO[I|!S)r<hP9fK-9hP:n/;))T=Z8Z-p-xNI[$F"
       nonce_salt: "4r<DkL7|vgmtZ)]9=%TaQT8Dw#p;YAE9.G-o;Z7rbtRrKlF9w0ykmtUBZ?-~n(9q"
+  wordpress_mail:
+    address: "smtp.sendgrid.net"
+    port: "587"
+    secure: "tls"
+    smtp_username: "apikey"
+    smtp_password: "{{ params.sendgrid_password }}"
+  s3: {}
+  minio_gateway: {}

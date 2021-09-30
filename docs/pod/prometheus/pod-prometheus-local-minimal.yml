@@ -1,0 +1,24 @@
+name: "prometheus-min-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/prometheus.yml"
+params:
+  local_domains:
+    grafana: "localhost"
+    prometheus: "prometheus.localhost"
+  pod_custom_dir_sync: true
+  use_nginx: true
+  use_grafana: true
+credentials:
+  grafana:
+    security_admin_password: "123456"
+    server_domain: "localhost"
+    smtp_enabled: true
+    smtp_host: "smtp.sendgrid.net:587"
+    smtp_user: "apikey"
+    smtp_password: "123456"
+    smtp_from_address: "noreply@example.com"

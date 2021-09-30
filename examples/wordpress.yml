@@ -444,8 +444,8 @@ pods:
         dir: "ext-pod"
     credentials:
       wordpress: "wordpress"
-      wordpress_mail: "wordpress_mail"
       mysql: "mysql"
+      wordpress_mail: "{{ params.use_wordpress_mail | default(false) | bool | ternary('wordpress_mail', '') }}"
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
       minio_gateway: "{{ params.use_minio_gateway | default(false) | bool | ternary('minio_gateway', '') }}"
       backup_bucket: "{{ params.use_s3 | default(false) | bool | ternary('s3', '') }}"

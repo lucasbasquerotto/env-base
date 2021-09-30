@@ -1,0 +1,87 @@
+name: "prometheus-local"
+ctxs: ["local"]
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "examples/prometheus.yml"
+params:
+  local_main_domain: "localhost"
+  local_domains:
+    grafana: "localhost"
+    prometheus: "prometheus.localhost"
+    private: "private.localhost"
+    theia: "theia.localhost"
+    minio_gateway: "s3.localhost"
+  backup_bucket_name: "prometheus-backup"
+  meta:
+    ignore_validators: true
+    skip_local_node_preparation: true
+    skip_local_pod_preparation: true
+    template_no_empty_lines: true
+  pod_meta:
+    no_stacktrace: false
+    no_info: false
+    no_info_wrap: false
+    no_summary: false
+    no_colors: false
+  use_pod_prefix: true
+  use_secrets: false
+  use_nginx: true
+  use_grafana: true
+  use_cadvisor: true
+  use_theia: true
+  use_minio_gateway: true
+  use_s3: true
+  use_local_s3: true
+  use_fluentd: true
+  use_certbot: true
+  use_private_path: true
+  use_basic_auth_private: true
+  use_ssl: false
+  use_secure_elasticsearch: false
+  use_node_exporter: true
+  use_internal_node_exporter: true
+  use_pod_full_prefix: true
+  db_backup_use_s3: false
+  define_cron: true
+  include_cron_watch: true
+  define_s3_backup_lifecycle: true
+  enable_logs_backup: true
+  enable_logs_setup: true
+  enable_sync_backup: true
+  enable_sync_setup: true
+  enable_backup_replica: false
+  local_standard_ports: false
+  prometheus_external_port: "9090"
+  pod_custom_dir_sync: true
+  inner_scripts_dir: ""
+  named_volumes: false
+  fluentd_output_plugin: "file"
+  s3_cli: "awscli"
+  auth_file: "demo/auth/.htpasswd"
+  memory_app:
+    nginx: 512mb
+    grafana: 512mb
+    prometheus: 1gb
+    node_exporter: 512mb
+    cadvisor: 512mb
+    theia: 512mb
+    minio_gateway: 512mb
+    toolbox: 512mb
+    fluentd: 256mb
+    certbot: 256mb
+    logrotator: 256mb
+    s3_cli: 512mb
+credentials:
+  grafana:
+    security_admin_password: "123456"
+    server_domain: "localhost"
+    smtp_enabled: true
+    smtp_host: "smtp.sendgrid.net:587"
+    smtp_user: "apikey"
+    smtp_password: "{{ params.sender_email }}"
+    smtp_from_address: "noreply@example.com"
+  s3: {}
+  minio_gateway: {}

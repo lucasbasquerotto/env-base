@@ -1,5 +1,5 @@
 name: "wordpress-min-remote"
-ctxs: ["local"]
+ctxs: ["remote"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
@@ -20,7 +20,6 @@ params:
   digital_ocean_node_size: "s-1vcpu-1gb"
   meta:
     template_no_empty_lines: true
-  pod_custom_dir_sync: true
   app_dev: false
   enable_db_setup_new: true
   use_nginx: true

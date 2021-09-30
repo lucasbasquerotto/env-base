@@ -1,5 +1,5 @@
 name: "wordpress-remote"
-ctxs: ["local"]
+ctxs: ["remote"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
@@ -76,7 +76,6 @@ params:
   use_private_path: true
   use_basic_auth_private: true
   use_ssl: false
-  use_secure_elasticsearch: true
   use_node_exporter: false
   use_pod_full_prefix: true
   non_s3_setup: true
@@ -97,8 +96,6 @@ params:
   enable_uploads_setup: true
   enable_backup_replica: false
   enable_uploads_replica: false
-  pod_custom_dir_sync: true
-  enable_db_setup_new: true
   inner_scripts_dir: ""
   named_volumes: false
   app_dev: false
@@ -152,6 +149,12 @@ credentials:
       secure_auth_salt: "+ekE BMikKj-;iSsIgVhDG*OAPss!XZ[Rb$_0i)]h94vtX%1)<5BwOjjj1C3_$uZ"
       logged_in_salt: "9iO)S9xRz aI:c4tOo,Z`(!)7lO[I|!S)r<hP9fK-9hP:n/;))T=Z8Z-p-xNI[$F"
       nonce_salt: "4r<DkL7|vgmtZ)]9=%TaQT8Dw#p;YAE9.G-o;Z7rbtRrKlF9w0ykmtUBZ?-~n(9q"
+  wordpress_mail:
+    address: "smtp.sendgrid.net"
+    port: "587"
+    secure: "tls"
+    smtp_username: "apikey"
+    smtp_password: "{{ params.sendgrid_password }}"
   host:
     host_user: "host"
     host_pass: "111222"
@@ -161,3 +164,11 @@ credentials:
   cloudflare:
     email: "{{ params.cloudflare_email }}"
     token: "{{ params.cloudflare_token }}"
+  s3:
+    endpoint: "{{ params.s3_endpoint }}"
+    access_key: "{{ params.s3_access_key }}"
+    secret_key: "{{ params.s3_secret_key }}"
+  minio_gateway:
+    endpoint: "{{ params.minio_gateway_endpoint }}"
+    access_key: "{{ params.minio_gateway_access_key }}"
+    secret_key: "{{ params.minio_gateway_secret_key }}"

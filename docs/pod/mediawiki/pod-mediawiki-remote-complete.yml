@@ -98,7 +98,6 @@ params:
   s3_cli: "awscli"
   outer_proxy_type: "cloudflare"
   auth_file: "demo/auth/.htpasswd"
-  pod_custom_dir_sync: false
   inner_scripts_dir: ""
   named_volumes: false
   internal_ssl:

@@ -70,7 +70,6 @@ params:
   enable_sync_backup: true
   enable_sync_setup: false
   enable_backup_replica: false
-  pod_custom_dir_sync: true
   inner_scripts_dir: ""
   named_volumes: false
   s3_cli: "awscli"
