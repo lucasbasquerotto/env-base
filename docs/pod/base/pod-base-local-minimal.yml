@@ -8,3 +8,4 @@ env:
   file: "examples/base.yml"
 params:
   pod_custom_dir_sync: true
+  use_nginx: true

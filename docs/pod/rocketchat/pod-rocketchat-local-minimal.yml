@@ -7,7 +7,10 @@ env:
   repo_dir: "env-base"
   file: "examples/rocketchat.yml"
 params:
+  local_domains:
+    rocketchat: "localhost"
   pod_custom_dir_sync: true
+  use_nginx: true
 credentials:
   rocketchat_db:
     name: "rocketchat"

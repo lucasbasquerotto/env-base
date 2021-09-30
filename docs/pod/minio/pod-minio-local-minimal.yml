@@ -7,7 +7,11 @@ env:
   repo_dir: "env-base"
   file: "examples/minio.yml"
 params:
+  local_main_domain: "localhost"
+  local_domains:
+    minio: "localhost"
   pod_custom_dir_sync: true
+  use_nginx: true
 credentials:
   minio:
     access_key: "minio"
