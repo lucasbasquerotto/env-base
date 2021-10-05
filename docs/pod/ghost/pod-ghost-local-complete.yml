@@ -53,8 +53,13 @@ params:
   enable_logs_setup: true
   enable_sync_backup: true
   enable_sync_setup: true
+  enable_uploads_backup: true
+  enable_uploads_setup: true
   enable_backup_replica: false
+  enable_uploads_replica: false
   local_standard_ports: false
+  local_db_backup_sync: false
+  local_uploads_backup_sync: true
   pod_custom_dir_sync: true
   inner_scripts_dir: ""
   named_volumes: false

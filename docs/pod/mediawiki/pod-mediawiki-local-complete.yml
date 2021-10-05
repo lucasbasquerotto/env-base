@@ -17,6 +17,15 @@ params:
     minio_gateway: "s3.localhost"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
   uploads_bucket_name: "{{ params.uploads_bucket_name }}"
+  mediawiki:
+    sitename: "My Wiki"
+    meta_namespace: "MyWiki"
+    logo: "https://www.mediawiki.org/static/images/project-logos/mediawikiwiki.png"
+    emergency_contact: "noreply@example.com"
+    password_sender: "noreply@example.com"
+    lang: "en"
+    authentication_token_version: "1"
+    upload_path: ""
   db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/db/20200612_181745.zip?raw=true"
   uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/mediawiki/uploads/20200612_181745.zip?raw=true"
   meta:
@@ -54,8 +63,13 @@ params:
   enable_logs_setup: true
   enable_sync_backup: true
   enable_sync_setup: true
+  enable_uploads_backup: true
+  enable_uploads_setup: true
   enable_backup_replica: false
+  enable_uploads_replica: false
   local_standard_ports: false
+  local_db_backup_sync: false
+  local_uploads_backup_sync: true
   pod_custom_dir_sync: true
   inner_scripts_dir: ""
   named_volumes: false

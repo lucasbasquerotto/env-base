@@ -37,7 +37,7 @@ params:
   use_certbot: true
   use_private_path: true
   use_basic_auth_private: true
-  use_ssl: true
+  use_ssl: false
   use_secure_elasticsearch: false
   use_node_exporter: false
   use_pod_full_prefix: true
