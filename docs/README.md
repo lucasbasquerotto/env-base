@@ -18,7 +18,7 @@ The following examples are about deployments using Cloud Services, with the clou
 The following examples are about pod deployments (both locally as well as remotely, the later using one or more of the cloud services above), with the pods definition normally found in the repository http://github.com/lucasbasquerotto/ext-pod.
 
 - [Base Pod](pod/base)
-- [Efk (Elasticsearch + Fluentd + Kibana)](pod/efk)
+- [EFK (Elasticsearch + Fluentd + Kibana)](pod/efk)
 - [Ghost](pod/ghost)
 - [Mattermost](pod/mattermost)
 - [Mediawiki](pod/mediawiki)
