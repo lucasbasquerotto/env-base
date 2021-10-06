@@ -1,0 +1,19 @@
+name: "linode"
+ctxs: "{{ project_ctxs }}"
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "cloud/linode.yml"
+params:
+  host_ssh_public_keys_content:
+    origin: "env"
+    file: "demo/ssh/id_rsa.pub"
+credentials:
+  host:
+    host_user: "host"
+    host_pass: "111222"
+    ssh_file: "demo/ssh/id_rsa"
+  linode:
+    api_token: "{{ params.linode_api_token }}"

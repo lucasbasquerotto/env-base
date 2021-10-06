@@ -1,5 +1,5 @@
-name: "rproxy-remote-hub"
-ctxs: ["remote_hub"]
+name: "rproxy-remote-replicas"
+ctxs: ["remote_replicas"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
@@ -19,23 +19,15 @@ params:
     private: "private-rproxy.{{ params.your_domain }}"
     theia: "files-rproxy.{{ params.your_domain }}"
     minio_gateway: "s3-rproxy.{{ params.your_domain }}"
-    rproxy_web_1: "web1-rproxy.{{ params.your_domain }}"
-    rproxy_web_1_theia: "files-web1-rproxy.{{ params.your_domain }}"
-    rproxy_web_2: "web2-rproxy.{{ params.your_domain }}"
-    rproxy_web_2_theia: "files-web2-rproxy.{{ params.your_domain }}"
-    rproxy_web_3: "web3-rproxy.{{ params.your_domain }}"
-    rproxy_web_3_theia: "files-web3-rproxy.{{ params.your_domain }}"
+    rproxy_replica: "rproxy-replica.lucasbasquerotto.com"
+    rproxy_replica_theia: "files-rproxy-replica.lucasbasquerotto.com"
   dns_service_params_list:
     - record: "rproxy"
     - record: "private-rproxy"
     - record: "files-rproxy"
     - record: "s3-rproxy"
-    - rproxy_web_1: "web1-rproxy"
-    - rproxy_web_1_theia: "files-web1-rproxy"
-    - rproxy_web_2: "web2-rproxy"
-    - rproxy_web_2_theia: "files-web2-rproxy"
-    - rproxy_web_3: "web3-rproxy"
-    - rproxy_web_3_theia: "files-web3-rproxy"
+    - record: "rproxy-replica"
+    - record: "files-rproxy-replica"
   digital_ocean_node_region: "ams3"
   digital_ocean_node_size: "s-1vcpu-1gb"
   certbot_email: "{{ params.certbot_email }}"

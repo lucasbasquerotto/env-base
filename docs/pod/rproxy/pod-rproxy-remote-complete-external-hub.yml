@@ -1,5 +1,5 @@
-name: "rproxy-remote-hub"
-ctxs: ["remote_hub"]
+name: "rproxy-remote-external-hub"
+ctxs: ["remote_external_hub"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"

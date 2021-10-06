@@ -1,0 +1,14 @@
+name: "godaddy"
+ctxs: "{{ project_ctxs }}"
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "cloud/godaddy.yml"
+params:
+  domain: "{{ params.your_domain }}"
+credentials:
+  godaddy:
+    api_key: "{{ params.godaddy_api_key }}"
+    api_secret: "{{ params.godaddy_api_secret }}"

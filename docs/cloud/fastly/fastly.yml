@@ -1,0 +1,11 @@
+name: "fastly"
+ctxs: "{{ project_ctxs }}"
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "cloud/fastly.yml"
+credentials:
+  fastly:
+    api_key: "{{ params.fastly_api_key }}"

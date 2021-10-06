@@ -1,5 +1,5 @@
-name: "rproxy-local-hub"
-ctxs: ["local_hub"]
+name: "rproxy-local-replicas"
+ctxs: ["local_replicas"]
 env:
   repo:
     src: "https://github.com/lucasbasquerotto/env-base.git"
@@ -14,9 +14,8 @@ params:
     private: "private.localhost"
     theia: "theia.localhost"
     minio_gateway: "s3.localhost"
-    rproxy_web_1: "web1.localhost"
-    rproxy_web_2: "web2.localhost"
-    rproxy_web_3: "web3.localhost"
+    rproxy_replica: "replica.localhost"
+    rproxy_replica_theia: "files-replica.localhost"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
   meta:
     ignore_validators: true

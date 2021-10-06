@@ -1,0 +1,14 @@
+name: "cloudflare"
+ctxs: "{{ project_ctxs }}"
+env:
+  repo:
+    src: "https://github.com/lucasbasquerotto/env-base.git"
+    version: "master"
+  repo_dir: "env-base"
+  file: "cloud/cloudflare.yml"
+params:
+  domain: "{{ params.your_domain }}"
+credentials:
+  cloudflare:
+    email: "{{ params.cloudflare_email }}"
+    token: "{{ params.cloudflare_token }}"
