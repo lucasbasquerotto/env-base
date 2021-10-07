@@ -34,6 +34,8 @@ params:
   certbot_email: "{{ params.certbot_email }}"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
   uploads_bucket_name: "{{ params.uploads_bucket_name }}"
+  db_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/ghost/db/20210505_013103.zip?raw=true"
+  uploads_setup_restore_remote_file: "https://github.com/lucasbasquerotto/backups/blob/master/ghost/uploads/20210505_013115.zip?raw=true"
   meta:
     ignore_validators: false
     skip_local_node_preparation: false
@@ -41,34 +43,39 @@ params:
     template_no_empty_lines: true
   run_dns_main: false
   use_pod_prefix: true
-  use_secrets: false
-  use_theia: true
-  use_minio_gateway: true
-  use_s3: true
+  use_secrets: true
   use_nginx: true
   use_varnish: true
   use_pma: true
   use_adminer: true
+  use_theia: true
+  use_minio_gateway: true
+  use_s3: true
+  use_s3_storage: false
   use_fluentd: true
+  use_outer_proxy: false
   use_certbot: true
   use_private_path: true
   use_basic_auth_private: true
   use_ssl: false
   use_node_exporter: false
   use_pod_full_prefix: true
-  define_s3_backup_lifecycle: true
   non_s3_setup: true
   db_gui_root_user: true
   block_ips: true
   define_cron: true
   include_cron_watch: true
+  define_s3_backup_lifecycle: true
   enable_db_backup: true
-  enable_db_setup: false
+  enable_db_setup: true
   enable_logs_backup: true
-  enable_logs_setup: false
+  enable_logs_setup: true
   enable_sync_backup: true
-  enable_sync_setup: false
+  enable_sync_setup: true
+  enable_uploads_backup: true
+  enable_uploads_setup: true
   enable_backup_replica: false
+  enable_uploads_replica: false
   inner_scripts_dir: ""
   named_volumes: false
   s3_cli: "awscli"
