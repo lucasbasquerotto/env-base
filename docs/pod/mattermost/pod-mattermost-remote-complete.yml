@@ -68,12 +68,15 @@ params:
   define_cron: true
   include_cron_watch: true
   enable_db_backup: true
-  enable_db_setup: false
+  enable_db_setup: true
   enable_logs_backup: true
-  enable_logs_setup: false
+  enable_logs_setup: true
   enable_sync_backup: true
-  enable_sync_setup: false
+  enable_sync_setup: true
+  enable_uploads_backup: true
+  enable_uploads_setup: true
   enable_backup_replica: false
+  enable_uploads_replica: false
   inner_scripts_dir: ""
   named_volumes: false
   s3_cli: "awscli"
@@ -108,6 +111,7 @@ credentials:
     db_user: "mattermost"
     db_password: "333333"
   mattermost:
+    password: "Ma1234567!"
     secret_key: "abce374745180efeeb2202933493d132429e589d59209f43f8325d59c7d4ebba"
   mattermost_mail:
     address: "smtp.sendgrid.net"
