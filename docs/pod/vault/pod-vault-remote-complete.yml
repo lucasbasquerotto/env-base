@@ -8,7 +8,7 @@ env:
   file: "examples/vault.yml"
 params:
   app_hostname: "vault_app"
-  private_ips: "{{ params.private_ips | default([]) }}"
+  private_ips: ["{{ params.private_ip }}"]
   cloud_service: "digital_ocean_vpn"
   node_service: "digital_ocean_node"
   dns_provider: "cloudflare"
