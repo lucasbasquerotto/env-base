@@ -132,7 +132,7 @@ credentials:
     email: "hubot@test.internal"
     room: ""
     user: "mybot"
-    password: "mypass"
+    password: "botpassword"
     bot_name: "bothere"
   host:
     host_user: "host"
