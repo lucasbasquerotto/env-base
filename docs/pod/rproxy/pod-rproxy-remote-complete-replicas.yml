@@ -29,7 +29,7 @@ params:
     - record: "rproxy-replica"
     - record: "files-rproxy-replica"
   digital_ocean_node_region: "ams3"
-  digital_ocean_node_size: "s-1vcpu-1gb"
+  digital_ocean_node_size: "s-1vcpu-2gb"
   certbot_email: "{{ params.certbot_email }}"
   backup_bucket_name: "{{ params.backup_bucket_name }}"
   meta:
