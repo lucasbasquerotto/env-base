@@ -362,7 +362,7 @@ pods:
       images:
         nginx: "nginx:1.21.3-alpine"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
-        theia: "theiaide/theia:1.17.2"
+        theia: "lucasbasquerotto/image:theia-1.17.2-20211122"
         minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
         certbot: "certbot/certbot:v1.2.0"

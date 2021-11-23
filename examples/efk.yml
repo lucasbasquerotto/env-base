@@ -454,7 +454,7 @@ pods:
         nginx: "nginx:1.21.3-alpine"
         elasticsearch: "docker.elastic.co/elasticsearch/elasticsearch:7.5.0"
         kibana: "docker.elastic.co/kibana/kibana:7.5.0"
-        theia: "theiaide/theia:1.17.2"
+        theia: "lucasbasquerotto/image:theia-1.17.2-20211122"
         minio_gateway: "minio/minio:RELEASE.2020-07-02T00-15-09Z"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"

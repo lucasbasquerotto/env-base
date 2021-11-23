@@ -541,7 +541,7 @@ pods:
         pgadmin: "dpage/pgadmin4:5.3"
         adminer: "lucasbasquerotto/image:adminer-20210609-02"
         postgres: "lucasbasquerotto/image:postgres-13.3-20210610"
-        theia: "theiaide/theia:1.17.2"
+        theia: "lucasbasquerotto/image:theia-1.17.2-20211122"
         minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"

@@ -492,7 +492,7 @@ pods:
         hubot: "rocketchat/hubot-rocketchat:v1.0.11"
         mongo_express: "mongo-express:0.54.0"
         mongo: "mongo:4.0"
-        theia: "theiaide/theia:1.17.2"
+        theia: "lucasbasquerotto/image:theia-1.17.2-20211122"
         minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"

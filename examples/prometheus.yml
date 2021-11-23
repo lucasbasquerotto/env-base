@@ -474,7 +474,7 @@ pods:
         grafana: "grafana/grafana:7.1.5"
         node_exporter: "prom/node-exporter:v1.0.1"
         cadvisor: "google/cadvisor:v0.33.0"
-        theia: "theiaide/theia:1.17.2"
+        theia: "lucasbasquerotto/image:theia-1.17.2-20211122"
         minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"

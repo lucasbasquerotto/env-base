@@ -550,7 +550,7 @@ pods:
         pma: "phpmyadmin/phpmyadmin:5.1.0"
         adminer: "lucasbasquerotto/image:adminer-20210408"
         mysql: "lucasbasquerotto/wordpress:mysql-8.0.16-02"
-        theia: "theiaide/theia:1.17.2"
+        theia: "lucasbasquerotto/image:theia-1.17.2-20211122"
         minio_gateway: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         minio: "minio/minio:RELEASE.2021-03-17T02-33-02Z"
         toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
