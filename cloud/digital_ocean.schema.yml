@@ -29,6 +29,11 @@ schemas:
     type: "dict"
     description: "project parameters schema"
     props:
+      private_ips:
+        non_empty: true
+        type: "list"
+        elem_type: "str"
+        description: "private ips allowed to access the nodes (via ssh)"
       host_ssh_public_keys_content:
         non_empty: true
         type: "simple_dict"
