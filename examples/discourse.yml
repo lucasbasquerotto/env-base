@@ -510,5 +510,5 @@ repos:
     version: "master"
   discourse_docker:
     src: "https://github.com/discourse/discourse_docker.git"
-    version: "master"
+    version: "main"
 credentials: "{{ credentials | combine({ 'localhost': { 'host_user': 'root' } }) }}"
