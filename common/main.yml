@@ -170,11 +170,11 @@ services:
     params:
       instance_type: "t2.micro"
       region: "us-east-1"
-      image_id: ""
+      image_id: "ami-0070c5311b7677678"
       vpc_subnet_id: ""
       network:
         assign_public_ip: true
-      security_groups: []
+      security_groups: ["main"]
       instance_initiated_shutdown_behavior: "terminate"
       termination_protection: false
       volumes:
@@ -195,26 +195,15 @@ services:
       vpn: "aws"
     params:
       security_groups:
-        - name: "my-test-rule"
-          description: "an example2 EC2 group"
+        - name: "main"
+          description: "Private SSH EC2 group"
           region: "us-east-1"
           vpc_id: ""
           rules:
             - proto: tcp
-              ports:
-                - 6379
-                - 26379
-              cidr_ip:
-                - 0.0.0.0/0
-              cidr_ipv6:
-                - "::/0"
-            - proto: tcp
-              ports: 5665
-              cidr_ip:
-                - 172.16.1.0/24
-                - 172.16.17.0/24
-              cidr_ipv6:
-                - 2607:F8B0::/32
+              ports: [22]
+              cidr_ip: "{{ params.private_ips | default([]) }}"
+              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
 nodes:
   local:
     pods: ["main"]
