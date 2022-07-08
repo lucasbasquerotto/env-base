@@ -498,10 +498,10 @@ nodes:
   mattermost:
     service:
       name: "{{ params.node_service | default('skip') }}"
-      params:
-        tags:
-          - "auto"
-          - "mattermost-dmz"
+      # params:
+      #   tags:
+      #     - "auto"
+      #     - "mattermost-dmz"
     dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
