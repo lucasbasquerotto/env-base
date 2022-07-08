@@ -276,6 +276,13 @@ services:
         - "mattermost-dmz"
         - "node-exporter"
       firewalls:
+        - name: "auto"
+          tags: ["auto"]
+          inbound_rules:
+            - ports: "22"
+              sources:
+                tags: ["main"]
+                addresses: "{{ params.private_ips | default([]) }}"
         - name: "private"
           tags: ["auto"]
           inbound_rules:
@@ -284,13 +291,6 @@ services:
                 addresses: "{{ params.private_ips | default([]) }}"
             - ports: "9443"
               sources:
-                addresses: "{{ params.private_ips | default([]) }}"
-        - name: "auto"
-          tags: ["auto"]
-          inbound_rules:
-            - ports: "22"
-              sources:
-                tags: ["main"]
                 addresses: "{{ params.private_ips | default([]) }}"
           outbound_rules:
             - protocol: "tcp"
@@ -383,6 +383,85 @@ services:
       user_data:
         type: "env"
         name: "user_data_ubuntu"
+  aws_vpn:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      security_groups:
+        - name: "auto"
+          description: "Private SSH EC2 group for hosts"
+          region: "us-east-1"
+          vpc_id: ""
+          rules:
+            - proto: tcp
+              ports: [22]
+              cidr_ip: "{{ params.private_ips | default([]) }}"
+              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
+        - name: "private"
+          description: "Private web ports"
+          region: "us-east-1"
+          vpc_id: ""
+          rules:
+            - proto: tcp
+              ports: [9080, 9443]
+              cidr_ip: "{{ params.private_ips | default([]) }}"
+              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
+        - name: "mattermost-dmz"
+          description: "Private SSH EC2 group for hosts"
+          region: "us-east-1"
+          vpc_id: ""
+          rules:
+            - proto: tcp
+              ports: [80, 443]
+              cidr_ip: "0.0.0.0/0"
+              cidr_ipv6: "::/0"
+  aws_node:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/aws/aws.main.node.yml"
+    schema: "tasks/node/aws/aws.schema.node.yml"
+    validator: "tasks/node/aws/aws.validator.node.yml"
+    credentials:
+      node: "aws"
+    params:
+      instance_type: "t2.micro"
+      region: "us-east-1"
+      image_id: "ami-0070c5311b7677678"
+      vpc_subnet_id: ""
+      network:
+        assign_public_ip: true
+      security_groups: ["auto", "private", "mattermost-dmz"]
+      instance_initiated_shutdown_behavior: "terminate"
+      termination_protection: false
+      volumes:
+        - device_name: "/dev/sda1"
+          ebs:
+            volume_size: 22
+            delete_on_termination: true
+      wait_timeout: 120
+      detailed_monitoring: false
+      ebs_optimized: false
+    contents:
+      user_data:
+        type: "template"
+        origin: "cloud"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        params:
+          user_directories: ["/var/cloud"]
+          install_docker: true
+          install_podman: false
+          install_node_exporter: "{{ params.use_node_exporter | default(false) }}"
+          install_packages: true
+        credentials:
+          node: "host"
+        contents:
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
 nodes:
   mattermost_local:
     credentials:
