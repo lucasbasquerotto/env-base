@@ -159,6 +159,25 @@ services:
           node: "host"
         contents:
           host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+  aws_vpn:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      security_groups:
+        - name: "main"
+          description: "Private SSH EC2 group"
+          region: "us-east-1"
+          vpc_id: ""
+          rules:
+            - proto: tcp
+              ports: [22]
+              cidr_ip: "{{ params.private_ips | default([]) }}"
+              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
   aws_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -185,25 +204,22 @@ services:
       wait_timeout: 120
       detailed_monitoring: false
       ebs_optimized: false
-  aws_vpn:
-    base_dir: "ext-cloud"
-    namespace: "ext_vpn"
-    task: "tasks/vpn/aws/aws.main.vpn.yml"
-    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
-    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
-    credentials:
-      vpn: "aws"
-    params:
-      security_groups:
-        - name: "main"
-          description: "Private SSH EC2 group"
-          region: "us-east-1"
-          vpc_id: ""
-          rules:
-            - proto: tcp
-              ports: [22]
-              cidr_ip: "{{ params.private_ips | default([]) }}"
-              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
+    contents:
+      user_data:
+        type: "template"
+        origin: "cloud"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        params:
+          user_directories: ["/var/cloud"]
+          install_docker: true
+          install_podman: false
+          install_node_exporter: "{{ params.use_node_exporter | default(false) }}"
+          install_packages: true
+        credentials:
+          node: "host"
+        contents:
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
 nodes:
   local:
     pods: ["main"]
