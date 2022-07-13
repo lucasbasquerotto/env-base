@@ -71,6 +71,9 @@ main:
     initial_services:
       - name: "base_services"
         can_destroy: true
+      - name: "aws_vpn_nodes"
+        when: "{{ (params.node_service == 'aws_node') and ('nodes' in project_ctxs) }}"
+        can_destroy: true
       - name: "s3_buckets"
         when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
@@ -85,9 +88,11 @@ main:
             host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
-            tags:
-              - "auto"
-              - "mattermost-postgres"
+            network:
+              private_ip_addresses: ["10.0.1.17"]
+            # tags:
+            #   - "auto"
+            #   - "mattermost-postgres"
         pods:
           mattermost:
             params:
@@ -102,15 +107,18 @@ main:
             type: "url"
             host: "{{ params.elasticsearch_url | default('') }}"
           postgres:
-            type: "node"
-            host: "db"
+            type: "ip"
+            host: "10.0.1.17"
             port: "5432"
         params:
           service_params:
-            tags:
-              - "auto"
-              - "mattermost-web"
-              - "mattermost-dmz"
+            network:
+              assign_public_ip: true
+              private_ip_addresses: ["10.0.1.18"]
+            # tags:
+            #   - "auto"
+            #   - "mattermost-web"
+            #   - "mattermost-dmz"
         pods:
           mattermost:
             params:
@@ -411,8 +419,16 @@ services:
               ports: [9080, 9443]
               cidr_ip: "{{ params.private_ips | default([]) }}"
               cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
+        - name: "mattermost-db"
+          description: "Mattermost Database Server"
+          region: "us-east-1"
+          vpc_id: ""
+          rules:
+            - proto: tcp
+              ports: [5432]
+              cidr_ip: "10.0.1.18/32"
         - name: "mattermost-dmz"
-          description: "Private SSH EC2 group for hosts"
+          description: "Mattermost Web Server"
           region: "us-east-1"
           vpc_id: ""
           rules:
@@ -420,6 +436,23 @@ services:
               ports: [80, 443]
               cidr_ip: "0.0.0.0/0"
               cidr_ipv6: "::/0"
+  aws_vpn_nodes:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      vpc:
+        name: "mattermost-vpc"
+        region: "us-east-1"
+        cidr_block: "10.10.0.0/16"
+      subnets:
+        - name: "mattermost-net"
+          region: "us-east-1"
+          cidr: "10.10.0.0/28"
   aws_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -432,7 +465,6 @@ services:
       instance_type: "t2.micro"
       region: "us-east-1"
       image_id: "ami-0070c5311b7677678"
-      vpc_subnet_id: ""
       network:
         assign_public_ip: true
       security_groups: ["auto", "private", "mattermost-dmz"]
