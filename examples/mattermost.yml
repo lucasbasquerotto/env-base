@@ -72,7 +72,7 @@ main:
       - name: "base_services"
         can_destroy: true
       - name: "aws_vpn_nodes"
-        when: "{{ (params.node_service == 'aws_node') and ('nodes' in project_ctxs) }}"
+        when: "{{ params.node_service == 'aws_node' }}"
         can_destroy: true
       - name: "s3_buckets"
         when: "{{ params.use_s3 | default(false) | bool }}"
@@ -88,6 +88,7 @@ main:
             host: "{{ params.elasticsearch_url | default('') }}"
         params:
           service_params:
+            security_groups: ["auto", "private", "mattermost-db"]
             network:
               private_ip_addresses: ["10.0.1.17"]
             # tags:
@@ -449,10 +450,8 @@ services:
         name: "mattermost-vpc"
         region: "us-east-1"
         cidr_block: "10.10.0.0/16"
-      subnets:
-        - name: "mattermost-net"
-          region: "us-east-1"
-          cidr: "10.10.0.0/28"
+        subnets:
+          - cidr: "10.10.0.0/28"
   aws_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -462,7 +461,7 @@ services:
     credentials:
       node: "aws"
     params:
-      instance_type: "t2.micro"
+      instance_type: "t3.micro"
       region: "us-east-1"
       image_id: "ami-0070c5311b7677678"
       network:
