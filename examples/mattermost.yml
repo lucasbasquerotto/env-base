@@ -73,7 +73,6 @@ main:
         can_destroy: true
       - name: "aws_vpn_nodes"
         when: "{{ params.node_service == 'aws_node' }}"
-        can_destroy: true
       - name: "s3_buckets"
         when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
