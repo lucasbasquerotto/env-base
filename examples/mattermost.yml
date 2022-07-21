@@ -404,7 +404,6 @@ services:
         - name: "auto"
           description: "Private SSH EC2 group for hosts"
           region: "us-east-1"
-          vpc_id: ""
           rules:
             - proto: tcp
               ports: [22]
@@ -413,7 +412,6 @@ services:
         - name: "private"
           description: "Private web ports"
           region: "us-east-1"
-          vpc_id: ""
           rules:
             - proto: tcp
               ports: [9080, 9443]
@@ -422,7 +420,6 @@ services:
         - name: "mattermost-db"
           description: "Mattermost Database Server"
           region: "us-east-1"
-          vpc_id: ""
           rules:
             - proto: tcp
               ports: [5432]
@@ -430,7 +427,6 @@ services:
         - name: "mattermost-dmz"
           description: "Mattermost Web Server"
           region: "us-east-1"
-          vpc_id: ""
           rules:
             - proto: tcp
               ports: [80, 443]
