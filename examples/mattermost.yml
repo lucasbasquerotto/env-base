@@ -71,8 +71,6 @@ main:
     initial_services:
       - name: "base_services"
         can_destroy: true
-      - name: "aws_vpn_nodes"
-        when: "{{ params.node_service == 'aws_node' }}"
       - name: "s3_buckets"
         when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
@@ -89,7 +87,8 @@ main:
           service_params:
             security_groups: ["auto", "private", "mattermost-db"]
             network:
-              private_ip_addresses: ["10.0.1.17"]
+              assign_public_ip: true
+              private_ip_address: "10.10.0.17"
             # tags:
             #   - "auto"
             #   - "mattermost-postgres"
@@ -108,13 +107,13 @@ main:
             host: "{{ params.elasticsearch_url | default('') }}"
           postgres:
             type: "ip"
-            host: "10.0.1.17"
+            host: "10.10.0.17"
             port: "5432"
         params:
           service_params:
             network:
               assign_public_ip: true
-              private_ip_addresses: ["10.0.1.18"]
+              private_ip_address: "10.10.0.18"
             # tags:
             #   - "auto"
             #   - "mattermost-web"
@@ -148,7 +147,7 @@ services:
     services:
       - name: "{{ params.cloud_service | default('skip', true) }}"
         when: "{{ (params.cloud_service | default('skip', true)) != 'skip' }}"
-        can_destroy: false
+        can_destroy: "{{ params.node_service == 'aws_node' }}"
       - name: "{{ params.run_nameserver_main | default(false) | bool | ternary('nameserver_main_service', 'skip') }}"
         when: "{{ params.run_nameserver_main | default(false) | bool }}"
         can_destroy: false
@@ -400,6 +399,14 @@ services:
     credentials:
       vpn: "aws"
     params:
+      vpc:
+        name: "mattermost-vpc"
+        region: "us-east-1"
+        cidr_block: "10.10.0.0/16"
+        subnets:
+          - name: "mattermost-main-subnet"
+            cidr: "10.10.0.0/24"
+            az: "us-east-1a"
       security_groups:
         - name: "auto"
           description: "Private SSH EC2 group for hosts"
@@ -423,7 +430,7 @@ services:
           rules:
             - proto: tcp
               ports: [5432]
-              cidr_ip: "10.0.1.18/32"
+              cidr_ip: "10.10.0.18/32"
         - name: "mattermost-dmz"
           description: "Mattermost Web Server"
           region: "us-east-1"
@@ -432,21 +439,6 @@ services:
               ports: [80, 443]
               cidr_ip: "0.0.0.0/0"
               cidr_ipv6: "::/0"
-  aws_vpn_nodes:
-    base_dir: "ext-cloud"
-    namespace: "ext_vpn"
-    task: "tasks/vpn/aws/aws.main.vpn.yml"
-    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
-    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
-    credentials:
-      vpn: "aws"
-    params:
-      vpc:
-        name: "mattermost-vpc"
-        region: "us-east-1"
-        cidr_block: "10.10.0.0/16"
-        subnets:
-          - cidr: "10.10.0.0/28"
   aws_node:
     base_dir: "ext-cloud"
     namespace: "ext_node"
@@ -469,9 +461,11 @@ services:
           ebs:
             volume_size: 22
             delete_on_termination: true
-      wait_timeout: 120
+      wait_timeout: 300
       detailed_monitoring: false
       ebs_optimized: false
+      vpc_name: "mattermost-vpc"
+      vpc_subnet_name: "mattermost-main-subnet"
     contents:
       user_data:
         type: "template"
