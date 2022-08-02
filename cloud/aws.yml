@@ -220,12 +220,14 @@ services:
         name: "aws-vpc"
         region: "us-east-1"
         cidr_block: "10.11.0.0/16"
+        public_vpc: true
         subnets:
-          - cidr: "10.11.0.0/28"
+          - name: "aws-vpc-subnet"
+            cidr: "10.11.0.0/28"
       security_groups:
         - name: "group1"
-          description: sg with rule descriptions
-          region: us-east-1
+          description: "sg with rule description"
+          region: "us-east-1"
           rules:
             - proto: tcp
               ports:
@@ -233,8 +235,8 @@ services:
               cidr_ip: 0.0.0.0/0
               rule_desc: allow all on port 80
         - name: "group2"
-          description: an example EC2 group
-          region: eu-west-1
+          description: "an example EC2 group"
+          region: "us-east-1"
           rules:
             - proto: tcp
               from_port: 80
@@ -265,7 +267,7 @@ services:
               cidr_ip: 0.0.0.0/0
               cidr_ipv6: 64:ff9b::/96
               # description to use if example-other needs to be created
-              group_desc: other example EC2 group
+              group_desc: "example EC2 group desc"
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"

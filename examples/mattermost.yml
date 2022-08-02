@@ -403,6 +403,7 @@ services:
         name: "mattermost-vpc"
         region: "us-east-1"
         cidr_block: "10.10.0.0/16"
+        public_vpc: true
         subnets:
           - name: "mattermost-main-subnet"
             cidr: "10.10.0.0/24"
