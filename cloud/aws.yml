@@ -154,7 +154,7 @@ services:
         - zone: "{{ params.domain | default('') }}"
           dns_type: "A"
           record: "dev2"
-          value: ["2.2.2.2"]
+          value: ["2.2.2.2", "2.4.2.4"]
         - zone: "{{ params.domain | default('') }}"
           dns_type: "AAAA"
           record: "dev3"
