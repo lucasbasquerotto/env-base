@@ -59,9 +59,16 @@ services:
     params:
       list:
         - name: test-service1
-          aliases: ["www.my-distribution-source.com", "zzz.aaa.io"]
+          origins:
+            - id: "test-1"
+              domain_name: www.my-cloudfront-origin-1.com
         - name: test-service2
-          comment: modified by ansible cloudfront.py
+          comment: modified by ansible (cloudfront module)
+          origins:
+            - id: "test-2-1"
+              domain_name: www.my-cloudfront-origin-2-1.com
+            - id: "test-2-2"
+              domain_name: www.my-cloudfront-origin-2-2.com
           tags:
             Name: example distribution
             Project: example project
@@ -83,23 +90,18 @@ services:
                 forward: all
               headers:
                 - "*"
-              viewer_protocol_policy: allow-all
-              smooth_streaming: true
-              compress: true
-              allowed_methods:
-                items:
-                  - GET
-                  - HEAD
-                cached_methods:
-                  - GET
-                  - HEAD
-          logging:
-            enabled: true
-            include_cookies: false
-            bucket: mylogbucket.s3.amazonaws.com
-            prefix: myprefix/
+            viewer_protocol_policy: allow-all
+            smooth_streaming: true
+            compress: true
+            allowed_methods:
+              items:
+                - GET
+                - HEAD
+              cached_methods:
+                - GET
+                - HEAD
           enabled: false
-          comment: this is a CloudFront distribution with logging
+          comment: this is another example of a CloudFront distribution
         - name: test-service4
           absent: true
           comment: destroy this distribution
