@@ -205,7 +205,6 @@ services:
         - name: "aws-vol-02"
           region: "us-east-1"
           zone: "us-east-1b"
-          #TODO: show as OK even if access_key & secret_key are wrong
           device_name: "/dev/sdf"
           volume_size: "20"
           volume_type: "gp2"
