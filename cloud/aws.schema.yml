@@ -33,13 +33,37 @@ schemas:
         non_empty: true
         type: "str"
         description: "domain name (dns zone)"
+      host_ssh_public_keys_content:
+        non_empty: true
+        type: "simple_dict"
+        alternative_type: "str"
+        description: "ssh public keys (one in each line) to be included in the newly created hosts"
   credentials:
     type: "dict"
     description: "project credentials schema"
     props:
+      host:
+        schema: "credential_host"
+        description: "host credentials"
       aws:
         schema: "credential_aws"
         description: "aws credentials"
+  credential_host:
+    type: "dict"
+    description: "host credentials schema"
+    props:
+      host_user:
+        type: "str"
+        non_empty: true
+        description: "host username"
+      host_pass:
+        type: "str"
+        non_empty: true
+        description: "host password"
+      ssh_file:
+        type: "str"
+        non_empty: true
+        description: "ssh private key file path (relative to the project environment directory)"
   credential_aws:
     type: "dict"
     description: "aws credentials schema"

@@ -469,20 +469,8 @@ services:
       vpc_subnet_name: "mattermost-main-subnet"
     contents:
       user_data:
-        type: "template"
-        origin: "cloud"
-        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
-        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
-        params:
-          user_directories: ["/var/cloud"]
-          install_docker: true
-          install_podman: false
-          install_node_exporter: "{{ params.use_node_exporter | default(false) }}"
-          install_packages: true
-        credentials:
-          node: "host"
-        contents:
-          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+        type: "env"
+        name: "user_data_ubuntu"
 nodes:
   mattermost_local:
     credentials:

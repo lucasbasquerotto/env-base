@@ -32,6 +32,26 @@ main:
     initial_services:
       - name: "dns_service"
         can_destroy: true
+  node:
+    extend_cloud: true
+    initial_services:
+      - name: "node_vpn_service"
+        can_destroy: true
+    nodes:
+      - name: "app"
+        key: "aws_node"
+        can_destroy: true
+      - name: "app2"
+        key: "aws_node"
+        amount: 2
+        max_amount: 3
+        can_destroy: true
+      - name: "app3"
+        key: "aws_node"
+        hostname: "myapp"
+        amount: 3
+        max_amount: 5
+        can_destroy: true
   snapshot:
     extend_cloud: true
     initial_services:
@@ -185,6 +205,32 @@ services:
           snapshot_tags:
             frequency: hourly
             source: vol-02
+        - name: "aws-snap-03"
+          resource_name: "app-host"
+          resource_type: "instance"
+          device_name: "/dev/sda1"
+          region: "us-east-1"
+          description: test snapshot of app-host
+          snapshot_tags:
+            source: app
+        - name: "aws-snap-04"
+          resource_name: "app2-host-2"
+          resource_type: "instance"
+          device_name: "/dev/sda1"
+          region: "us-east-1"
+          description: hourly snapshot of app2-host-2
+          last_snapshot_min_age: 60
+          snapshot_tags:
+            frequency: hourly
+            source: app2
+        - name: "aws-snap-05"
+          resource_name: "myapp-3"
+          resource_type: "instance"
+          device_name: "/dev/sda1"
+          region: "us-east-1"
+          description: test snapshot of myapp-3
+          snapshot_tags:
+            source: app3
   volume_service:
     base_dir: "ext-cloud"
     namespace: "ext_volume"
@@ -266,6 +312,80 @@ services:
               cidr_ipv6: 64:ff9b::/96
               # description to use if example-other needs to be created
               group_desc: "example EC2 group desc"
+  node_vpn_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      security_groups:
+        - name: "allow-ssh"
+          description: "allow SSH access"
+          region: "us-east-1"
+          rules:
+            - proto: tcp
+              ports: [22]
+              cidr_ip: 0.0.0.0/0
+              rule_desc: allow all on port 22
+  node_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/aws/aws.main.node.yml"
+    schema: "tasks/node/aws/aws.schema.node.yml"
+    validator: "tasks/node/aws/aws.validator.node.yml"
+    credentials:
+      node: "aws"
+    params:
+      instance_type: "t3.micro"
+      region: "us-east-1"
+      image_id: "ami-0070c5311b7677678"
+      network:
+        assign_public_ip: true
+      security_groups: ["allow-ssh"]
+      instance_initiated_shutdown_behavior: "terminate"
+      termination_protection: false
+      volumes:
+        - device_name: "/dev/sda1"
+          ebs:
+            volume_size: 22
+            delete_on_termination: true
+      wait_timeout: 300
+      detailed_monitoring: false
+      ebs_optimized: false
+    contents:
+      user_data:
+        type: "template"
+        origin: "cloud"
+        file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+        schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+        params:
+          user_directories: ["/var/cloud"]
+          install_docker: true
+          install_podman: false
+          install_node_exporter: false
+          install_packages: true
+        credentials:
+          node: "host"
+        contents:
+          host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+nodes:
+  aws_node:
+    service: "node_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    params:
+      host_users:
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 90
+          setup_finished_timeout: 300
 repos:
   cloud:
     src: "https://github.com/lucasbasquerotto/cloud.git"
@@ -274,6 +394,10 @@ repos:
     src: "https://github.com/lucasbasquerotto/ext-cloud.git"
     version: "master"
 credentials:
+  host:
+    host_user: "{{ credentials.host.host_user | default('') }}"
+    host_pass: "{{ credentials.host.host_pass | default('') }}"
+    ssh_file: "{{ credentials.host.ssh_file | default('') }}"
   aws:
     access_key: "{{ credentials.aws.access_key | default('') }}"
     secret_key: "{{ credentials.aws.secret_key | default('') }}"
