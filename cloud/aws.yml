@@ -67,6 +67,11 @@ main:
     initial_services:
       - name: "vpn_service"
         can_destroy: true
+  s3:
+    extend_cloud: true
+    initial_services:
+      - name: "s3_buckets"
+        can_destroy: true
 services:
   cdn_service:
     base_dir: "ext-cloud"
@@ -137,8 +142,9 @@ services:
       region: "us-east-1"
       list:
         - name: ansible-test-aurora-db-instance
+          cluster: ansible-test-cluster
+          own_cluster: true
           engine: aurora
-          db_cluster_identifier: ansible-test-cluster
           instance_type: db.t2.small
           master_username: "user1"
         - name: test-encrypted-db
@@ -147,16 +153,16 @@ services:
           instance_type: db.t2.medium
           master_username: "user2"
           allocated_storage: 15
-        - name: ansible-test-aurora-db-instance
+        - name: ansible-test-aurora-db-instance-2
           absent: true
           skip_final_snapshot: true
-        - name: test-encrypted-db
+        - name: test-encrypted-db-2
           force_state: terminated
           final_db_snapshot_identifier: "test-encrypted-db-snapshot"
-        - name: test-db-02
-          vpc_security_group_ids:
-            - sg-0be17ba10c9286b0b
-          purge_security_groups: false
+        # - name: test-db-02
+        #   vpc_security_group_ids:
+        #     - sg-0be17ba10c9286b0b
+        #   purge_security_groups: false
   dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
@@ -371,6 +377,20 @@ services:
           node: "host"
         contents:
           host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+  s3_buckets:
+    base_dir: "ext-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/main.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
+    credentials:
+      s3: "s3"
+    params:
+      list:
+        - bucket: "lrd-bucket-private"
+          permission: "private"
+        - bucket: "lrd-bucket-public-read"
+          permission: "public-read"
 nodes:
   aws_node:
     service: "node_service"
@@ -405,3 +425,7 @@ credentials:
     access_key: "{{ credentials.aws.access_key | default('') }}"
     secret_key: "{{ credentials.aws.secret_key | default('') }}"
     master_user_password: "RD$-p4ss"
+  s3:
+    endpoint: "https://s3.us-east-1.amazonaws.com"
+    access_key: "{{ credentials.aws.access_key | default('') }}"
+    secret_key: "{{ credentials.aws.secret_key | default('') }}"
