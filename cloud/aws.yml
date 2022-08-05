@@ -147,12 +147,14 @@ services:
           engine: aurora
           instance_type: db.t2.small
           master_username: "user1"
+          skip_final_snapshot: true
         - name: test-encrypted-db
           engine: mariadb
           storage_encrypted: true
           instance_type: db.t2.medium
           master_username: "user2"
           allocated_storage: 15
+          skip_final_snapshot: true
         - name: ansible-test-aurora-db-instance-2
           absent: true
           skip_final_snapshot: true
