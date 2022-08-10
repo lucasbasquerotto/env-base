@@ -25,6 +25,8 @@ main:
   db:
     extend_cloud: true
     initial_services:
+      - name: "db_vpn_service"
+        can_destroy: true
       - name: "db_service"
         can_destroy: true
   dns:
@@ -130,6 +132,44 @@ services:
         - name: test-service4
           absent: true
           comment: destroy this distribution
+  db_vpn_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      vpc:
+        name: "db-test-vpc"
+        region: "us-east-1"
+        cidr_block: "10.12.0.0/16"
+        public_vpc: true
+        subnets:
+          - name: "db-test-subnet-01"
+            cidr: "10.12.1.0/24"
+          - name: "db-test-subnet-02"
+            cidr: "10.12.2.0/24"
+          - name: "db-test-subnet-03"
+            cidr: "10.12.3.0/24"
+      security_groups:
+        - name: "db-test-group-01"
+          description: "allow SSH access"
+          region: "us-east-1"
+          rules:
+            - proto: tcp
+              ports: [22]
+              cidr_ip: 0.0.0.0/0
+              rule_desc: "allow all on port 22"
+        - name: "db-test-group-02"
+          description: "allow web access"
+          region: "us-east-1"
+          rules:
+            - proto: tcp
+              ports: [80, 443]
+              cidr_ip: 0.0.0.0/0
+              rule_desc: "allow all on ports 80 and 443"
   db_service:
     base_dir: "ext-cloud"
     namespace: "ext_db"
@@ -154,17 +194,21 @@ services:
           instance_type: db.t2.medium
           master_username: "user2"
           allocated_storage: 15
-          skip_final_snapshot: true
+          final_snapshot_identifier: "test-encrypted-db-snapshot"
         - name: ansible-test-aurora-db-instance-2
           absent: true
           skip_final_snapshot: true
         - name: test-encrypted-db-2
           force_state: terminated
-          final_db_snapshot_identifier: "test-encrypted-db-snapshot"
-        # - name: test-db-02
-        #   vpc_security_group_ids:
-        #     - sg-0be17ba10c9286b0b
-        #   purge_security_groups: false
+          storage_encrypted: true
+        - name: test-db-subnet-group
+          subnets:
+            - "db-test-subnet-01"
+            - "db-test-subnet-02"
+          security_groups:
+            - "db-test-group-01"
+            - "db-test-group-02"
+          skip_final_snapshot: true
   dns_service:
     base_dir: "ext-cloud"
     namespace: "ext_dns"
