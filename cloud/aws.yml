@@ -202,6 +202,7 @@ services:
           force_state: terminated
           storage_encrypted: true
         - name: test-db-subnet-group
+          vpc_name: "db-test-vpc"
           subnets:
             - "db-test-subnet-01"
             - "db-test-subnet-02"
