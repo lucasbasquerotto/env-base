@@ -390,6 +390,28 @@ services:
       user_data:
         type: "env"
         name: "user_data_ubuntu"
+  aws_db_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_db"
+    task: "tasks/db/aws/aws.main.db.yml"
+    schema: "tasks/db/aws/aws.schema.db.yml"
+    validator: "tasks/db/aws/aws.validator.db.yml"
+    credentials:
+      db: "aws_rds"
+    params:
+      name: "mattermost-db"
+      region: "us-east-1"
+      engine: "postgresql"
+      instance_type: "db.t2.medium"
+      master_username: "{{ credentials.postgres.db_user | default('') }}"
+      allocated_storage: 10
+      vpc_name: "mattermost-vpc"
+      subnets:
+        - "mattermost-main-subnet-a"
+        - "mattermost-main-subnet-b"
+      security_groups: ["mattermost-db"]
+      final_snapshot_identifier: "{{ params.db_final_snapshot_identifier | default('') }}"
+      skip_final_snapshot: "{{ params.db_skip_final_snapshot | default(false) }}"
   aws_vpn:
     base_dir: "ext-cloud"
     namespace: "ext_vpn"
@@ -405,9 +427,12 @@ services:
         cidr_block: "10.10.0.0/16"
         public_vpc: true
         subnets:
-          - name: "mattermost-main-subnet"
+          - name: "mattermost-main-subnet-a"
             cidr: "10.10.0.0/24"
             az: "us-east-1a"
+          - name: "mattermost-main-subnet-b"
+            cidr: "10.10.0.0/24"
+            az: "us-east-1b"
       security_groups:
         - name: "auto"
           description: "Private SSH EC2 group for hosts"
