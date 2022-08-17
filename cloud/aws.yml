@@ -206,6 +206,10 @@ services:
           force_state: terminated
           storage_encrypted: true
         - name: test-db-subnet-group
+          engine: mariadb
+          instance_type: db.t2.medium
+          master_username: "user3"
+          allocated_storage: 10
           vpc_name: "db-test-vpc"
           subnets:
             - "db-test-subnet-01"
