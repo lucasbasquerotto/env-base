@@ -687,6 +687,8 @@ pods:
       smtp_reply_to_email: "{{ params.smtp_reply_to_email | default('') }}"
       send_email_notifications: "{{ params.send_email_notifications | default(false) }}"
       require_email_verification: "{{ params.require_email_verification | default(false) }}"
+      mattermost_websocket_url: "{{ params.mattermost_websocket_url | default('') }}"
+      mattermost_allow_cookies_for_subdomains: "{{ params.mattermost_allow_cookies_for_subdomains | default(false) }}"
       certbot:
         email: "{{ params.certbot_email | default('') }}"
         staging: "{{ params.certbot_staging | default(false) }}"
