@@ -84,14 +84,33 @@ main:
             type: "url"
             host: "{{ params.elasticsearch_url | default('') }}"
         params:
-          service_params:
-            security_groups: ["auto", "private", "mattermost-db"]
-            network:
-              assign_public_ip: true
-              private_ip_address: "10.10.0.17"
-            # tags:
-            #   - "auto"
-            #   - "mattermost-postgres"
+          service_params: >-
+            {{
+              (params.node_service == 'aws_node')
+              | ternary(
+                {
+                  'security_groups': [
+                    'auto',
+                    'private',
+                    'mattermost-db'
+                  ],
+                  'network': {
+                    'assign_public_ip': true,
+                    'private_ip_address': '10.10.0.17'
+                  }
+                },
+                (params.node_service == 'digital_ocean_node')
+                | ternary(
+                  {
+                    'tags': [
+                      'auto',
+                      'mattermost-postgres'
+                    ]
+                  },
+                  {}
+                )
+              )
+            }}
         pods:
           mattermost:
             params:
@@ -110,14 +129,29 @@ main:
             host: "10.10.0.17"
             port: "5432"
         params:
-          service_params:
-            network:
-              assign_public_ip: true
-              private_ip_address: "10.10.0.18"
-            # tags:
-            #   - "auto"
-            #   - "mattermost-web"
-            #   - "mattermost-dmz"
+          service_params: >-
+            {{
+              (params.node_service == 'aws_node')
+              | ternary(
+                {
+                  'network': {
+                    'assign_public_ip': true,
+                    'private_ip_address': '10.10.0.18'
+                  }
+                },
+                (params.node_service == 'digital_ocean_node')
+                | ternary(
+                  {
+                    'tags': [
+                      'auto',
+                      'mattermost-web',
+                      'mattermost-dmz'
+                    ]
+                  },
+                  {}
+                )
+              )
+            }}
         pods:
           mattermost:
             params:
@@ -401,7 +435,7 @@ services:
     params:
       name: "mattermost-db"
       region: "us-east-1"
-      engine: "postgresql"
+      engine: "aurora-postgresql"
       instance_type: "db.t2.medium"
       master_username: "{{ credentials.postgres.db_user | default('') }}"
       allocated_storage: 10
@@ -431,7 +465,7 @@ services:
             cidr: "10.10.0.0/24"
             az: "us-east-1a"
           - name: "mattermost-main-subnet-b"
-            cidr: "10.10.0.0/24"
+            cidr: "10.10.1.0/24"
             az: "us-east-1b"
       security_groups:
         - name: "auto"
@@ -491,7 +525,7 @@ services:
       detailed_monitoring: false
       ebs_optimized: false
       vpc_name: "mattermost-vpc"
-      vpc_subnet_name: "mattermost-main-subnet"
+      vpc_subnet_name: "mattermost-main-subnet-a"
     contents:
       user_data:
         type: "env"
@@ -532,10 +566,19 @@ nodes:
   mattermost:
     service:
       name: "{{ params.node_service | default('skip') }}"
-      # params:
-      #   tags:
-      #     - "auto"
-      #     - "mattermost-dmz"
+      params: >-
+        {{
+          (params.node_service == 'digital_ocean_node')
+          | ternary(
+            {
+              'tags': [
+                'auto',
+                'mattermost-dmz'
+              ]
+            },
+            {}
+          )
+        }}
     dns_service: "dns_base_service"
     base_dir: "/var/cloud"
     root: true
