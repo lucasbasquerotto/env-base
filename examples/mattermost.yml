@@ -84,6 +84,7 @@ main:
             type: "url"
             host: "{{ params.elasticsearch_url | default('') }}"
         params:
+          dns_service_params_list: []
           service_params: >-
             {{
               (params.node_service == 'aws_node')
