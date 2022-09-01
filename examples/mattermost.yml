@@ -74,10 +74,14 @@ main:
       - name: "s3_buckets"
         when: "{{ params.use_s3 | default(false) | bool }}"
         can_destroy: true
+      - name: "{{ params.db_service | default('') }}"
+        when: "{{ params.use_db_service | default(false) | bool }}"
+        can_destroy: true
     nodes:
       - name: "db"
         key: "mattermost"
         hostname: "{{ params.db_hostname | default('') }}"
+        when: "{{ not (params.use_db_service | default(false) | bool) }}"
         can_destroy: true
         dependencies:
           elasticsearch:
@@ -126,8 +130,14 @@ main:
             type: "url"
             host: "{{ params.elasticsearch_url | default('') }}"
           postgres:
-            type: "ip"
-            host: "10.10.0.17"
+            type: "{{ params.use_db_service | default(false) | bool | ternary('service', 'ip') }}"
+            host: >-
+              {{
+                params.use_db_service | default(false) | bool | ternary(
+                  params.db_service | default(''),
+                  '10.10.0.17'
+                )
+              }}
             port: "5432"
         params:
           service_params: >-
@@ -167,7 +177,8 @@ main:
             all_nodes: true
             task_target: "pod"
           - name: "main_upgrade"
-            nodes: ["db"]
+            when: "{{ not (params.use_db_service | default(false) | bool) }}"
+            nodes: "{{ params.use_db_service | default(false) | bool | ternary([], ['db']) }}"
             task_target: "pod"
       - tasks:
           - name: "main_upgrade"
@@ -436,9 +447,10 @@ services:
     params:
       name: "mattermost-db"
       region: "us-east-1"
-      engine: "aurora-postgresql"
-      instance_type: "db.t2.medium"
+      engine: "postgres"
+      instance_type: "db.t4g.medium"
       master_username: "{{ credentials.postgres.db_user | default('') }}"
+      db_name: "{{ params.postgres.db_name | default('') }}"
       allocated_storage: 10
       vpc_name: "mattermost-vpc"
       subnets:
