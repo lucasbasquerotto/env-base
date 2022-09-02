@@ -75,7 +75,7 @@ services:
         - bucket: "{{ params.backup_bucket_name | default('') }}"
           permission: "private"
         - bucket: "{{ params.uploads_bucket_name | default('') }}"
-          permission: "public-read"
+          permission: "private"
   dns_main_service:
     list: true
     services:
