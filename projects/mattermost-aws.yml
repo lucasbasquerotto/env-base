@@ -74,6 +74,8 @@ services:
       list:
         - bucket: "{{ params.backup_bucket_name | default('') }}"
           permission: "private"
+        - bucket: "{{ params.uploads_bucket_name | default('') }}"
+          permission: "public-read"
   dns_main_service:
     list: true
     services:
@@ -364,6 +366,8 @@ pods:
       cron_dest: "/var/spool/cron/crontabs/root"
       backup_bucket_name: "{{ params.backup_bucket_name | default('') }}"
       backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
+      uploads_bucket_name: "{{ params.uploads_bucket_name | default('') }}"
+      uploads_bucket_path: "{{ params.uploads_bucket_path | default('') }}"
       uploads_cdn_path: "{{ params.uploads_cdn_path | default('') }}"
       db_gui_root_user: true
       enable_logs_backup: true
