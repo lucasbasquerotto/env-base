@@ -1,0 +1,512 @@
+name: "{{ project_name }}"
+ctxs: "{{ project_ctxs }}"
+migration: ""
+container: ""
+meta: "{{ params.meta | default({ 'template_no_empty_lines': true }) }}"
+cloud:
+  repo: "cloud"
+  ext_repos:
+    - repo: "ext_cloud"
+      dir: "ext-cloud"
+  collections:
+    - namespace: "lrd"
+      collection: "ext_cloud"
+      path: "ext-cloud/collection"
+  hosts:
+    type: "template"
+    file: "files/hosts.tpl.ini"
+    schema: "files/hosts.schema.yml"
+main:
+  nodes:
+    extend_cloud: true
+    initial_services:
+      - name: "vpn_service"
+        can_destroy: true
+      - name: "dns_main_service"
+        when: "{{ (params.dns_main_service_params_list | default([]) | length) > 0 }}"
+        can_destroy: true
+      - name: "cdn_service"
+        can_destroy: true
+      - name: "s3_buckets"
+        can_destroy: true
+      - name: "db_service"
+        can_destroy: true
+    nodes:
+      - name: "web"
+        key: "mattermost"
+        hostname: "{{ params.ec2_name | default('') }}"
+        can_destroy: true
+        dependencies:
+          elasticsearch:
+            type: "url"
+            host: "{{ params.elasticsearch_url | default('') }}"
+          postgres:
+            type: "service"
+            host: "db_service"
+            port: "5432"
+        params:
+          service_params:
+            network:
+              assign_public_ip: true
+              private_ip_address: "10.10.0.18"
+        pods: ["mattermost"]
+    run_stages:
+      - tasks:
+          - name: "docker_compose_install"
+            all_nodes: true
+            task_target: "node"
+          - name: "main_upgrade"
+            all_nodes: true
+            task_target: "pod"
+services:
+  skip:
+    list: true
+    services: []
+  s3_buckets:
+    base_dir: "ext-cloud"
+    namespace: "ext_s3"
+    task: "tasks/s3/main.s3.yml"
+    schema: "tasks/s3/schema.s3.yml"
+    validator: "tasks/s3/validator.s3.yml"
+    credentials:
+      s3: "s3"
+    params:
+      list:
+        - bucket: "{{ params.backup_bucket_name | default('') }}"
+          permission: "private"
+  dns_main_service:
+    list: true
+    services:
+      - name: "dns_base_service"
+        params:
+          list: "{{ params.dns_main_service_params_list | default([]) }}"
+  dns_base_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_dns"
+    task: >-
+      tasks/dns/{{
+        params.dns_provider | default('')
+      }}/{{
+        params.dns_provider | default('')
+      }}.main.dns.yml
+    schema: >-
+      tasks/dns/{{
+        params.dns_provider | default('')
+      }}/{{
+        params.dns_provider | default('')
+      }}.schema.dns.yml
+    validator: >-
+      tasks/dns/{{
+        params.dns_provider | default('')
+      }}/{{
+        params.dns_provider | default('')
+      }}.validator.dns.yml
+    credentials:
+      dns: "{{ params.dns_provider | default('') }}"
+    params:
+      zone: "{{ params.domain | default('') }}"
+  cdn_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_cdn"
+    task: "tasks/cdn/aws/aws.main.cdn.yml"
+    schema: "tasks/cdn/aws/aws.schema.cdn.yml"
+    validator: "tasks/cdn/aws/aws.validator.cdn.yml"
+    credentials:
+      cdn: "aws"
+    params:
+      name: "mattermost"
+      dns_service: "dns_base_service"
+      clear_old_dns_records: true
+      aliases: ["{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"]
+      origins:
+          - id: "mattermost-static"
+            domain_name: "static.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+          - id: "mattermost-api"
+            domain_name: "api.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+      default_cache_behavior:
+        target_origin_id: "mattermost-static"
+        forwarded_values:
+          query_string: true
+          cookies:
+            forward: "all"
+        allowed_methods:
+          items: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+          cached_methods: [GET, HEAD, OPTIONS]
+        viewer_protocol_policy: "redirect-to-https"
+      cache_behaviors:
+        - target_origin_id: "mattermost-api"
+          path_pattern: "/api/*"
+          forwarded_values:
+            query_string: true
+            cookies:
+              forward: "all"
+            headers:
+            - "*"
+          allowed_methods:
+            items: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+            cached_methods: [GET, HEAD]
+          viewer_protocol_policy: "redirect-to-https"
+        - target_origin_id: "mattermost-api"
+          path_pattern: "/.well-known/acme-challenge/*"
+          forwarded_values:
+            query_string: true
+            cookies:
+              forward: "all"
+            headers:
+            - "*"
+          allowed_methods:
+            items: [GET, HEAD, OPTIONS, PUT, POST, PATCH, DELETE]
+            cached_methods: [GET, HEAD, OPTIONS]
+          viewer_protocol_policy: "allow-all"
+      custom_error_responses:
+        - error_code: 403
+          response_code: 200
+          response_page_path: "/static/root.html"
+          error_caching_min_ttl: 300
+        - error_code: 404
+          response_code: 200
+          response_page_path: "/static/root.html"
+          error_caching_min_ttl: 300
+      enabled: true
+      comment: "mattermost cdn"
+  db_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_db"
+    task: "tasks/db/aws/aws.main.db.yml"
+    schema: "tasks/db/aws/aws.schema.db.yml"
+    validator: "tasks/db/aws/aws.validator.db.yml"
+    credentials:
+      db: "aws_rds"
+    params:
+      name: "{{ params.rds_name | default('') }}"
+      region: "{{ params.region | default('') }}"
+      engine: "postgres"
+      instance_type: "{{ params.rds_instance_type | default('') }}"
+      allocated_storage: "{{ params.rds_allocated_storage | default('') }}"
+      master_username: "{{ credentials.postgres.db_user | default('') }}"
+      db_name: "{{ params.postgres.db_name | default('') }}"
+      vpc_name: "mattermost-vpc"
+      subnets:
+        - "mattermost-main-subnet-a"
+        - "mattermost-main-subnet-b"
+      security_groups: ["mattermost-db"]
+      backup_retention_period: "{{ params.rds_backup_retention_period  | default(false) }}"
+      backup_retention_period: "{{ params.rds_backup_retention_period  | default(false) }}"
+      backup_retention_period: "{{ params.rds_backup_retention_period  | default(false) }}"
+      final_snapshot_identifier: "{{ params.rds_final_snapshot_identifier | default('') }}"
+      skip_final_snapshot: "{{ params.rds_skip_final_snapshot | default(false) }}"
+  vpn_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_vpn"
+    task: "tasks/vpn/aws/aws.main.vpn.yml"
+    schema: "tasks/vpn/aws/aws.schema.vpn.yml"
+    validator: "tasks/vpn/aws/aws.validator.vpn.yml"
+    credentials:
+      vpn: "aws"
+    params:
+      vpc:
+        name: "mattermost-vpc"
+        region: "{{ params.region | default('') }}"
+        cidr_block: "10.10.0.0/16"
+        public_vpc: true
+        subnets:
+          - name: "mattermost-main-subnet-a"
+            cidr: "10.10.0.0/24"
+            az: "{{ params.region | default('') }}a"
+          - name: "mattermost-main-subnet-b"
+            cidr: "10.10.1.0/24"
+            az: "{{ params.region | default('') }}b"
+      security_groups:
+        - name: "auto"
+          description: "Private SSH EC2 group for hosts"
+          region: "{{ params.region | default('') }}"
+          rules:
+            - proto: tcp
+              ports: [22]
+              cidr_ip: "{{ params.private_ips | default([]) }}"
+              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
+        - name: "private"
+          description: "Private web ports"
+          region: "{{ params.region | default('') }}"
+          rules:
+            - proto: tcp
+              ports: [9080, 9443]
+              cidr_ip: "{{ params.private_ips | default([]) }}"
+              cidr_ipv6: "{{ params.private_ipv6_list | default([]) }}"
+        - name: "mattermost-db"
+          description: "Mattermost Database Server"
+          region: "{{ params.region | default('') }}"
+          rules:
+            - proto: tcp
+              ports: [5432]
+              cidr_ip: "10.10.0.18/32"
+        - name: "mattermost-dmz"
+          description: "Mattermost Web Server"
+          region: "{{ params.region | default('') }}"
+          rules:
+            - proto: tcp
+              ports: [80, 443]
+              cidr_ip: "0.0.0.0/0"
+              cidr_ipv6: "::/0"
+  node_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_node"
+    task: "tasks/node/aws/aws.main.node.yml"
+    schema: "tasks/node/aws/aws.schema.node.yml"
+    validator: "tasks/node/aws/aws.validator.node.yml"
+    credentials:
+      node: "aws"
+    params:
+      instance_type: "{{ params.ec2_instance_type | default('') }}"
+      region: "{{ params.region | default('') }}"
+      image_id: "{{ params.ec2_image_id | default('ami-0070c5311b7677678', true) }}"
+      network:
+        assign_public_ip: true
+      security_groups: ["auto", "private", "mattermost-dmz"]
+      instance_initiated_shutdown_behavior: "terminate"
+      termination_protection: "{{ params.ec2_termination_protection | default(true) }}"
+      volumes:
+        - device_name: "/dev/sda1"
+          ebs:
+            volume_size: "{{ params.ec2_volume_size | default('') }}"
+            delete_on_termination: "{{ params.ec2_termination_protection | default(false) }}"
+      wait_timeout: 300
+      detailed_monitoring: "{{ params.ec2_detailed_monitoring | default(false) }}"
+      ebs_optimized: "{{ params.ec2_ebs_optimized | default(false) }}"
+      vpc_name: "mattermost-vpc"
+      vpc_subnet_name: "mattermost-main-subnet-a"
+    contents:
+      user_data:
+        type: "env"
+        name: "user_data_ubuntu"
+nodes:
+  mattermost:
+    service: "node_service"
+    dns_service: "dns_base_service"
+    base_dir: "/var/cloud"
+    root: true
+    credentials:
+      host: "host"
+    params:
+      dns_service_params_list:
+        - record: "static.chat"
+        - record: "api.chat"
+        - record: "ws.chat"
+        - record: "private-chat"
+        - record: "files-chat"
+        - record: "s3-chat"
+      host_users:
+        - name: "host"
+          setup_log_file: "/var/log/setup.log"
+          setup_finished_log_regex: "^Setup Finished.*$"
+          setup_success_log_last_line: "Setup Finished - Success"
+          initial_connection_timeout: 90
+          setup_finished_timeout: 300
+    pods:
+      - name: "mattermost"
+        params:
+          local: false
+        domains:
+          mattermost: "{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+          mattermost_static: "static.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+          mattermost_api: "api.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+          mattermost_websocket: "ws.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+          private: "private-{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+          pgadmin: "pgadmin-{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+pods:
+  mattermost:
+    repo: "pod"
+    ext_repos:
+      - repo: "ext_pod"
+        dir: "ext-pod"
+    root: true
+    ctx: "ext-pod/mattermost/mattermost.ctx.yml"
+    schema: "ext-pod/mattermost/mattermost.schema.yml"
+    validator: "ext-pod/mattermost/mattermost.validator.yml"
+    fast_prepare: true
+    credentials:
+      postgres: "postgres"
+      mattermost_mail: "mattermost_mail"
+      pgadmin: "pgadmin"
+      backup_bucket: "s3"
+      elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
+    params:
+      type: "web"
+      orchestration: "docker_compose"
+      postgres_port: "5432"
+      fluentd_port: "24224"
+      meta: "{{ params.pod_meta | default({}) }}"
+      memory: "{{ params.memory | default({})}}"
+      main_domain: "{{ params.domain | default('') }}"
+      use_secrets: true
+      use_ssl: true
+      use_secure_elasticsearch: "{{ params.use_secure_elasticsearch | default(false) }}"
+      use_pod_prefix: true
+      use_pod_full_prefix: false
+      use_mattermost_mail: true
+      use_nginx: true
+      use_pgadmin: true
+      use_s3: true
+      use_s3_storage: true
+      use_fluentd: true
+      use_certbot: true
+      use_private_path: true
+      use_basic_auth_private: true
+      block_ips: "{{ params.block_ips | default(false) }}"
+      auth_file: "{{ params.auth_file | default('') }}"
+      fluentd_output_plugin: "{{ params.fluentd_output_plugin | default('file', true) }}"
+      s3_cli: "awscli"
+      define_s3_backup_lifecycle: true
+      s3_backup_lifecycle_file: "s3-backup-lifecycle.json"
+      define_cron: true
+      include_cron_watch: false
+      cron_src: "env/cron/cron-file"
+      cron_dest: "/var/spool/cron/crontabs/root"
+      backup_bucket_name: "{{ params.backup_bucket_name | default('') }}"
+      backup_bucket_path: "{{ params.backup_bucket_path | default('') }}"
+      uploads_cdn_path: "{{ params.uploads_cdn_path | default('') }}"
+      db_gui_root_user: true
+      enable_logs_backup: true
+      enable_logs_setup: true
+      enable_sync_backup: true
+      enable_sync_setup: true
+      enable_uploads_backup: true
+      enable_uploads_setup: true
+      smtp_feedback_email: "{{ params.smtp_feedback_email | default('') }}"
+      smtp_reply_to_email: "{{ params.smtp_reply_to_email | default('') }}"
+      send_email_notifications: "{{ params.send_email_notifications | default(false) }}"
+      require_email_verification: "{{ params.require_email_verification | default(false) }}"
+      mattermost_websocket_url: "{{ params.mattermost_websocket_url | default('') }}"
+      mattermost_allow_cookies_for_subdomains: true
+      certbot:
+        email: "{{ params.certbot_email | default('') }}"
+        staging: "{{ params.certbot_staging | default(false) }}"
+        force: "{{ params.certbot_force | default(false) }}"
+      images:
+        nginx: "nginx:1.21.3-alpine"
+        mattermost: "mattermost/mattermost-team-edition:release-5.39"
+        pgadmin: "dpage/pgadmin4:5.3"
+        toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
+        certbot: "certbot/certbot:v1.2.0"
+        awscli: "lucasbasquerotto/image:awscli-20210712"
+        logrotator: "python:3.8.4-buster"
+        fluentd: "lucasbasquerotto/image:fluentd-20200617"
+    transfer:
+      - dest: "env/cron/cron-file"
+        when: "{{ params.define_cron | default(false) }}"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/cron/pod.tpl.sh"
+          schema: "ext-cloud/files/cron/pod.schema.yml"
+          params:
+            tasks:
+              - name: "log"
+                task: "custom:unique:log"
+                cron: "*/5 * * * *"
+              - name: "block_ips"
+                when: "{{ params.block_ips | default(false) }}"
+                task: "unique:action:block_ips"
+                cron: "*/15 * * * *"
+              - name: "full_log"
+                task: "unique:all logrotate log_summary"
+                cron: "* */1 * * *"
+              - name: "backup"
+                task: "unique:action:backup"
+                cron: "{{ params.cron_backup | default('0 */6 * * *', true) }}"
+      - dest: "env/awscli/etc/s3-backup-lifecycle.json"
+        src:
+          type: "template"
+          origin: "cloud"
+          file: "ext-cloud/files/s3/s3_lifecycle.json.j2"
+          schema: "ext-cloud/files/s3/s3_lifecycle.schema.yml"
+          params:
+            rules:
+              - name: "logs-expiration"
+                filter_prefix: "logs/"
+                expiration_days: 30
+                older_versions_expiration_days: 180
+tasks:
+  docker_compose_install:
+    type: "task"
+    root: true
+    file: "ext-cloud/run-tasks/docker/docker.yml"
+    schema: "ext-cloud/run-tasks/docker/docker.schema.yml"
+    params:
+      compose:
+        version: "{{ params.docker_compose_version | default('1.27.2', true) }}"
+  main_build:
+    type: "shell"
+    root: true
+    cmd: "./run build"
+  main_upgrade:
+    type: "shell"
+    root: true
+    cmd: "./run upgrade"
+contents:
+  user_data_ubuntu:
+    type: "template"
+    origin: "cloud"
+    file: "ext-cloud/files/user-data/ubuntu-18.04.tpl.sh"
+    schema: "ext-cloud/files/user-data/ubuntu-18.04.schema.yml"
+    params:
+      user_directories: ["/var/cloud"]
+      install_docker: true
+      install_podman: false
+      install_node_exporter: false
+      install_packages: true
+    credentials:
+      node: "host"
+    contents:
+      host_ssh_public_keys: "{{ params.host_ssh_public_keys_content | default('') }}"
+repos:
+  cloud:
+    src: "https://github.com/lucasbasquerotto/cloud.git"
+    version: "master"
+  ext_cloud:
+    src: "https://github.com/lucasbasquerotto/ext-cloud.git"
+    version: "master"
+  pod:
+    src: "https://github.com/lucasbasquerotto/pod.git"
+    version: "master"
+  ext_pod:
+    src: "https://github.com/lucasbasquerotto/ext-pod.git"
+    version: "master"
+credentials:
+  host:
+    host_user: "{{ params.credentials.host.host_user | default('') }}"
+    host_pass: "{{ params.credentials.host.host_pass | default('') }}"
+    ssh_file: "{{ params.credentials.host.ssh_file | default('') }}"
+  mattermost:
+    email: "{{ params.credentials.mattermost.email | default('') }}"
+    password: "{{ params.credentials.mattermost.password | default('') }}"
+    secret_key: "{{ params.credentials.mattermost.secret_key | default('') }}"
+  mattermost_mail:
+    address: "{{ params.credentials.mattermost_mail.address | default('') }}"
+    port: "{{ params.credentials.mattermost_mail.port | default('') }}"
+    connection_security: "{{ params.credentials.mattermost_mail.connection_security | default('') }}"
+    smtp_username: "{{ params.credentials.mattermost_mail.smtp_username | default('') }}"
+    smtp_password: "{{ params.credentials.mattermost_mail.smtp_password | default('') }}"
+  pgadmin:
+    email: "{{ params.credentials.pgadmin.email | default('') }}"
+    password: "{{ params.credentials.pgadmin.password | default('') }}"
+  postgres:
+    root_password: "{{ params.credentials.postgres.root_password | default('') }}"
+    viewer_password: "{{ params.credentials.postgres.viewer_password | default('') }}"
+    db_name: "{{ params.credentials.postgres.db_name | default('') }}"
+    db_user: "{{ params.credentials.postgres.db_user | default('') }}"
+    db_password: "{{ params.credentials.postgres.db_password | default('') }}"
+  elasticsearch:
+    fluentd_password: "{{ params.credentials.elasticsearch.fluentd_password | default('') }}"
+  dns: "{{ params.credentials[params.dns_provider | default('')] | default({}) }}"
+  aws:
+    access_key: "{{ params.credentials.aws.access_key | default('') }}"
+    secret_key: "{{ params.credentials.aws.secret_key | default('') }}"
+  aws_rds:
+    access_key: "{{ params.credentials.aws.access_key | default('') }}"
+    secret_key: "{{ params.credentials.aws.secret_key | default('') }}"
+    master_user_password: "{{ params.credentials.postgres.db_password | default('') }}"
+  s3:
+    endpoint: "{{ params.s3_endpoint | default('') }}"
+    access_key: "{{ params.credentials.aws.access_key | default('') }}"
+    secret_key: "{{ params.credentials.aws.secret_key | default('') }}"

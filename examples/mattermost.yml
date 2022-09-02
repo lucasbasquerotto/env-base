@@ -120,7 +120,7 @@ main:
           mattermost:
             params:
               type: "db"
-              memory: "{{ params.memory_db | default({})}}"
+              memory: "{{ params.memory_db | default({}) }}"
       - name: "web"
         key: "mattermost"
         hostname: "{{ params.web_hostname | default('') }}"
@@ -167,7 +167,7 @@ main:
           mattermost:
             params:
               type: "web"
-              memory: "{{ params.memory_web | default({})}}"
+              memory: "{{ params.memory_web | default({}) }}"
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -450,7 +450,7 @@ services:
       engine: "postgres"
       instance_type: "db.t4g.medium"
       master_username: "{{ credentials.postgres.db_user | default('') }}"
-      db_name: "{{ params.postgres.db_name | default('') }}"
+      db_name: "{{ credentials.postgres.db_name | default('') }}"
       allocated_storage: 10
       vpc_name: "mattermost-vpc"
       subnets:
@@ -641,7 +641,7 @@ pods:
       custom_dir_sync: "{{ params.pod_custom_dir_sync | default(false) }}"
       inner_scripts_dir: "{{ params.inner_scripts_dir | default('') }}"
       meta: "{{ params.pod_meta | default({}) }}"
-      memory: "{{ params.memory_app | default({})}}"
+      memory: "{{ params.memory_app | default({}) }}"
       main_domain: "{{ params.main_domain | default('') }}"
       use_secrets: "{{ params.use_secrets | default(false) }}"
       use_ssl: "{{ params.use_ssl | default(false) }}"
