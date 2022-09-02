@@ -49,7 +49,6 @@ main:
             network:
               assign_public_ip: true
               private_ip_address: "10.10.0.18"
-        pods: ["mattermost"]
     run_stages:
       - tasks:
           - name: "docker_compose_install"
@@ -186,15 +185,13 @@ services:
       instance_type: "{{ params.rds_instance_type | default('') }}"
       allocated_storage: "{{ params.rds_allocated_storage | default('') }}"
       master_username: "{{ credentials.postgres.db_user | default('') }}"
-      db_name: "{{ params.postgres.db_name | default('') }}"
+      db_name: "{{ credentials.postgres.db_name | default('') }}"
       vpc_name: "mattermost-vpc"
       subnets:
         - "mattermost-main-subnet-a"
         - "mattermost-main-subnet-b"
       security_groups: ["mattermost-db"]
-      backup_retention_period: "{{ params.rds_backup_retention_period  | default(false) }}"
-      backup_retention_period: "{{ params.rds_backup_retention_period  | default(false) }}"
-      backup_retention_period: "{{ params.rds_backup_retention_period  | default(false) }}"
+      backup_retention_period: "{{ params.rds_backup_retention_period  | default(15) }}"
       final_snapshot_identifier: "{{ params.rds_final_snapshot_identifier | default('') }}"
       skip_final_snapshot: "{{ params.rds_skip_final_snapshot | default(false) }}"
   vpn_service:
@@ -271,7 +268,7 @@ services:
         - device_name: "/dev/sda1"
           ebs:
             volume_size: "{{ params.ec2_volume_size | default('') }}"
-            delete_on_termination: "{{ params.ec2_termination_protection | default(false) }}"
+            delete_on_termination: "{{ not (params.ec2_termination_protection | default(false) | bool) }}"
       wait_timeout: 300
       detailed_monitoring: "{{ params.ec2_detailed_monitoring | default(false) }}"
       ebs_optimized: "{{ params.ec2_ebs_optimized | default(false) }}"
@@ -295,8 +292,7 @@ nodes:
         - record: "api.chat"
         - record: "ws.chat"
         - record: "private-chat"
-        - record: "files-chat"
-        - record: "s3-chat"
+        - record: "pgadmin-chat"
       host_users:
         - name: "host"
           setup_log_file: "/var/log/setup.log"
@@ -304,17 +300,7 @@ nodes:
           setup_success_log_last_line: "Setup Finished - Success"
           initial_connection_timeout: 90
           setup_finished_timeout: 300
-    pods:
-      - name: "mattermost"
-        params:
-          local: false
-        domains:
-          mattermost: "{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
-          mattermost_static: "static.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
-          mattermost_api: "api.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
-          mattermost_websocket: "ws.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
-          private: "private-{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
-          pgadmin: "pgadmin-{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+    pods: ["mattermost"]
 pods:
   mattermost:
     repo: "pod"
@@ -334,11 +320,19 @@ pods:
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
     params:
       type: "web"
+      custom_dir: "ext-pod"
+      local: false
+      domains:
+        mattermost: "{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+        mattermost_static: "static.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+        mattermost_api: "api.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+        mattermost_websocket: "ws.{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+        private: "private-{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
+        pgadmin: "pgadmin-{{ params.subdomain | default('') }}.{{ params.domain | default('') }}"
       orchestration: "docker_compose"
       postgres_port: "5432"
       fluentd_port: "24224"
       meta: "{{ params.pod_meta | default({}) }}"
-      memory: "{{ params.memory | default({})}}"
       main_domain: "{{ params.domain | default('') }}"
       use_secrets: true
       use_ssl: true
@@ -374,8 +368,6 @@ pods:
       enable_logs_setup: true
       enable_sync_backup: true
       enable_sync_setup: true
-      enable_uploads_backup: true
-      enable_uploads_setup: true
       smtp_feedback_email: "{{ params.smtp_feedback_email | default('') }}"
       smtp_reply_to_email: "{{ params.smtp_reply_to_email | default('') }}"
       send_email_notifications: "{{ params.send_email_notifications | default(false) }}"
@@ -387,14 +379,23 @@ pods:
         staging: "{{ params.certbot_staging | default(false) }}"
         force: "{{ params.certbot_force | default(false) }}"
       images:
-        nginx: "nginx:1.21.3-alpine"
-        mattermost: "mattermost/mattermost-team-edition:release-5.39"
-        pgadmin: "dpage/pgadmin4:5.3"
-        toolbox: "lucasbasquerotto/image:toolbox-20200715-02"
-        certbot: "certbot/certbot:v1.2.0"
-        awscli: "lucasbasquerotto/image:awscli-20210712"
-        logrotator: "python:3.8.4-buster"
-        fluentd: "lucasbasquerotto/image:fluentd-20200617"
+        nginx: "{{ params.images.nginx | default('nginx:1.21.3-alpine', true) }}"
+        mattermost: "{{ params.images.mattermost | default('mattermost/mattermost-team-edition:release-5.39', true) }}"
+        pgadmin: "{{ params.images.pgadmin | default('dpage/pgadmin4:5.3', true) }}"
+        toolbox: "{{ params.images.toolbox | default('lucasbasquerotto/image:toolbox-20200715-02', true) }}"
+        certbot: "{{ params.images.certbot | default('certbot/certbot:v1.2.0', true) }}"
+        logrotator: "{{ params.images.logrotator | default('python:3.8.4-buster', true) }}"
+        fluentd: "{{ params.images.fluentd | default('lucasbasquerotto/image:fluentd-20200617', true) }}"
+        awscli: "{{ params.images.awscli | default('lucasbasquerotto/image:awscli-20210712', true) }}"
+      memory:
+        nginx: "{{ params.memory.nginx | default('512mb', true) }}"
+        mattermost: "{{ params.memory.mattermost | default('1gb', true) }}"
+        pgadmin: "{{ params.memory.pgadmin | default('512mb', true) }}"
+        toolbox: "{{ params.memory.toolbox | default('512mb', true) }}"
+        certbot: "{{ params.memory.certbot | default('256mb', true) }}"
+        logrotator: "{{ params.memory.logrotator | default('256mb', true) }}"
+        fluentd: "{{ params.memory.fluentd | default('256mb', true) }}"
+        s3_cli: "{{ params.memory.awscli | default('512mb', true) }}"
     transfer:
       - dest: "env/cron/cron-file"
         when: "{{ params.define_cron | default(false) }}"
@@ -478,39 +479,39 @@ repos:
     version: "master"
 credentials:
   host:
-    host_user: "{{ params.credentials.host.host_user | default('') }}"
-    host_pass: "{{ params.credentials.host.host_pass | default('') }}"
-    ssh_file: "{{ params.credentials.host.ssh_file | default('') }}"
+    host_user: "{{ credentials.host.host_user | default('') }}"
+    host_pass: "{{ credentials.host.host_pass | default('') }}"
+    ssh_file: "{{ credentials.host.ssh_file | default('') }}"
   mattermost:
-    email: "{{ params.credentials.mattermost.email | default('') }}"
-    password: "{{ params.credentials.mattermost.password | default('') }}"
-    secret_key: "{{ params.credentials.mattermost.secret_key | default('') }}"
+    email: "{{ credentials.mattermost.email | default('') }}"
+    password: "{{ credentials.mattermost.password | default('') }}"
+    secret_key: "{{ credentials.mattermost.secret_key | default('') }}"
   mattermost_mail:
-    address: "{{ params.credentials.mattermost_mail.address | default('') }}"
-    port: "{{ params.credentials.mattermost_mail.port | default('') }}"
-    connection_security: "{{ params.credentials.mattermost_mail.connection_security | default('') }}"
-    smtp_username: "{{ params.credentials.mattermost_mail.smtp_username | default('') }}"
-    smtp_password: "{{ params.credentials.mattermost_mail.smtp_password | default('') }}"
+    address: "{{ credentials.mattermost_mail.address | default('') }}"
+    port: "{{ credentials.mattermost_mail.port | default('') }}"
+    connection_security: "{{ credentials.mattermost_mail.connection_security | default('') }}"
+    smtp_username: "{{ credentials.mattermost_mail.smtp_username | default('') }}"
+    smtp_password: "{{ credentials.mattermost_mail.smtp_password | default('') }}"
   pgadmin:
-    email: "{{ params.credentials.pgadmin.email | default('') }}"
-    password: "{{ params.credentials.pgadmin.password | default('') }}"
+    email: "{{ credentials.pgadmin.email | default('') }}"
+    password: "{{ credentials.pgadmin.password | default('') }}"
   postgres:
-    root_password: "{{ params.credentials.postgres.root_password | default('') }}"
-    viewer_password: "{{ params.credentials.postgres.viewer_password | default('') }}"
-    db_name: "{{ params.credentials.postgres.db_name | default('') }}"
-    db_user: "{{ params.credentials.postgres.db_user | default('') }}"
-    db_password: "{{ params.credentials.postgres.db_password | default('') }}"
+    root_password: "{{ credentials.postgres.root_password | default('') }}"
+    viewer_password: "{{ credentials.postgres.viewer_password | default('') }}"
+    db_name: "{{ credentials.postgres.db_name | default('') }}"
+    db_user: "{{ credentials.postgres.db_user | default('') }}"
+    db_password: "{{ credentials.postgres.db_password | default('') }}"
   elasticsearch:
-    fluentd_password: "{{ params.credentials.elasticsearch.fluentd_password | default('') }}"
-  dns: "{{ params.credentials[params.dns_provider | default('')] | default({}) }}"
+    fluentd_password: "{{ credentials.elasticsearch.fluentd_password | default('') }}"
+  dns: "{{ credentials[params.dns_provider | default('')] | default({}) }}"
   aws:
-    access_key: "{{ params.credentials.aws.access_key | default('') }}"
-    secret_key: "{{ params.credentials.aws.secret_key | default('') }}"
+    access_key: "{{ credentials.aws.access_key | default('') }}"
+    secret_key: "{{ credentials.aws.secret_key | default('') }}"
   aws_rds:
-    access_key: "{{ params.credentials.aws.access_key | default('') }}"
-    secret_key: "{{ params.credentials.aws.secret_key | default('') }}"
-    master_user_password: "{{ params.credentials.postgres.db_password | default('') }}"
+    access_key: "{{ credentials.aws.access_key | default('') }}"
+    secret_key: "{{ credentials.aws.secret_key | default('') }}"
+    master_user_password: "{{ credentials.postgres.db_password | default('') }}"
   s3:
     endpoint: "{{ params.s3_endpoint | default('') }}"
-    access_key: "{{ params.credentials.aws.access_key | default('') }}"
-    secret_key: "{{ params.credentials.aws.secret_key | default('') }}"
+    access_key: "{{ credentials.aws.access_key | default('') }}"
+    secret_key: "{{ credentials.aws.secret_key | default('') }}"
