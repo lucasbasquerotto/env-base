@@ -317,6 +317,7 @@ pods:
       mattermost_mail: "mattermost_mail"
       pgadmin: "pgadmin"
       backup_bucket: "s3"
+      uploads_bucket: "s3"
       elasticsearch: "{{ params.use_secure_elasticsearch | default(false) | bool | ternary('elasticsearch', '') }}"
     params:
       type: "web"
