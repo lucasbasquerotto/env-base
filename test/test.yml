@@ -27,6 +27,60 @@ main:
         can_destroy: true
       - name: "dynamic_data_consumer"
         can_destroy: true
+      - name: "dynamic_data_producer_02"
+        key: "dynamic_data_producer"
+        can_destroy: true
+        params:
+          test_param_01: "producer param value info overwritten 01"
+          producer_param_04: "producer param value info new 04"
+          producer_param_05: "producer param value info new 05"
+        contents:
+          test_content_01: "producer content value info overwritten 01"
+          producer_content_04: "producer content value info new 04"
+          producer_content_05: "producer content value info new 05"
+        credentials:
+          test_credential_01: "dynamic_data_producer_02_credential_info_01"
+          producer_credential_04: "dynamic_data_producer_02_credential_info_04"
+          producer_credential_05: "dynamic_data_producer_02_credential_info_05"
+      - name: "dynamic_data_consumer_02"
+        key: "dynamic_data_consumer"
+        can_destroy: true
+        params:
+          consumer_param_01: "consumer param value info overwritten 01"
+          consumer_param_04: "consumer param value info new 04"
+          consumer_param_05: "consumer param value info new 05"
+        dynamic_params:
+          test_param_01: "dynamic_data_producer_02"
+          dynamic_param_04:
+            name: "dynamic_data_producer_02"
+            param: "producer_param_04"
+          dynamic_param_05:
+            name: "dynamic_data_producer_02"
+            param: "producer_param_05"
+        contents:
+          consumer_content_01: "consumer content value info overwritten 01"
+          consumer_content_04: "consumer content value info new 04"
+          consumer_content_05: "consumer content value info new 05"
+        dynamic_contents:
+          test_content_01: "dynamic_data_producer_02"
+          dynamic_content_04:
+            name: "dynamic_data_producer_02"
+            content: "producer_content_04"
+          dynamic_content_05:
+            name: "dynamic_data_producer_02"
+            content: "producer_content_05"
+        credentials:
+          consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
+          consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
+          consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
+        dynamic_credentials:
+          test_credential_01: "dynamic_data_producer_02"
+          dynamic_credential_04:
+            name: "dynamic_data_producer_02"
+            credential: "producer_credential_04"
+          dynamic_credential_05:
+            name: "dynamic_data_producer_02"
+            credential: "producer_credential_05"
   local_cloud_hooks:
     repo: "cloud"
     ext_repos:
@@ -2202,6 +2256,12 @@ credentials:
   dynamic_data_consumer_credential_01: "dynamic data consumer credential value 01"
   dynamic_data_consumer_credential_02: "dynamic data consumer credential value 02"
   dynamic_data_consumer_credential_03: "dynamic data consumer credential value 03"
+  dynamic_data_producer_02_credential_info_01: "dynamic data producer 02 credential info overwitten 01"
+  dynamic_data_producer_02_credential_info_04: "dynamic data producer 02 credential info new 04"
+  dynamic_data_producer_02_credential_info_05: "dynamic data producer 02 credential info new 05"
+  dynamic_data_consumer_02_credential_info_01: "dynamic data consumer 02 credential info overwitten 01"
+  dynamic_data_consumer_02_credential_info_04: "dynamic data consumer 02 credential info new 04"
+  dynamic_data_consumer_02_credential_info_05: "dynamic data consumer 02 credential info new 05"
   node_cred_content_1:
     secret1: "1234556"
     secret2: 2
