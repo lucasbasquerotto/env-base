@@ -9,6 +9,24 @@ meta:
   template_no_empty_lines: true
   no_node_type_dependency: false
 main:
+  local_dynamic_data:
+    repo: "cloud"
+    ext_repos:
+      - repo: "ext_cloud"
+        dir: "ext-cloud"
+    collections:
+      - namespace: "lrd"
+        collection: "ext_cloud"
+        path: "ext-cloud/collection"
+    hosts: |
+      [main]
+      localhost ansible_connection=local
+      [host]
+    initial_services:
+      - name: "dynamic_data_producer"
+        can_destroy: true
+      - name: "dynamic_data_consumer"
+        can_destroy: true
   local_cloud_hooks:
     repo: "cloud"
     ext_repos:
@@ -1178,6 +1196,62 @@ services:
     namespace: "ext_test_after"
     params:
       param_unchanged: "after_value"
+  dynamic_data_producer:
+    base_dir: "ext-cloud"
+    task: "test/dynamic-data/dynamic-data-producer.yml"
+    namespace: "ext_test_dynamic_data"
+    params:
+      test_param_01: "producer param value 01"
+      producer_param_02: "producer param value 02"
+      producer_param_03: "producer param value 03"
+    contents:
+      test_content_01: "producer content value 01"
+      producer_content_02: "producer content value 02"
+      producer_content_03: "producer content value 03"
+    credentials:
+      test_credential_01: "dynamic_data_producer_credential_01"
+      producer_credential_02: "dynamic_data_producer_credential_02"
+      producer_credential_03: "dynamic_data_producer_credential_03"
+  dynamic_data_consumer:
+    base_dir: "ext-cloud"
+    task: "test/dynamic-data/dynamic-data-consumer.yml"
+    namespace: "ext_test_dynamic_data"
+    params:
+      consumer_param_01: "consumer param value 01"
+      consumer_param_02: "consumer param value 02"
+      consumer_param_03: "consumer param value 03"
+    dynamic_params:
+      test_param_01: "dynamic_data_producer"
+      dynamic_param_02:
+        name: "dynamic_data_producer"
+        param: "producer_param_02"
+      dynamic_param_03:
+        name: "dynamic_data_producer"
+        param: "producer_param_03"
+    contents:
+      consumer_content_01: "consumer content value 01"
+      consumer_content_02: "consumer content value 02"
+      consumer_content_03: "consumer content value 03"
+    dynamic_contents:
+      test_content_01: "dynamic_data_producer"
+      dynamic_content_02:
+        name: "dynamic_data_producer"
+        content: "producer_content_02"
+      dynamic_content_03:
+        name: "dynamic_data_producer"
+        content: "producer_content_03"
+    credentials:
+      consumer_credential_01: "dynamic_data_consumer_credential_01"
+      consumer_credential_02: "dynamic_data_consumer_credential_02"
+      consumer_credential_03: "dynamic_data_consumer_credential_03"
+    dynamic_credentials:
+      test_credential_01: "dynamic_data_producer"
+      dynamic_credential_02:
+        name: "dynamic_data_producer"
+        credential: "producer_credential_02"
+      dynamic_credential_03:
+        name: "dynamic_data_producer"
+        credential: "producer_credential_03"
 service_shared_group_params:
   value_g1:
     param1: "shared_1_1"
@@ -2122,6 +2196,12 @@ credentials:
   test_task_prop5: "value5_credential"
   test_task_overridden: "value_credential_overridden"
   test_task_run_stage: "value_credential_run_stage"
+  dynamic_data_producer_credential_01: "dynamic data producer credential value 01"
+  dynamic_data_producer_credential_02: "dynamic data producer credential value 02"
+  dynamic_data_producer_credential_03: "dynamic data producer credential value 03"
+  dynamic_data_consumer_credential_01: "dynamic data consumer credential value 01"
+  dynamic_data_consumer_credential_02: "dynamic data consumer credential value 02"
+  dynamic_data_consumer_credential_03: "dynamic data consumer credential value 03"
   node_cred_content_1:
     secret1: "1234556"
     secret2: 2

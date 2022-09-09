@@ -71,6 +71,9 @@ schemas:
       host_ssh_public_keys_content:
         schema: "content"
         non_empty: true
+      node_initial_services:
+        type: "list"
+        elem_type: "str"
   node:
     type: "simple_dict"
     alternative_type: "str"
@@ -165,6 +168,8 @@ schemas:
     props:
       host:
         schema: "credential_host"
+      root:
+        type: "dict"
       digital_ocean:
         schema: "credential_digital_ocean"
       s3:
