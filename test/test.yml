@@ -223,96 +223,96 @@ main:
         key: "dynamic_data_local"
         local: true
         local_node_setup: true
-        # transfer:
-        #   - dest: "env-transfer/content.node.print.yml"
-        #     src:
-        #       type: "template"
-        #       origin: "cloud"
-        #       file: "ext-cloud/test/files/transfer.tpl.yml"
-        #       schema: "ext-cloud/test/files/transfer.schema.yml"
-        #       validator: "ext-cloud/test/files/transfer.validator.yml"
-        #       params:
-        #         consumer_param_01: "consumer param value info overwritten 01"
-        #         consumer_param_04: "consumer param value info new 04"
-        #         consumer_param_05: "consumer param value info new 05"
-        #       dynamic_params:
-        #         test_param_01: "dynamic_data_producer_02"
-        #         dynamic_param_04:
-        #           name: "dynamic_data_producer_02"
-        #           param: "producer_param_04"
-        #         dynamic_param_05:
-        #           name: "dynamic_data_producer_02"
-        #           param: "producer_param_05"
-        #       contents:
-        #         consumer_content_01: "consumer content value info overwritten 01"
-        #         consumer_content_04: "consumer content value info new 04"
-        #         consumer_content_05: "consumer content value info new 05"
-        #       dynamic_contents:
-        #         test_content_01: "dynamic_data_producer_02"
-        #         dynamic_content_04:
-        #           name: "dynamic_data_producer_02"
-        #           content: "producer_content_04"
-        #         dynamic_content_05:
-        #           name: "dynamic_data_producer_02"
-        #           content: "producer_content_05"
-        #       credentials:
-        #         consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
-        #         consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
-        #         consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
-        #       dynamic_credentials:
-        #         test_credential_01: "dynamic_data_producer_02"
-        #         dynamic_credential_04:
-        #           name: "dynamic_data_producer_02"
-        #           credential: "producer_credential_04"
-        #         dynamic_credential_05:
-        #           name: "dynamic_data_producer_02"
-        #           credential: "producer_credential_05"
+        transfer:
+          - dest: "env-transfer/content.node.print.yml"
+            src:
+              type: "template"
+              origin: "cloud"
+              file: "ext-cloud/test/dynamic-data/files/transfer.tpl.yml"
+              schema: "ext-cloud/test/dynamic-data/files/transfer.schema.yml"
+              validator: "ext-cloud/test/dynamic-data/files/transfer.validator.yml"
+              params:
+                consumer_param_01: "consumer param value info overwritten 01"
+                consumer_param_04: "consumer param value info new 04"
+                consumer_param_05: "consumer param value info new 05"
+              dynamic_params:
+                test_param_01: "dynamic_data_producer_02"
+                dynamic_param_04:
+                  name: "dynamic_data_producer_02"
+                  param: "producer_param_04"
+                dynamic_param_05:
+                  name: "dynamic_data_producer_02"
+                  param: "producer_param_05"
+              contents:
+                consumer_content_01: "consumer content value info overwritten 01"
+                consumer_content_04: "consumer content value info new 04"
+                consumer_content_05: "consumer content value info new 05"
+              dynamic_contents:
+                test_content_01: "dynamic_data_producer_02"
+                dynamic_content_04:
+                  name: "dynamic_data_producer_02"
+                  content: "producer_content_04"
+                dynamic_content_05:
+                  name: "dynamic_data_producer_02"
+                  content: "producer_content_05"
+              credentials:
+                consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
+                consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
+                consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
+              dynamic_credentials:
+                test_credential_01: "dynamic_data_producer_02"
+                dynamic_credential_04:
+                  name: "dynamic_data_producer_02"
+                  credential: "producer_credential_04"
+                dynamic_credential_05:
+                  name: "dynamic_data_producer_02"
+                  credential: "producer_credential_05"
         pods:
           dynamic_data:
-            # transfer:
-            #   - dest: "env-transfer/content.pod.print.yml"
-            #     src:
-            #       type: "template"
-            #       origin: "cloud"
-            #       file: "ext-cloud/test/files/transfer.tpl.yml"
-            #       schema: "ext-cloud/test/files/transfer.schema.yml"
-            #       validator: "ext-cloud/test/files/transfer.validator.yml"
-            #       params:
-            #         consumer_param_01: "consumer param value info overwritten 01"
-            #         consumer_param_04: "consumer param value info new 04"
-            #         consumer_param_05: "consumer param value info new 05"
-            #       dynamic_params:
-            #         test_param_01: "dynamic_data_producer_02"
-            #         dynamic_param_04:
-            #           name: "dynamic_data_producer_02"
-            #           param: "producer_param_04"
-            #         dynamic_param_05:
-            #           name: "dynamic_data_producer_02"
-            #           param: "producer_param_05"
-            #       contents:
-            #         consumer_content_01: "consumer content value info overwritten 01"
-            #         consumer_content_04: "consumer content value info new 04"
-            #         consumer_content_05: "consumer content value info new 05"
-            #       dynamic_contents:
-            #         test_content_01: "dynamic_data_producer_02"
-            #         dynamic_content_04:
-            #           name: "dynamic_data_producer_02"
-            #           content: "producer_content_04"
-            #         dynamic_content_05:
-            #           name: "dynamic_data_producer_02"
-            #           content: "producer_content_05"
-            #       credentials:
-            #         consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
-            #         consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
-            #         consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
-            #       dynamic_credentials:
-            #         test_credential_01: "dynamic_data_producer_02"
-            #         dynamic_credential_04:
-            #           name: "dynamic_data_producer_02"
-            #           credential: "producer_credential_04"
-            #         dynamic_credential_05:
-            #           name: "dynamic_data_producer_02"
-            #           credential: "producer_credential_05"
+            transfer:
+              - dest: "env-transfer/content.pod.print.yml"
+                src:
+                  type: "template"
+                  origin: "cloud"
+                  file: "ext-cloud/test/dynamic-data/files/transfer.tpl.yml"
+                  schema: "ext-cloud/test/dynamic-data/files/transfer.schema.yml"
+                  validator: "ext-cloud/test/dynamic-data/files/transfer.validator.yml"
+                  params:
+                    consumer_param_01: "consumer param value info overwritten 01"
+                    consumer_param_04: "consumer param value info new 04"
+                    consumer_param_05: "consumer param value info new 05"
+                  dynamic_params:
+                    test_param_01: "dynamic_data_producer_02"
+                    dynamic_param_04:
+                      name: "dynamic_data_producer_02"
+                      param: "producer_param_04"
+                    dynamic_param_05:
+                      name: "dynamic_data_producer_02"
+                      param: "producer_param_05"
+                  contents:
+                    consumer_content_01: "consumer content value info overwritten 01"
+                    consumer_content_04: "consumer content value info new 04"
+                    consumer_content_05: "consumer content value info new 05"
+                  dynamic_contents:
+                    test_content_01: "dynamic_data_producer_02"
+                    dynamic_content_04:
+                      name: "dynamic_data_producer_02"
+                      content: "producer_content_04"
+                    dynamic_content_05:
+                      name: "dynamic_data_producer_02"
+                      content: "producer_content_05"
+                  credentials:
+                    consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
+                    consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
+                    consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
+                  dynamic_credentials:
+                    test_credential_01: "dynamic_data_producer_02"
+                    dynamic_credential_04:
+                      name: "dynamic_data_producer_02"
+                      credential: "producer_credential_04"
+                    dynamic_credential_05:
+                      name: "dynamic_data_producer_02"
+                      credential: "producer_credential_05"
             params:
               consumer_param_01: "consumer param value info overwritten 01"
               consumer_param_04: "consumer param value info new 04"
