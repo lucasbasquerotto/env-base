@@ -232,41 +232,41 @@ main:
               schema: "ext-cloud/test/dynamic-data/files/transfer.schema.yml"
               validator: "ext-cloud/test/dynamic-data/files/transfer.validator.yml"
               params:
-                consumer_param_01: "consumer param value info overwritten 01"
-                consumer_param_04: "consumer param value info new 04"
-                consumer_param_05: "consumer param value info new 05"
+                consumer_param_01: "consumer param value 01"
+                consumer_param_02: "consumer param value 02"
+                consumer_param_03: "consumer param value 03"
               dynamic_params:
-                test_param_01: "dynamic_data_producer_02"
-                dynamic_param_04:
-                  name: "dynamic_data_producer_02"
-                  param: "producer_param_04"
-                dynamic_param_05:
-                  name: "dynamic_data_producer_02"
-                  param: "producer_param_05"
+                test_param_01: "dynamic_data_producer"
+                dynamic_param_02:
+                  name: "dynamic_data_producer"
+                  param: "producer_param_02"
+                dynamic_param_03:
+                  name: "dynamic_data_producer"
+                  param: "producer_param_03"
               contents:
-                consumer_content_01: "consumer content value info overwritten 01"
-                consumer_content_04: "consumer content value info new 04"
-                consumer_content_05: "consumer content value info new 05"
+                consumer_content_01: "consumer content value 01"
+                consumer_content_02: "consumer content value 02"
+                consumer_content_03: "consumer content value 03"
               dynamic_contents:
-                test_content_01: "dynamic_data_producer_02"
-                dynamic_content_04:
-                  name: "dynamic_data_producer_02"
-                  content: "producer_content_04"
-                dynamic_content_05:
-                  name: "dynamic_data_producer_02"
-                  content: "producer_content_05"
+                test_content_01: "dynamic_data_producer"
+                dynamic_content_02:
+                  name: "dynamic_data_producer"
+                  content: "producer_content_02"
+                dynamic_content_03:
+                  name: "dynamic_data_producer"
+                  content: "producer_content_03"
               credentials:
-                consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
-                consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
-                consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
+                consumer_credential_01: "dynamic_data_consumer_credential_01"
+                consumer_credential_02: "dynamic_data_consumer_credential_02"
+                consumer_credential_03: "dynamic_data_consumer_credential_03"
               dynamic_credentials:
-                test_credential_01: "dynamic_data_producer_02"
-                dynamic_credential_04:
-                  name: "dynamic_data_producer_02"
-                  credential: "producer_credential_04"
-                dynamic_credential_05:
-                  name: "dynamic_data_producer_02"
-                  credential: "producer_credential_05"
+                test_credential_01: "dynamic_data_producer"
+                dynamic_credential_02:
+                  name: "dynamic_data_producer"
+                  credential: "producer_credential_02"
+                dynamic_credential_03:
+                  name: "dynamic_data_producer"
+                  credential: "producer_credential_03"
         pods:
           dynamic_data:
             transfer:
@@ -278,41 +278,41 @@ main:
                   schema: "ext-cloud/test/dynamic-data/files/transfer.schema.yml"
                   validator: "ext-cloud/test/dynamic-data/files/transfer.validator.yml"
                   params:
-                    consumer_param_01: "consumer param value info overwritten 01"
-                    consumer_param_04: "consumer param value info new 04"
-                    consumer_param_05: "consumer param value info new 05"
+                    consumer_param_01: "consumer param value 01"
+                    consumer_param_02: "consumer param value 02"
+                    consumer_param_03: "consumer param value 03"
                   dynamic_params:
-                    test_param_01: "dynamic_data_producer_02"
-                    dynamic_param_04:
-                      name: "dynamic_data_producer_02"
-                      param: "producer_param_04"
-                    dynamic_param_05:
-                      name: "dynamic_data_producer_02"
-                      param: "producer_param_05"
+                    test_param_01: "dynamic_data_producer"
+                    dynamic_param_02:
+                      name: "dynamic_data_producer"
+                      param: "producer_param_02"
+                    dynamic_param_03:
+                      name: "dynamic_data_producer"
+                      param: "producer_param_03"
                   contents:
-                    consumer_content_01: "consumer content value info overwritten 01"
-                    consumer_content_04: "consumer content value info new 04"
-                    consumer_content_05: "consumer content value info new 05"
+                    consumer_content_01: "consumer content value 01"
+                    consumer_content_02: "consumer content value 02"
+                    consumer_content_03: "consumer content value 03"
                   dynamic_contents:
-                    test_content_01: "dynamic_data_producer_02"
-                    dynamic_content_04:
-                      name: "dynamic_data_producer_02"
-                      content: "producer_content_04"
-                    dynamic_content_05:
-                      name: "dynamic_data_producer_02"
-                      content: "producer_content_05"
+                    test_content_01: "dynamic_data_producer"
+                    dynamic_content_02:
+                      name: "dynamic_data_producer"
+                      content: "producer_content_02"
+                    dynamic_content_03:
+                      name: "dynamic_data_producer"
+                      content: "producer_content_03"
                   credentials:
-                    consumer_credential_01: "dynamic_data_consumer_02_credential_info_01"
-                    consumer_credential_04: "dynamic_data_consumer_02_credential_info_04"
-                    consumer_credential_05: "dynamic_data_consumer_02_credential_info_05"
+                    consumer_credential_01: "dynamic_data_consumer_credential_01"
+                    consumer_credential_02: "dynamic_data_consumer_credential_02"
+                    consumer_credential_03: "dynamic_data_consumer_credential_03"
                   dynamic_credentials:
-                    test_credential_01: "dynamic_data_producer_02"
-                    dynamic_credential_04:
-                      name: "dynamic_data_producer_02"
-                      credential: "producer_credential_04"
-                    dynamic_credential_05:
-                      name: "dynamic_data_producer_02"
-                      credential: "producer_credential_05"
+                    test_credential_01: "dynamic_data_producer"
+                    dynamic_credential_02:
+                      name: "dynamic_data_producer"
+                      credential: "producer_credential_02"
+                    dynamic_credential_03:
+                      name: "dynamic_data_producer"
+                      credential: "producer_credential_03"
             params:
               consumer_param_01: "consumer param value info overwritten 01"
               consumer_param_04: "consumer param value info new 04"
@@ -431,6 +431,18 @@ main:
               dynamic_credential_05:
                 name: "dynamic_data_producer_02"
                 credential: "producer_credential_05"
+          - name: "task_dynamic_data_verifier_node"
+            key: "task_dynamic_data_verifier"
+            all_nodes: true
+            task_target: "node"
+            params:
+              file_relative_path: "env-transfer/content.node.print.yml"
+          - name: "task_dynamic_data_verifier_pod"
+            key: "task_dynamic_data_verifier"
+            all_nodes: true
+            task_target: "pod"
+            params:
+              file_relative_path: "env-transfer/content.pod.print.yml"
   local_cloud_hooks:
     repo: "cloud"
     ext_repos:
@@ -2367,7 +2379,7 @@ tasks:
   task_dynamic_data:
     type: "task"
     root: true
-    file: "ext-cloud/test/run-tasks/task.yml"
+    file: "ext-cloud/test/dynamic-data/dynamic-data-task.yml"
     params:
       consumer_param_01: "consumer param value 01"
       consumer_param_02: "consumer param value 02"
@@ -2404,6 +2416,50 @@ tasks:
       dynamic_credential_03:
         name: "dynamic_data_producer"
         credential: "producer_credential_03"
+  task_dynamic_data_verifier:
+    type: "task"
+    root: true
+    file: "ext-cloud/test/dynamic-data/dynamic-data-verifier-task.yml"
+    params:
+      params:
+        - name: "consumer_param_01"
+          value: "consumer param value 01"
+        - name: "consumer_param_02"
+          value: "consumer param value 02"
+        - name: "consumer_param_03"
+          value: "consumer param value 03"
+        - name: "test_param_01"
+          value: "producer param value 01"
+        - name: "dynamic_param_02"
+          value: "producer param value 02"
+        - name: "dynamic_param_03"
+          value: "producer param value 03"
+      credentials:
+        - name: "consumer_credential_01"
+          value: "dynamic data consumer credential value 01"
+        - name: "consumer_credential_02"
+          value: "dynamic data consumer credential value 02"
+        - name: "consumer_credential_03"
+          value: "dynamic data consumer credential value 03"
+        - name: "test_credential_01"
+          value: "dynamic data producer credential value 01"
+        - name: "dynamic_credential_02"
+          value: "dynamic data producer credential value 02"
+        - name: "dynamic_credential_03"
+          value: "dynamic data producer credential value 03"
+      contents:
+        - name: "consumer_content_01"
+          value: "consumer content value 01"
+        - name: "consumer_content_02"
+          value: "consumer content value 02"
+        - name: "consumer_content_03"
+          value: "consumer content value 03"
+        - name: "test_content_01"
+          value: "producer content value 01"
+        - name: "dynamic_content_02"
+          value: "producer content value 02"
+        - name: "dynamic_content_03"
+          value: "producer content value 03"
   test_task_env:
     type: "task"
     target_origin: "env"
