@@ -17,6 +17,11 @@ cloud:
     file: "files/hosts.tpl.ini"
     schema: "files/hosts.schema.yml"
 main:
+  nodes_tmp:
+    extend_cloud: true
+    initial_services:
+      - name: "elasticsearch_service"
+        can_destroy: true
   nodes:
     extend_cloud: true
     initial_services:
@@ -278,6 +283,30 @@ services:
       user_data:
         type: "env"
         name: "user_data_ubuntu"
+  elasticsearch_service:
+    base_dir: "ext-cloud"
+    namespace: "ext_elasticsearch"
+    task: "tasks/logging/elasticsearch/aws/aws.main.elasticsearch.yml"
+    schema: "tasks/logging/elasticsearch/aws/aws.schema.elasticsearch.yml"
+    validator: "tasks/logging/elasticsearch/aws/aws.validator.elasticsearch.yml"
+    credentials:
+      elasticsearch: "aws"
+    params:
+      name: "mattermost"
+      region: "us-east-1"
+      elasticsearch_version: "2.3"
+      instance_type: "m3.medium.elasticsearch"
+      instance_count: 2
+      dedicated_master: True
+      zone_awareness: True
+      dedicated_master_instance_type: "t2.micro.elasticsearch"
+      dedicated_master_instance_count: 2
+      ebs: True
+      volume_type: "standard"
+      volume_size: 10
+      vpc_subnets: "subnet-e537d64a"
+      vpc_security_groups: "sg-dd2f13cb"
+      snapshot_hour: 13
 nodes:
   mattermost:
     service: "node_service"
